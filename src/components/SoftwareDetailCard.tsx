@@ -70,7 +70,7 @@ export default function SoftwareDetailCard({
     navigate(`/software/${subCategory}/${slug}`);
   };
   return (
-    <div className="relative  w-full mx-auto">
+    <div className="relative w-full mx-auto h-full">
       {/* Floating Logo */}
       <div
         className="absolute -top-8  left-4 md:left-6 z-10 cursor-pointer"
@@ -86,7 +86,7 @@ export default function SoftwareDetailCard({
           />
         </div>
       </div>
-      <Card className="relative bg-white rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3  pt-2 sm:pt-10 ">
+      <Card className="relative bg-white rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
         {/* Logo space is handled above */}
         {/* Logo and Compare */}
         <div className="flex items-start gap-4 ">
@@ -106,8 +106,8 @@ export default function SoftwareDetailCard({
         {/* Name, Rating, Review, Write Review */}
         <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-4">
           <div>
-            <div onClick={viewProductPage} className="font-bold cursor-pointer text-base sm:text-xl text-gray-900 leading-tight capitalize">
-              {name}
+            <div onClick={viewProductPage} className="font-bold cursor-pointer text-base sm:text-xl text-gray-900 leading-tight capitalize line-clamp-2">
+              {name}   {name}   {name}               {name}   {name}   {name}
             </div>
             <div className=" flex items-center gap-2 mt-1">
                       <StarRating rating={rating} />
@@ -128,7 +128,7 @@ export default function SoftwareDetailCard({
           <div className="font-semibold text-gray-900 text-sm sm:text-base ">
             Product Description
           </div>
-          <div className="text-gray-700 text-xs sm:text-sm mt-1">
+          <div className="text-gray-700 text-xs sm:text-sm mt-1 line-clamp-4">
             {description}{" "}
             <a href="#" className="text-blue-600 font-medium hover:underline">
               See More
@@ -174,16 +174,16 @@ export default function SoftwareDetailCard({
         <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4 ">
           <button
             onClick={onSave}
-            className="flex items-center gap-1 text-gray-500 hover:text-red-500 !text-[11px] xl:!text-[12px]  font-medium px-2 py-1 rounded transition"
+            className="flex items-center gap-1 text-gray-500 hover:text-red-500 !text-[11px] xl:!text-[12px]  font-medium sm:px-2 py-1 rounded transition"
           >
             <Heart className="w-5 h-5" /> Save to My List
           </button>
           <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
-            <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 ml-2">
+            <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 sm:ml-2">
               Entry Level Price: {entryPrice}
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 ml-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 sm:ml-2"
               onClick={onTry}
             >
               Try For Free

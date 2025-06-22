@@ -118,7 +118,7 @@ const SubCategoryPage = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2  gap-6 space-y-6 mt-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 gap-y-12">
           {listings.map((item, idx) => (
             <SoftwareDetailCard
               key={item.name + idx}

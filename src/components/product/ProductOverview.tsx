@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Newspaper, Globe, Users, Building2, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ProductFeatures from "./ProductFeatures";
+import ProductIntegrations from "./ProductIntegrations";
 
 interface DetailItemProps {
   icon: React.ElementType;
@@ -28,7 +30,7 @@ const ProductOverview = () => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const fullText =
-    "Cloudflare is the cloud for the “everywhere world”. At Cloudflare, we have our eyes set on an ambitious goal -- to help build a better Internet. Today, everything needs to be connected to everything everywhere, all the time. This hyperconnectivity creates new challenges related to security, performance, resilience and privacy. As the world’s first connectivity cloud, Cloudflare helps connect and protect millions of customers globally. Everyone from individuals to the world’s largest enterprises use our unified platform of networking, security, and developer services to succeed in the ever-evolving digital landscape.";
+    `Cloudflare is the cloud for the "everywhere world". At Cloudflare, we have our eyes set on an ambitious goal -- to help build a better Internet. Today, everything needs to be connected to everything everywhere, all the time. This hyperconnectivity creates new challenges related to security, performance, resilience and privacy. As the world's first connectivity cloud, Cloudflare helps connect and protect millions of customers globally. Everyone from individuals to the world's largest enterprises use our unified platform of networking, security, and developer services to succeed in the ever-evolving digital landscape.`;
   const truncatedText = fullText.substring(0, 350) + "...";
 
   const productDetails = {
@@ -44,7 +46,7 @@ const ProductOverview = () => {
   };
 
   return (
-    <div className="py-4 md:py-8">
+    <div className="py-4 md:py-8 ">
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
         {productDetails.name} Overview
       </h2>
@@ -69,7 +71,7 @@ const ProductOverview = () => {
         <h3 className="text-xl font-bold text-gray-900">Other Details</h3>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-12">
           {/* Left Column */}
-          <div>
+          <div className="max-w-md">
             <DetailItem icon={Newspaper}>
               <p>
                 <span className="font-semibold">Product Website</span> (
@@ -112,6 +114,8 @@ const ProductOverview = () => {
           </div>
         </div>
       </div>
+      <ProductFeatures />
+      <ProductIntegrations />
     </div>
   );
 };

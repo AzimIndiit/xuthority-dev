@@ -2,6 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import StarRating from "../ui/StarRating";
+import useUserStore from "@/store/useUserStore";
+import useUIStore from "@/store/useUIStore";
+import { useReviewStore } from "@/store/useReviewStore";
 
 interface SoftwareCardProps {
   name: string;
@@ -12,6 +15,9 @@ interface SoftwareCardProps {
 }
 
 export default function SoftwareCard({ name, logo, rating, reviewCount, logoBackground = "bg-white" }: SoftwareCardProps) {
+  const { isLoggedIn } = useUserStore();
+  const openAuthModal = useUIStore((state) => state.openAuthModal);
+  const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const navigate = useNavigate();
   const viewProductPage = () => {
     const slug = name
@@ -42,6 +48,15 @@ export default function SoftwareCard({ name, logo, rating, reviewCount, logoBack
         </div>
         <div className="mt-auto ">
           <Button 
+            onClick={() => {
+              if(!isLoggedIn) {
+                openAuthModal();
+                return;
+              }
+              setSelectedSoftware(name);
+              setCurrentStep(2);
+              navigate("/write-review");
+            }}
             variant="default" 
             className="w-full max-w-[180px] sm:max-w-[200px] bg-red-600 hover:bg-red-700 text-white font-semibold rounded-none py-2 shadow-none"
           >

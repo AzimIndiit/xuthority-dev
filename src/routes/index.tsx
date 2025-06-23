@@ -3,6 +3,11 @@ import { Suspense, lazy } from "react";
 import { ProtectedRoute, RoleRoute } from "./ProtectedRoute";
 import useUserStore from "@/store/useUserStore";
 import LottieLoader from "@/components/LottieLoader";
+import SoftwareCategoryPage from "@/pages/software/SoftwareCategoryPage";
+import SubCategoryPage from "@/pages/software/SubCategoryPage";
+import CommunityPage from "@/pages/software/CommunityPage";
+import DisputesPage from '@/pages/software/DisputesPage';
+import WriteReviewPage from '@/pages/review/WriteReviewPage';
 
 const About = () => <div>About Page</div>;
 const AuthLayout = ({ children }: { children?: React.ReactNode }) => (
@@ -17,12 +22,6 @@ const RootLayout = lazy(() => import("@/components/layout/RootLayout"));
 const Home = lazy(() => import("@/pages/Home"));
 
 // Lazy load software category routes
-const SoftwareCategoryPage = lazy(
-  () => import("@/pages/software/SoftwareCategoryPage")
-);
-const SubCategoryPage = lazy(
-  () => import("@/pages/software/SubCategoryPage")
-);
 const ProductDetailPage = lazy(
   () => import("@/pages/software/ProductDetailPage")
 );
@@ -109,36 +108,43 @@ const router = createBrowserRouter([
                   </Suspense>
                 ),
               },
+             
               // ...other user routes
             ],
           },
        
         ],
       },
+      { 
+        element: <ProtectedRoute  />,
+        path: "/write-review",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <WriteReviewPage {...props} />
+          </Suspense>
+        ),
+      },
       {
         path: "/:category",
-        Component: (props: any) => (
-          <Suspense fallback={<Loader />}>
-            <SoftwareCategoryPage {...props} />
-          </Suspense>
-        ),
+        children: [
+          { index: true, Component: SoftwareCategoryPage },
+          {
+            path: ":subCategory",
+            children: [
+              { index: true, Component: SubCategoryPage },
+              {
+                path: ":productSlug",
+                children: [
+                  { index: true, Component: ProductDetailPage },
+                  { path: "community", Component: CommunityPage },
+                  { path: "disputes", Component: DisputesPage },
+                ],
+              },
+            ],
+          },
+        ],
       },
-      {
-        path: "/:category/:subCategory",
-        Component: (props: any) => (
-          <Suspense fallback={<Loader />}>
-            <SubCategoryPage {...props} />
-          </Suspense>
-        ),
-      },
-      {
-        path: "/:category/:subCategory/:productSlug",
-        Component: (props: any) => (
-          <Suspense fallback={<Loader />}>
-            <ProductDetailPage {...props} />
-          </Suspense>
-        ),
-      },
+     
     ],
   },
 ]);

@@ -1,6 +1,6 @@
 import SoftwareCard from "@/components/home/SoftwareCard";
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
   ChevronLeft,
@@ -12,6 +12,9 @@ import SoftwareDetailCard from "@/components/SoftwareDetailCard";
 import PillButton from "@/components/ui/PillButton";
 import SortByDropdown from "@/components/SortByDropdown";
 import FilterDropdown from "@/components/FilterDropdown";
+import useUserStore from "@/store/useUserStore";
+import useUIStore from "@/store/useUIStore";
+import { useReviewStore } from "@/store/useReviewStore";
 
 const DUMMY_SOFTWARES = [
   {
@@ -82,6 +85,10 @@ const exampleMarketSegment = "63% Small-Business, 29% Mid-Market";
 const exampleEntryPrice = "$ Free";
 
 const SubCategoryPage = () => {
+  const { isLoggedIn } = useUserStore();
+  const openAuthModal = useUIStore((state) => state.openAuthModal);
+  const navigate = useNavigate();
+  const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const { subCategory } = useParams<{ subCategory: string }>();
   const [page, setPage] = useState(1);
   const total = 230;
@@ -132,6 +139,15 @@ const SubCategoryPage = () => {
               industries={exampleIndustries}
               marketSegment={exampleMarketSegment}
               entryPrice={exampleEntryPrice}
+              onWriteReview={() => {
+                if(!isLoggedIn) {
+                  openAuthModal();
+                  return;
+                }
+                setSelectedSoftware(item.name);
+                setCurrentStep(2);
+                navigate("/write-review");
+              }}
             />
           ))}
         </div>

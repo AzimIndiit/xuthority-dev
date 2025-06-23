@@ -43,12 +43,16 @@ export function LoginForm() {
     login("123456",{
       id: "1",
       email: data.email,
-      name: "John Doe Smith John Doe Smith ",
-      role: "vendor",
+      displayName: "John Doe Smith John Doe Smith ",
+      firstName: "John",
+      lastName: "Doe Smith",
+      role: "user",
       avatar: "https://github.com/shadcn.png",
+      followers: 0,
+      following: 0,
     });
    
-   navigate("/");
+  //  navigate("/");
    closeAuthModal();
   };
 

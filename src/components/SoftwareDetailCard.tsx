@@ -106,15 +106,18 @@ export default function SoftwareDetailCard({
         {/* Name, Rating, Review, Write Review */}
         <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-4">
           <div>
-            <div onClick={viewProductPage} className="font-bold cursor-pointer text-base sm:text-xl text-gray-900 leading-tight capitalize line-clamp-2">
-              {name}   {name}   {name}               {name}   {name}   {name}
+            <div
+              onClick={viewProductPage}
+              className="font-bold cursor-pointer text-base sm:text-xl text-gray-900 leading-tight capitalize line-clamp-2"
+            >
+              {name}
             </div>
             <div className=" flex items-center gap-2 mt-1">
-                      <StarRating rating={rating} />
-                      <span className="text-gray-600 text-xs sm:text-sm">
-                        ({reviewCount}) {rating} out of 5
-                      </span>
-                    </div>
+              <StarRating rating={rating} />
+              <span className="text-gray-600 text-xs sm:text-sm">
+                ({reviewCount}) {rating} out of 5
+              </span>
+            </div>
           </div>
           <Button
             className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-none px-4 py-2 text-xs sm:text-sm shadow"

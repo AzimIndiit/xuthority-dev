@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronDown } from "lucide-react";
+import { useReviewStore } from "@/store/useReviewStore";
+import { formatNumber } from "@/utils/formatNumber";
 
 const navLinks = [
   { label: "Software", href: "/software" },
@@ -30,6 +32,9 @@ const navLinks = [
 
 export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const {  setSelectedSoftware } = useReviewStore();
+  const { resetReview } = useReviewStore();
+  const setCurrentStep = useReviewStore((state) => state.setCurrentStep);
   const { logout, user, isLoggedIn } = useUserStore();
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const navigate = useNavigate();
@@ -47,7 +52,9 @@ export default function Navbar() {
   }, []);
   const handleLogout = () => {
     logout();
-    window.location.replace("/");
+    resetReview();
+    
+    // window.location.replace("/");
   };
   return (
     <>
@@ -55,9 +62,16 @@ export default function Navbar() {
         {/* Responsive nav: px-4 on mobile/tablet, px-6 on desktop */}
         <nav className="lg:max-w-screen-xl mx-auto flex items-center justify-between h-20 px-4 lg:px-6">
           {/* Logo */}
-          <div className="flex items-center cursor-pointer" onClick={() => navigate("/")}>
+          <div
+            className="flex items-center cursor-pointer"
+            onClick={() => navigate("/")}
+          >
             {/* Replace with actual logo image if available */}
-            <img src="/xuthority_logo.svg" alt="Xuthority Logo" className="h-10" />
+            <img
+              src="/xuthority_logo.svg"
+              alt="Xuthority Logo"
+              className="h-10"
+            />
           </div>
           {/* Desktop Nav Links (only on lg+) */}
           <div className="flex items-center justify-between lg:space-x-3 xl:space-x-8">
@@ -76,9 +90,23 @@ export default function Navbar() {
             <div className="flex items-center justify-end ">
               {/* Actions: visible on md+ (tablet and up) and also on lg+ (desktop) */}
               <div className="hidden sm:flex  items-center space-x-4 w-full">
-                <Button className="bg-blue-600 text-white font-semibold rounded-full px-6 py-2 text-base shadow hover:bg-blue-700 transition-colors sm:max-w-40">
-                  Write A Review
-                </Button>
+               
+                {(!isLoggedIn || user.role === "user") && (
+                  <Button
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        openAuthModal();
+                        return;
+                      }
+                      setSelectedSoftware(null);
+                      setCurrentStep(1);
+                      navigate("/write-review");
+                    }}
+                    className="bg-blue-600 text-white font-semibold rounded-full px-6 py-2 text-base shadow hover:bg-blue-700 transition-colors sm:max-w-40"
+                  >
+                    Write A Review
+                  </Button>
+                )}
                 {isLoggedIn && user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -88,15 +116,15 @@ export default function Navbar() {
                       >
                         <Avatar className="h-8 w-8">
                           <AvatarImage
-                            src={user.avatar || "https://github.com/shadcn.png"}
-                            alt={user.name}
+                            src={user?.avatar || "https://github.com/shadcn.png"}
+                            alt={user?.displayName}
                           />
-                          <AvatarFallback>
-                            {user.name.charAt(0)}
-                          </AvatarFallback>
+                          <AvatarFallback>{user?.displayName}</AvatarFallback>
                         </Avatar>
                         <span className="font-semibold text-blue-600 truncate max-w-24">
-                          {user.name.length > 20 ? `${user.name.substring(0, 20)}...` : user.name}
+                          {user?.displayName?.length > 20
+                            ? `${user?.displayName?.substring(0, 20)}...`
+                            : user?.displayName}
                         </span>
                         <ChevronDown className="h-4 w-4 text-blue-600" />
                       </Button>
@@ -173,8 +201,15 @@ export default function Navbar() {
       >
         {/* Drawer Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-100">
-          <div className="flex items-center  cursor-pointer" onClick={() => navigate("/")}>
-            <img src="/xuthority_logo.svg" alt="Xuthority Logo" className="h-10" />
+          <div
+            className="flex items-center  cursor-pointer"
+            onClick={() => navigate("/")}
+          >
+            <img
+              src="/xuthority_logo.svg"
+              alt="Xuthority Logo"
+              className="h-10"
+            />
           </div>
           <Button
             className="p-2 rounded-full hover:bg-gray-100"
@@ -200,58 +235,63 @@ export default function Navbar() {
           </Button>
         </div>
         {/* Profile Section */}
-     {isLoggedIn && user &&   <div className="flex flex-col  px-4 py-6 border-b border-gray-100">
-          <div className="flex items-center gap-2 ju">
-            <img
-              src={user.avatar || "https://github.com/shadcn.png"}
-              alt="Profile"
-              className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-            />
-            <div className="flex space-x-6 mt-3 mb-1">
-              <div className="text-center">
-                <div className="font-bold text-gray-900 text-base leading-tight">
-                  18.3K
+        {isLoggedIn && user && (
+          <div className="flex flex-col  px-4 py-6 border-b border-gray-100">
+            <div className="flex items-center gap-2 ju">
+              <img
+                src={user?.avatar || "https://github.com/shadcn.png"}
+                alt="Profile"
+                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
+              />
+              <div className="flex space-x-6 mt-3 mb-1">
+                <div className="text-center">
+                  <div className="font-bold text-gray-900 text-base leading-tight">
+                    {formatNumber(user?.followers)}
+                  </div>
+                  <div className="text-xs text-gray-500">Followers</div>
                 </div>
-                <div className="text-xs text-gray-500">Followers</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-gray-900 text-base leading-tight">
-                  5.7K
+                <div className="text-center">
+                  <div className="font-bold text-gray-900 text-base leading-tight">
+                    {formatNumber(user?.following)}
+                  </div>
+                  <div className="text-xs text-gray-500">Following</div>
                 </div>
-                <div className="text-xs text-gray-500">Following</div>
               </div>
             </div>
-          </div>
-          <div className="flex justify-between items-center gap-2">
-            <div className="flex flex-col">
-              <div className="font-semibold text-gray-900 text-base mt-1 truncate">
-                {user.name.length > 15 ? `${user.name.substring(0, 15)}...` : user.name}
+            <div className="flex justify-between items-center gap-2">
+              <div className="flex flex-col">
+                <div className="font-semibold text-gray-900 text-base mt-1 truncate">
+                  {user?.displayName?.length > 15
+                    ? `${user?.displayName?.substring(0, 15)}...`
+                    : user?.displayName}
+                </div>
+                <div className="text-xs text-gray-500 mb-2">{user?.email}</div>
               </div>
-              <div className="text-xs text-gray-500 mb-2">
-                {user.email}
-              </div>
-            </div>
-            <Button
-              size="sm"
-              className="flex items-center bg-blue-600 text-white font-semibold rounded-full px-4 py-1.5 text-sm mt-1 hover:bg-blue-700 transition-colors"
-            >
-              View Profile
-              <svg
-                className="ml-2 w-4 h-4"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
+              <Button
+                size="sm"
+                onClick={() => {navigate("/profile")
+                  setDrawerOpen(false)
+                }}
+                className="flex items-center bg-blue-600 text-white font-semibold rounded-full px-4 py-1.5 text-sm mt-1 hover:bg-blue-700 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </Button>
+                View Profile
+                <svg
+                  className="ml-2 w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </Button>
+            </div>
           </div>
-        </div>}
+        )}
         {/* Nav Links */}
         <ul className="flex-1 overflow-y-auto divide-y divide-gray-100">
           {navLinks.map((link) => (
@@ -277,7 +317,8 @@ export default function Navbar() {
               </a>
             </li>
           ))}
-       {isLoggedIn && user &&     <li>
+          {isLoggedIn && user && (
+            <li>
               <a
                 onClick={handleLogout}
                 className="flex items-center justify-between px-6 py-3 text-base text-gray-900 hover:bg-gray-50 transition-colors"
@@ -297,23 +338,37 @@ export default function Navbar() {
                   />
                 </svg>
               </a>
-            </li>}
+            </li>
+          )}
         </ul>
         {/* Drawer Footer Actions (always visible in drawer) */}
         <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 border-t border-gray-100">
-          <Button className="bg-blue-600 text-white font-semibold rounded-full px-4 sm:px-6 py-2 text-sm sm:text-base shadow hover:bg-blue-700 transition-colors w-full sm:w-1/2">
-            Write A Review
-          </Button>
-       { !isLoggedIn &&   <Button
+       {(!isLoggedIn || user?.role === 'user') &&   <Button
             onClick={() => {
-              openAuthModal();
-              setDrawerOpen(false);
+              if (!isLoggedIn) {
+                openAuthModal();
+                return;
+              }
+              setSelectedSoftware(null);
+              setCurrentStep(1);
+              navigate("/write-review");
             }}
-            variant="outline"
-            className="border border-blue-600 text-blue-600 font-semibold rounded-full px-4 sm:px-6 py-2 text-sm sm:text-base bg-white hover:bg-blue-50 transition-colors w-full sm:w-1/2"
+            className="bg-blue-600 text-white font-semibold rounded-full px-4 sm:px-6 py-2 text-sm sm:text-base shadow hover:bg-blue-700 transition-colors w-full sm:w-1/2"
           >
-            Join or Log In
+            Write A Review
           </Button>}
+          {!isLoggedIn && (
+            <Button
+              onClick={() => {
+                openAuthModal();
+                setDrawerOpen(false);
+              }}
+              variant="outline"
+              className="border border-blue-600 text-blue-600 font-semibold rounded-full px-4 sm:px-6 py-2 text-sm sm:text-base bg-white hover:bg-blue-50 transition-colors w-full sm:w-1/2"
+            >
+              Join or Log In
+            </Button>
+          )}
         </div>
       </aside>
     </>

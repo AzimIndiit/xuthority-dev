@@ -2,12 +2,16 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import toast from "react-hot-toast";
 
-interface UserInfo {
+export interface UserInfo {
   id: string;
-  name: string;
+  displayName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   role: "user" | "vendor";
   avatar: string;
+  followers: number;
+  following: number;
   // Add more fields as needed
 }
 

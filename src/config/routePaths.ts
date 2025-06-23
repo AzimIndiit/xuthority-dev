@@ -1,0 +1,15 @@
+export const routePaths = {
+  HOME: "/",
+  LOGIN: "/login",
+  SIGNUP: "/signup",
+  FORGOT_PASSWORD: "/forgot-password",
+  PROFILE: "/profile",
+  CATEGORIES: "/categories",
+  SOFTWARE_CATEGORY: "/:category",
+  SUB_CATEGORY: "/:category/:subCategory",
+  PRODUCT_DETAIL: "/:category/:subCategory/:productSlug",
+  COMMUNITY: "/:category/:subCategory/:productSlug/community",
+  DISPUTES: "/disputes",
+  DISPUTE_DETAIL: "/disputes/:disputeId",
+  WRITE_REVIEW: "/write-review",
+};

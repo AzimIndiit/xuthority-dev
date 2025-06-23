@@ -5,16 +5,91 @@ import ProductDetailHeader from "@/components/ProductDetailHeader";
 import ProductPricing from "@/components/product/ProductPricing";
 import ProductMedia from "@/components/product/ProductMedia";
 import ProductCompanyInfo from "@/components/product/ProductCompanyInfo";
+import ProductReviews from "@/components/product/ProductReviews";
+import { Review } from '@/types/review';
 
 export default function ProductDetailPage() {
   // Dummy data
   const product = {
     name: "Cloudflare Application Security & Performance",
     rating: 4.7,
-    reviewCount: 1562,
+    reviewCount: 2306,
     logoUrl: "https://placehold.co/128x128/fce7f3/4a044e?text=Logo", // Placeholder
     bannerUrl: "https://placehold.co/1200x300/6d28d9/ffffff?text=Banner", // Placeholder
     entryPrice: "$ Free",
+  };
+
+  const reviewData = {
+    productName: "Cloudflare Application Security and Performance",
+    rating: 4.7,
+    reviewCount: 2306,
+    ratingDistribution: [
+      { stars: 5, count: 987, percentage: 50 },
+      { stars: 4, count: 786, percentage: 35 },
+      { stars: 3, count: 655, percentage: 10 },
+      { stars: 2, count: 235, percentage: 5 },
+      { stars: 1, count: 12, percentage: 2 },
+    ],
+    popularMentions: [
+      'All Reviews', 'Automations', 'Team', 'Team Members', 'Time Tracking',
+      'Communication', 'Difference', 'Features', 'Organization', 'Platform',
+      'Project Board', 'Projects', 'Task Lists', 'Task', 'Time Zones', 'Track',
+    ],
+  };
+
+  const reviews: Review[] = [
+    {
+      id: '1',
+      title: 'Reliable Security with Seamless Performance',
+      rating: 4,
+      date: 'Jan 18, 2025',
+      content: 'Cloudflare delivers a powerful combination of security and performance, ensuring that web applications remain protected from cyber threats without compromising speed. With an advanced firewall, real-time DDoS mitigation, and a global CDN, Cloudflare helps businesses safeguard sensitive data, prevent downtime, and enhance user experience.',
+      author: {
+        name: 'Calista Mayasari',
+        avatarUrl: 'https://i.pravatar.cc/48?u=1',
+        title: 'Senior Payroll Administrator, Enterprise(> 1000 emp.)',
+        verified: true,
+      },
+      tags: ['Validated Reviewer', 'Review source: Seller invite', 'Incentivized Review'],
+    },
+    {
+      id: '2',
+      title: 'Great for Speed, But Pricing Could Be Better',
+      rating: 3,
+      date: 'Jan 16, 2025',
+      content: 'Cloudflare excels in accelerating website performance and fortifying security with its intelligent caching, load balancing, and threat detection features. Websites experience reduced latency and improved uptime, making it a great tool for businesses looking to enhance their digital presence. However, some of the premium features, such as advanced bot management and enterprise-level security controls.',
+      author: {
+        name: 'Carolyn Wilson',
+        avatarUrl: 'https://i.pravatar.cc/48?u=2',
+        title: 'Facilities Manager, Mid-Market(51-1000 emp.)',
+        verified: true,
+      },
+      tags: ['Validated Reviewer', 'Review source: Seller invite', 'Incentivized Review'],
+    },
+    {
+        id: '3',
+        title: 'Comprehensive Protection, But Learning Curve Exists',
+        rating: 4,
+        date: 'Jan 15, 2025',
+        content: "Cloudflare provides an extensive suite of security and performance tools, from web application firewalls to advanced traffic management, ensuring that businesses can protect and optimize their online assets. While the platform offers powerful capabilities, configuring its advanced settings and custom rules may be challenging for users unfamiliar with web security.",
+        author: {
+          name: 'Diego Díaz',
+          avatarUrl: 'https://i.pravatar.cc/48?u=3',
+          title: 'Co-CEO, Small-Business(50 or fewer emp.)',
+          verified: true,
+        },
+        tags: ['Validated Reviewer', 'Review source: Seller invite', 'Incentivized Review'],
+      },
+  ];
+
+  const handleSearch = (query: string) => {
+    console.log("Search query:", query);
+    // Implement search logic here
+  };
+
+  const handleFilterChange = (stars: number) => {
+    console.log("Filter by stars:", stars);
+    // Implement filter logic here
   };
 
   return (
@@ -51,6 +126,14 @@ export default function ProductDetailPage() {
         </section>
         <section id="company-info">
             <ProductCompanyInfo />
+        </section>
+        <section id="reviews">
+            <ProductReviews
+              {...reviewData}
+              reviews={reviews}
+              onSearch={handleSearch}
+              onFilterChange={handleFilterChange}
+            />
         </section>
         {/* You can add more sections here for other tabs */}
       </main>

@@ -16,7 +16,7 @@ const breadcrumbNameMap: { [key: string]: string } = {
 
 const Breadcrumb = () => {
   const location = useLocation();
-  const pathnames = location.pathname.split("/").filter((x) => x);
+  const pathnames = location?.pathname?.split("/").filter((x) => x);
 
   // Don't render breadcrumbs on the homepage.
   if (pathnames.length === 0) {

@@ -7,6 +7,8 @@ interface StarRatingProps {
   totalStars?: number;
   className?: string;
   starClassName?: string;
+  onRatingChange?: (rating: number) => void;
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
 const StarRating = ({
@@ -14,13 +16,40 @@ const StarRating = ({
   totalStars = 5,
   className,
   starClassName,
+  onRatingChange,
+  size = "lg"
 }: StarRatingProps) => {
+  // Size variants for stars
+  const sizeClasses = {
+    sm: "w-3 h-3",
+    md: "w-4 h-4", 
+    lg: "w-5 h-5",
+    xl: "w-6 h-6"
+  };
+
+  const starSize = sizeClasses[size];
+  const isInteractive = !!onRatingChange;
+
+  const handleStarClick = (starIndex: number) => {
+    if (onRatingChange) {
+      onRatingChange(starIndex + 1);
+    }
+  };
+
   // Handle case for no rating: all stars are gray outlines
   if (!rating || rating === 0) {
     return (
       <div className={cn("flex items-center gap-0.5 text-gray-300", className)}>
         {[...Array(totalStars)].map((_, i) => (
-          <Star key={`empty-${i}`} className={cn("w-5 h-5", starClassName)} />
+          <Star 
+            key={`empty-${i}`} 
+            className={cn(
+              starSize, 
+              starClassName,
+              isInteractive && "cursor-pointer hover:text-gray-400 transition-colors"
+            )}
+            onClick={() => handleStarClick(i)}
+          />
         ))}
       </div>
     );
@@ -38,7 +67,13 @@ const StarRating = ({
       {[...Array(fullStars)].map((_, i) => (
         <Star
           key={`full-${i}`}
-          className={cn(`w-5 h-5 fill-current `, starClassName)}
+          className={cn(
+            starSize,
+            "fill-current",
+            starClassName,
+            isInteractive && "cursor-pointer hover:opacity-80 transition-opacity"
+          )}
+          onClick={() => handleStarClick(i)}
         />
       ))}
       {halfStar && (
@@ -46,13 +81,19 @@ const StarRating = ({
           {/* Background star (outline) - inherits colorClass */}
           <Star
             key="half-outline"
-            className={cn("w-5 h-5", starClassName)}
+            className={cn(
+              starSize, 
+              starClassName,
+              isInteractive && "cursor-pointer hover:opacity-80 transition-opacity"
+            )}
+            onClick={() => handleStarClick(fullStars)}
           />
           {/* Foreground star (filled and clipped) - inherits colorClass */}
           <Star
             key="half-filled"
             className={cn(
-              "w-5 h-5 fill-current absolute top-0 left-0",
+              starSize,
+              "fill-current absolute top-0 left-0",
               starClassName
             )}
             style={{ clipPath: "inset(0 50% 0 0)" }}
@@ -63,7 +104,13 @@ const StarRating = ({
         [...Array(emptyStars)].map((_, i) => (
           <Star
             key={`empty-${i}`}
-            className={cn(`w-5 h-5 ${colorClass}`, starClassName)}
+            className={cn(
+              starSize,
+              colorClass,
+              starClassName,
+              isInteractive && "cursor-pointer hover:opacity-80 transition-opacity"
+            )}
+            onClick={() => handleStarClick(fullStars + (halfStar ? 1 : 0) + i)}
           />
         ))}
     </div>

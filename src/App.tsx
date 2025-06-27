@@ -8,6 +8,8 @@ import { queryClient } from "@/lib/queryClient";
 
 function App() {
   const { initializeAuth } = useUserStore();
+  
+  // Test query to ensure React Query is working
 
   useEffect(() => {
     // Initialize authentication on app start

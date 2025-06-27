@@ -63,9 +63,18 @@ export const useLogin = () => {
     mutationFn: async (credentials: LoginRequest) => {
       const success = await loginWithAPI(credentials);
       if (success) {
-        // Invalidate and refetch user data
-        await queryClient.invalidateQueries({ queryKey: queryKeys.user });
-        await queryClient.invalidateQueries({ queryKey: queryKeys.profile });
+        // Clear cache first, then set fresh data
+        queryClient.removeQueries();
+        queryClient.clear();
+        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        
+        // Set fresh query data
+        const user = useUserStore.getState().user;
+        if (user) {
+          queryClient.setQueryData(queryKeys.user, user);
+          queryClient.setQueryData(queryKeys.profile, user);
+        }
+        
         // Navigate to dashboard or home
         navigate('/');
       }
@@ -87,9 +96,18 @@ export const useRegisterUser = () => {
     mutationFn: async (data: UserRegisterRequest) => {
       const success = await registerUserWithAPI(data);
       if (success) {
-        // Invalidate and refetch user data
-        await queryClient.invalidateQueries({ queryKey: queryKeys.user });
-        await queryClient.invalidateQueries({ queryKey: queryKeys.profile });
+        // Clear cache first, then set fresh data
+        queryClient.removeQueries();
+        queryClient.clear();
+        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        
+        // Set fresh query data
+        const user = useUserStore.getState().user;
+        if (user) {
+          queryClient.setQueryData(queryKeys.user, user);
+          queryClient.setQueryData(queryKeys.profile, user);
+        }
+        
         // Navigate to dashboard or home
         navigate('/');
       }
@@ -111,9 +129,18 @@ export const useRegisterVendor = () => {
     mutationFn: async (data: VendorRegisterRequest) => {
       const success = await registerVendorWithAPI(data);
       if (success) {
-        // Invalidate and refetch user data
-        await queryClient.invalidateQueries({ queryKey: queryKeys.user });
-        await queryClient.invalidateQueries({ queryKey: queryKeys.profile });
+        // Clear cache first, then set fresh data
+        queryClient.removeQueries();
+        queryClient.clear();
+        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        
+        // Set fresh query data
+        const user = useUserStore.getState().user;
+        if (user) {
+          queryClient.setQueryData(queryKeys.user, user);
+          queryClient.setQueryData(queryKeys.profile, user);
+        }
+        
         // Navigate to dashboard or home
         navigate('/');
       }

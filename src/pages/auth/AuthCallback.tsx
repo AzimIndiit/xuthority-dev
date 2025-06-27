@@ -38,6 +38,12 @@ const AuthCallback: React.FC = () => {
           return;
         }
 
+        // First, clear all existing data
+        localStorage.clear();
+        queryClient.removeQueries();
+        queryClient.clear();
+        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+
         // Store the token
         AuthService.tokenStorage.setToken(token);
 
@@ -52,8 +58,10 @@ const AuthCallback: React.FC = () => {
         const success = await loginWithToken(profileResponse.data.user, token);
         
         if (success) {
-          // Invalidate and refetch user data
-          await queryClient.invalidateQueries({ queryKey: ['user'] });
+          // Set fresh query data
+          queryClient.setQueryData(['user'], profileResponse.data.user);
+          queryClient.setQueryData(['profile'], profileResponse.data.user);
+          
           toast.dismiss();
           toast.success(`Login successful!`);
           
@@ -68,8 +76,11 @@ const AuthCallback: React.FC = () => {
         setError(err.message || 'Authentication failed');
         toast.error(err.message || 'Authentication failed');
         
-        // Clear any stored tokens
-        AuthService.tokenStorage.removeToken();
+        // Clear any stored tokens and cache
+        localStorage.clear();
+        queryClient.removeQueries();
+        queryClient.clear();
+        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
         
         setTimeout(() => {
           navigate('/');

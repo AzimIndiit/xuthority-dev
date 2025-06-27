@@ -10,16 +10,21 @@ import ProfileLayout from '@/components/layout/ProfileLayout';
 import ProfileDetailsForm, {
   ProfileFormData,
 } from '@/components/user/ProfileDetailsForm';
-import useUserStore from '@/store/useUserStore';
+import { useProfile } from '@/hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile-details');
-  const { user } = useUserStore();
+  
+  // Use the useProfile hook to trigger React Query
+  const { data: user, isLoading, error } = useProfile();
 
-  if (!user) {
-    // Render a loading state or redirect if the user is not available
+  if (isLoading) {
     return <div>Loading...</div>;
+  }
+
+  if (error || !user) {
+    return <div>Error loading profile or user not authenticated</div>;
   }
 
   const userForProfile = {

@@ -40,7 +40,7 @@ export default function Navbar() {
   const setCurrentStep = useReviewStore((state) => state.setCurrentStep);
   
   // Use the new authentication hooks
-  const { user, isAuthenticated } = useAuth();
+  const { user, isLoggedIn } = useAuth();
   const logoutMutation = useLogout();
   
   const openAuthModal = useUIStore((state) => state.openAuthModal);
@@ -106,10 +106,10 @@ export default function Navbar() {
               {/* Actions: visible on md+ (tablet and up) and also on lg+ (desktop) */}
               <div className="hidden sm:flex  items-center space-x-4 w-full">
                
-                {(!isAuthenticated || user?.role === "user") && (
+                {(!isLoggedIn || user?.role === "user") && (
                   <Button
                     onClick={() => {
-                      if (!isAuthenticated) {
+                      if (!isLoggedIn) {
                         openAuthModal();
                         return;
                       }
@@ -123,7 +123,7 @@ export default function Navbar() {
                     Write A Review
                   </Button>
                 )}
-                {isAuthenticated && user ? (
+                {isLoggedIn && user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
@@ -250,7 +250,7 @@ export default function Navbar() {
           </Button>
         </div>
         {/* Profile Section */}
-        {isAuthenticated && user && (
+        {isLoggedIn && user && (
           <div className="flex flex-col  px-4 py-6 border-b border-gray-100">
             <div className="flex items-center gap-2 ju">
              
@@ -333,7 +333,7 @@ export default function Navbar() {
                 </a>
               </li>
             ))}
-          {isAuthenticated && user && (
+          {isLoggedIn && user && (
             <li>
               <a
                 onClick={handleLogout}
@@ -359,9 +359,9 @@ export default function Navbar() {
         </ul>
         {/* Drawer Footer Actions (always visible in drawer) */}
         <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 border-t border-gray-100">
-       {(!isAuthenticated || user?.role === 'user') &&   <Button
+       {(!isLoggedIn || user?.role === 'user') &&   <Button
             onClick={() => {
-              if (!isAuthenticated) {
+              if (!isLoggedIn) {
                 openAuthModal();
                 return;
               }
@@ -373,7 +373,7 @@ export default function Navbar() {
           >
             Write A Review
           </Button>}
-          {!isAuthenticated && (
+            {!isLoggedIn && (
             <Button
               onClick={() => {
                 openAuthModal();

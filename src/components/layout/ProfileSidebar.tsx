@@ -1,8 +1,9 @@
 import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ChevronRightIcon } from 'lucide-react';
-import { UserInfo } from '@/store/useUserStore';
 import { formatNumber } from '@/utils/formatNumber';
+import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
+import { User } from '@/services/auth';
 
 interface SidebarItem {
   id: string;
@@ -11,7 +12,7 @@ interface SidebarItem {
 }
 
 interface ProfileSidebarProps {
-  user: UserInfo;
+    user: User;
   sidebarItems: SidebarItem[];
   activeTab: string;
   onTabChange: (tabId: string) => void;
@@ -28,8 +29,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
       {/* Profile Header */}
       <div className="flex items-center space-x-4 mb-4">
         <Avatar className="w-16 h-16">
-          <AvatarImage src={user?.avatar || '/api/placeholder/64/64'} alt="Profile" />
-          <AvatarFallback className="text-lg">{user?.displayName}</AvatarFallback>
+          <AvatarImage src={user?.avatar || ''} alt="Profile" />
+          <AvatarFallback className="text-lg">{getUserInitials(user)}</AvatarFallback>
         </Avatar>
         <div className="flex items-center space-x-6">
           <div className="text-center">
@@ -48,7 +49,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
       </div>
 
       <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900">{user?.displayName}</h3>
+        <h3 className="text-xl font-bold text-gray-900">{getUserDisplayName(user)}</h3>
         <p className="text-sm text-gray-500">{user?.email}</p>
       </div>
 

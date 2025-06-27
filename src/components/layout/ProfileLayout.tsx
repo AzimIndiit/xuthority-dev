@@ -1,6 +1,6 @@
 import React from 'react';
 import ProfileSidebar from './ProfileSidebar';
-import { UserInfo } from '@/store/useUserStore';
+import { User } from '@/services/auth';
 
 interface SidebarItem {
   id: string;
@@ -9,7 +9,7 @@ interface SidebarItem {
 }
 
 interface ProfileLayoutProps {
-  user: UserInfo;
+  user: User;
   sidebarItems: SidebarItem[];
   activeTab: string;
   onTabChange: (tabId: string) => void;

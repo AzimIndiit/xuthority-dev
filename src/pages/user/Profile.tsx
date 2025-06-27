@@ -11,6 +11,7 @@ import ProfileDetailsForm, {
   ProfileFormData,
 } from '@/components/user/ProfileDetailsForm';
 import useUserStore from '@/store/useUserStore';
+import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile-details');
@@ -21,32 +22,25 @@ const ProfilePage: React.FC = () => {
     return <div>Loading...</div>;
   }
 
-  const getInitials = (name: string) => {
-    const names = name?.split(' ');
-    const initials = names?.map(n => n[0])?.join('');
-    return initials?.toUpperCase();
-  };
-
   const userForProfile = {
     ...user,
-    initials: getInitials(user?.displayName),
+    initials: getUserInitials(user),
   };
 
   const initialProfileData: ProfileFormData = {
     avatar: user?.avatar || '',
-    displayName: user?.displayName || '',
+    displayName: getUserDisplayName(user) || '',
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
     email: user?.email || '',
-    region: 'USA',
-    description:
-      'As a Reviewer provides insightful and balanced evaluations of tools and services, focusing on usability, functionality, and real-world impact. Their feedback reflects hands-on experience, offering valuable guidance to others seeking the best solutions for their business needs.',
-    industry: 'IT and Services',
-    title: 'Product Manager',
-    companyName: 'infotech Pvt. Ltd',
-    companySize: '100-200 Employees',
-    linkedinUrl: 'https://www.linkedin.com/in/nikol-hansen',
-    twitterUrl: 'https://twitter.com/nikol_hansen',
+    region: user?.region || '',
+    description: user?.description || '',
+    industry: user?.industry || '',
+    title: user?.title || '',
+    companyName: user?.companyName || '',
+    companySize: user?.companySize || '',
+    linkedinUrl: user?.socialLinks?.linkedin || '',
+    twitterUrl: user?.socialLinks?.twitter || '',
   };
 
   const sidebarItems = [
@@ -82,11 +76,6 @@ const ProfilePage: React.FC = () => {
     current: 'My Profile',
   };
 
-  const onSubmit = (data: ProfileFormData) => {
-    console.log('Profile data submitted:', data);
-    // Here you would typically dispatch an action or call an API
-  };
-
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
   };
@@ -94,7 +83,7 @@ const ProfilePage: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'profile-details':
-        return <ProfileDetailsForm initialData={initialProfileData} onSubmit={onSubmit} />;
+        return <ProfileDetailsForm initialData={initialProfileData} />;
       // Placeholder for other tabs
       default:
         return (

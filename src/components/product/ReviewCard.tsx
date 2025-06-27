@@ -3,7 +3,7 @@ import { ThumbsUp, MessageSquare } from 'lucide-react';
 import StarRating from '@/components/ui/StarRating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Review } from '@/types/review';
-import VerifiedBadge from '../icons/VerifiedBadge';
+import { VerifiedBadge } from '../icons/VerifiedBadge';
 
 interface ReviewCardProps {
   review: Review;

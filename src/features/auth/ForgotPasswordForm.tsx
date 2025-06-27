@@ -4,6 +4,8 @@ import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import useUIStore from "@/store/useUIStore";
+import { useForgotPassword } from "@/hooks/useAuth";
 
 const forgotPasswordSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -12,6 +14,11 @@ const forgotPasswordSchema = z.object({
 type ForgotPasswordFormInputs = z.infer<typeof forgotPasswordSchema>;
 
 export function ForgotPasswordForm() {
+  const { setAuthModalView, closeAuthModal } = useUIStore();
+  
+  // Use the new authentication hooks
+  const forgotPasswordMutation = useForgotPassword();
+  
   const {
     register,
     handleSubmit,
@@ -20,9 +27,15 @@ export function ForgotPasswordForm() {
     resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = (data: ForgotPasswordFormInputs) => {
-    console.log("Forgot password for:", data.email);
-    // Handle forgot password logic
+  const onSubmit = async (data: ForgotPasswordFormInputs) => {
+    try {
+      await forgotPasswordMutation.mutateAsync({ email: data.email });
+      // Show success message and close modal
+      closeAuthModal();
+    } catch (error) {
+      // Error is handled by the mutation hook
+      console.error('Forgot password error:', error);
+    }
   };
 
   return (
@@ -35,6 +48,7 @@ export function ForgotPasswordForm() {
             placeholder="Enter Email Address"
             {...register("email")}
             className="rounded-full h-14 flex-1 px-5 py-3"
+            disabled={forgotPasswordMutation.isPending}
           />
           {errors.email && (
             <p className="text-red-500 text-xs mt-1">
@@ -47,10 +61,22 @@ export function ForgotPasswordForm() {
         <Button
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 h-14 rounded-full"
+          disabled={forgotPasswordMutation.isPending}
         >
-          Continue
+          {forgotPasswordMutation.isPending ? "Sending..." : "Send Reset Link"}
         </Button>
+        
+
       </div>
+      <div  className={`mt-6 text-center text-sm`}>
+              <button
+              disabled={forgotPasswordMutation.isPending}
+                onClick={() => setAuthModalView("login")}
+                className="text-gray-900 hover:underline cursor-pointer"
+              >
+                Back To <span className="font-semibold text-red-500">Login</span>
+              </button>
+            </div>
     </form>
   );
 }

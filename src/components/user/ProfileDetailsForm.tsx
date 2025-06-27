@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -15,6 +15,9 @@ import {
 } from '@/config/constants';
 import { ArrowLeftIcon, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useUpdateProfileWithImage } from '@/hooks/useAuth';
+import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
+import useUserStore from '@/store/useUserStore';
 
 // Zod schema for profile validation, exported for reuse
 export const profileSchema = z.object({
@@ -45,7 +48,7 @@ export type ProfileFormData = z.infer<typeof profileSchema>;
 
 interface ProfileDetailsFormProps {
   initialData: ProfileFormData;
-  onSubmit: (data: ProfileFormData) => void;
+  onSubmit?: (data: ProfileFormData) => void;
 }
 
 const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
@@ -53,11 +56,92 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   onSubmit,
 }) => {
   const navigate = useNavigate();
+  const { user } = useUserStore();
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const updateProfileMutation = useUpdateProfileWithImage();
+
+
+
   const formMethods = useForm<ProfileFormData>({
     mode: 'onChange',
     resolver: zodResolver(profileSchema),
     defaultValues: initialData,
   });
+    //set default values
+    useEffect(() => {
+      formMethods.reset(initialData);
+    }, [initialData]);
+    console.log("initialData",user, initialData);
+
+  const handleImageSelect = (file: File) => {
+    // Validate file
+    if (!file.type.startsWith('image/')) {
+      alert('Please select an image file');
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) { // 5MB
+      alert('File size must be less than 5MB');
+      return;
+    }
+
+    setSelectedImageFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleSubmit = async (data: ProfileFormData) => {
+    try {
+      await updateProfileMutation.mutateAsync({
+        profileData: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          region: data.region,
+          description: data.description,
+          industry: data.industry,
+          title: data.title,
+          companyName: data.companyName,
+          companySize: data.companySize,
+          socialLinks: {
+            linkedin: data.linkedinUrl,
+            twitter: data.twitterUrl,
+          },
+          avatar: data.avatar,
+        },
+        imageFile: selectedImageFile || undefined,
+      });
+
+      // Clear selected image after successful upload
+      setSelectedImageFile(null);
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+
+      // Call custom onSubmit if provided
+      if (onSubmit) {
+        onSubmit(data);
+      }
+    } catch (error) {
+      console.error('Profile update failed:', error);
+    }
+  };
+
+  const handleImageClick = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        handleImageSelect(file);
+      }
+    };
+    input.click();
+  };
+
+  const currentAvatar = previewUrl || formMethods.watch('avatar') || user?.avatar;
+  const displayName = getUserDisplayName(user);
 
   return (
     <FormProvider {...formMethods}>
@@ -66,7 +150,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
           <span className='block lg:hidden' onClick={() => navigate(-1)}> <ArrowLeftIcon className='w-6 h-6' /></span>
           Profile Details</h2>
 
-        <form onSubmit={formMethods.handleSubmit(onSubmit)} className="space-y-6 sm:space-y-8">
+        <form onSubmit={formMethods.handleSubmit(handleSubmit)} className="space-y-6 sm:space-y-8">
           {/* Personal Details */}
           <div>
             <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
@@ -76,28 +160,17 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
             <div className="flex items-center mb-4 sm:mb-6">
               <div className="relative">
                 <Avatar className="w-16 h-16 sm:w-20 sm:h-20">
-                  <AvatarImage className="object-cover" src={formMethods.watch('avatar') || initialData.avatar} alt="Profile" />
-                  <AvatarFallback className="text-sm sm:text-base">{formMethods.watch('displayName')}</AvatarFallback>
+                  <AvatarImage className="object-cover" src={currentAvatar} alt="Profile" />
+                  <AvatarFallback className="text-sm sm:text-base">
+                    {getUserInitials(user)}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-1 -right-1">
                   <button
                     type="button"
-                    onClick={() => {
-                      const input = document.createElement('input');
-                      input.type = 'file';
-                      input.accept = 'image/*';
-                      input.onchange = (e) => {
-                        const file = (e.target as HTMLInputElement).files?.[0];
-                        if (file) {
-                          // Handle file upload here
-                          console.log('File selected:', file);
-                          formMethods.setValue('avatar', URL.createObjectURL(file));
-                          // You can add your upload logic here
-                        }
-                      };
-                      input.click();
-                    }}
-                    className="bg-blue-500 rounded-full p-1 shadow-md hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={handleImageClick}
+                    disabled={updateProfileMutation.isPending}
+                    className="bg-blue-500 rounded-full p-1 shadow-md hover:shadow-lg transition-shadow cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Edit className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                   </button>
@@ -159,11 +232,13 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
               <FormInput
+                type="url"
                 name="linkedinUrl"
                 label="LinkedIn Profile URL"
                 placeholder="https://www.linkedin.com/in/your-profile"
               />
               <FormInput
+                type="url"
                 name="twitterUrl"
                 label="Twitter Profile URL"
                 placeholder="https://twitter.com/your-handle"
@@ -182,9 +257,10 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
 
             <Button 
               type="submit" 
-              className="w-full sm:w-auto px-6 sm:px-8 rounded-full bg-blue-500 text-white hover:bg-blue-600 order-1 sm:order-2"
+              disabled={updateProfileMutation.isPending}
+              className="w-full sm:w-auto px-6 sm:px-8 rounded-full bg-blue-500 text-white hover:bg-blue-600 order-1 sm:order-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Save
+              {updateProfileMutation.isPending ? 'Saving...' : 'Save'}
             </Button>
           </div>
         </form>

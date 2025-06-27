@@ -3,6 +3,8 @@ import { Button } from "../ui/button";
 import useUserStore from "@/store/useUserStore";
 import { useNavigate } from "react-router-dom";
 import useUIStore from "@/store/useUIStore";
+import { useAuth, useLogout } from "@/hooks/useAuth";
+import { getUserDisplayName, getUserInitials, getTruncatedDisplayName } from "@/utils/userHelpers";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,12 +34,17 @@ const navLinks = [
 
 export default function Navbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const {  setSelectedSoftware } = useReviewStore();
+  const { setSelectedSoftware } = useReviewStore();
   const { resetReview } = useReviewStore();
   const setCurrentStep = useReviewStore((state) => state.setCurrentStep);
-  const { logout, user, isLoggedIn } = useUserStore();
+  
+  // Use the new authentication hooks
+  const { user, isAuthenticated } = useAuth();
+  const logoutMutation = useLogout();
+  
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const navigate = useNavigate();
+  
   // Auto-close drawer on desktop (lg and up)
   useEffect(() => {
     const handleResize = () => {
@@ -50,12 +57,16 @@ export default function Navbar() {
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-  const handleLogout = () => {
-    logout();
-    resetReview();
-    
-    // window.location.replace("/");
+  
+  const handleLogout = async () => {
+    try {
+      await logoutMutation.mutateAsync();
+      resetReview();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
+
   return (
     <>
       <header className="w-full bg-white border-b border-gray-100 ">
@@ -91,10 +102,10 @@ export default function Navbar() {
               {/* Actions: visible on md+ (tablet and up) and also on lg+ (desktop) */}
               <div className="hidden sm:flex  items-center space-x-4 w-full">
                
-                {(!isLoggedIn || user.role === "user") && (
+                {(!isAuthenticated || user?.role === "user") && (
                   <Button
                     onClick={() => {
-                      if (!isLoggedIn) {
+                      if (!isAuthenticated) {
                         openAuthModal();
                         return;
                       }
@@ -103,44 +114,42 @@ export default function Navbar() {
                       navigate("/write-review");
                     }}
                     className="bg-blue-600 text-white font-semibold rounded-full px-6 py-2 text-base shadow hover:bg-blue-700 transition-colors sm:max-w-40"
+                    disabled={logoutMutation.isPending}
                   >
                     Write A Review
                   </Button>
                 )}
-                {isLoggedIn && user ? (
+                {isAuthenticated && user ? (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="outline"
                         className="flex items-center space-x-2 border-blue-600 rounded-full pl-2 pr-3 py-1.5 h-auto max-w-40"
+                        disabled={logoutMutation.isPending}
                       >
                         <Avatar className="h-8 w-8">
                           <AvatarImage
-                            src={user?.avatar || "https://github.com/shadcn.png"}
-                            alt={user?.displayName}
+                            src={user?.avatar || ""}
+                            alt={getUserDisplayName(user)}
                           />
-                          <AvatarFallback>{user?.displayName}</AvatarFallback>
+                          <AvatarFallback className="text-xs">{getUserInitials(user)}</AvatarFallback>
                         </Avatar>
                         <span className="font-semibold text-blue-600 truncate max-w-24">
-                          {user?.displayName?.length > 20
-                            ? `${user?.displayName?.substring(0, 20)}...`
-                            : user?.displayName}
+                          {getTruncatedDisplayName(user, 20)}
                         </span>
                         <ChevronDown className="h-4 w-4 text-blue-600" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-56" align="end">
-                      {/* <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator /> */}
                       <DropdownMenuItem onClick={() => navigate("/profile")}>
                         Profile
                       </DropdownMenuItem>
-                      {/* <DropdownMenuItem>Billing</DropdownMenuItem>
-                      <DropdownMenuItem>Team</DropdownMenuItem>
-                      <DropdownMenuItem>Subscription</DropdownMenuItem> */}
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={handleLogout}>
-                        Log out
+                      <DropdownMenuItem 
+                        onClick={handleLogout}
+                        disabled={logoutMutation.isPending}
+                      >
+                        {logoutMutation.isPending ? "Logging out..." : "Log out"}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -149,6 +158,7 @@ export default function Navbar() {
                     variant="outline"
                     className="border border-blue-600 text-blue-600 font-semibold rounded-full px-6 py-2 text-base bg-white hover:bg-blue-50 transition-colors sm:max-w-40"
                     onClick={() => openAuthModal()}
+                    disabled={logoutMutation.isPending}
                   >
                     Join or Log In
                   </Button>
@@ -160,6 +170,7 @@ export default function Navbar() {
                 onClick={() => setDrawerOpen(true)}
                 aria-label="Open menu"
                 variant="ghost"
+                disabled={logoutMutation.isPending}
               >
                 <svg
                   width="28"
@@ -205,11 +216,11 @@ export default function Navbar() {
             className="flex items-center  cursor-pointer"
             onClick={() => navigate("/")}
           >
-            <img
-              src="/xuthority_logo.svg"
-              alt="Xuthority Logo"
+          <img
+            src="/xuthority_logo.svg"
+            alt="Xuthority Logo"
               className="h-10"
-            />
+          />
           </div>
           <Button
             className="p-2 rounded-full hover:bg-gray-100"
@@ -235,7 +246,7 @@ export default function Navbar() {
           </Button>
         </div>
         {/* Profile Section */}
-        {isLoggedIn && user && (
+        {isAuthenticated && user && (
           <div className="flex flex-col  px-4 py-6 border-b border-gray-100">
             <div className="flex items-center gap-2 ju">
               <img
@@ -261,9 +272,7 @@ export default function Navbar() {
             <div className="flex justify-between items-center gap-2">
               <div className="flex flex-col">
                 <div className="font-semibold text-gray-900 text-base mt-1 truncate">
-                  {user?.displayName?.length > 15
-                    ? `${user?.displayName?.substring(0, 15)}...`
-                    : user?.displayName}
+                  {getTruncatedDisplayName(user, 15)}
                 </div>
                 <div className="text-xs text-gray-500 mb-2">{user?.email}</div>
               </div>
@@ -294,13 +303,13 @@ export default function Navbar() {
         )}
         {/* Nav Links */}
         <ul className="flex-1 overflow-y-auto divide-y divide-gray-100">
-          {navLinks.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
+            {navLinks.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href}
                 className="flex items-center justify-between px-6 py-3 text-base text-gray-900 hover:bg-gray-50 transition-colors"
-              >
-                {link.label}
+                >
+                  {link.label}
                 <svg
                   className="w-5 h-5 text-gray-400"
                   fill="none"
@@ -314,10 +323,10 @@ export default function Navbar() {
                     d="M9 5l7 7-7 7"
                   />
                 </svg>
-              </a>
-            </li>
-          ))}
-          {isLoggedIn && user && (
+                </a>
+              </li>
+            ))}
+          {isAuthenticated && user && (
             <li>
               <a
                 onClick={handleLogout}
@@ -343,9 +352,9 @@ export default function Navbar() {
         </ul>
         {/* Drawer Footer Actions (always visible in drawer) */}
         <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 border-t border-gray-100">
-       {(!isLoggedIn || user?.role === 'user') &&   <Button
+       {(!isAuthenticated || user?.role === 'user') &&   <Button
             onClick={() => {
-              if (!isLoggedIn) {
+              if (!isAuthenticated) {
                 openAuthModal();
                 return;
               }
@@ -357,7 +366,7 @@ export default function Navbar() {
           >
             Write A Review
           </Button>}
-          {!isLoggedIn && (
+          {!isAuthenticated && (
             <Button
               onClick={() => {
                 openAuthModal();

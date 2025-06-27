@@ -8,6 +8,7 @@ import SubCategoryPage from "@/pages/software/SubCategoryPage";
 import CommunityPage from "@/pages/software/CommunityPage";
 import DisputesPage from '@/pages/software/DisputesPage';
 import WriteReviewPage from '@/pages/review/WriteReviewPage';
+import AuthCallback from '@/pages/auth/AuthCallback';
 
 const About = () => <div>About Page</div>;
 const AuthLayout = ({ children }: { children?: React.ReactNode }) => (
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
                 <Register {...props} />
               </AuthGuard>
             ),
+          },
+          {
+            path: "callback",
+            Component: AuthCallback,
           },
         ],
       },

@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronDown } from "lucide-react";
 import { useReviewStore } from "@/store/useReviewStore";
 import { formatNumber } from "@/utils/formatNumber";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 
 const navLinks = [
   { label: "Software", href: "/software" },
@@ -34,7 +34,6 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-  const queryClient = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { setSelectedSoftware } = useReviewStore();
   const { resetReview } = useReviewStore();

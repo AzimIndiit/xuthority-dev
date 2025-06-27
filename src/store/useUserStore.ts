@@ -2,9 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import toast from "react-hot-toast";
 import { AuthService, LoginRequest, User, UserRegisterRequest, VendorRegisterRequest } from "../services/auth";
-
-// Import query client to clear cache on logout
-import { queryClient } from "../App";
+import { queryClient } from "@/lib/queryClient";
 
 interface UserState {
   token: string | null;
@@ -45,14 +43,13 @@ const useUserStore = create<UserState>()(
         // toast.success("Successfully logged in!");
       },
       logout: () => {
-        // Clear token from storage
         AuthService.tokenStorage.removeToken();
-        
-        // Clear all TanStack Query cache
+        // Aggressively clear all TanStack Query cache
+        queryClient.removeQueries();
         queryClient.clear();
-        
+        // If using persistence, clear localStorage
+        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
         set({ token: null, user: null, isLoggedIn: false });
-        // toast.success("Successfully logged out!");
       },
       updateUser: (userUpdate) => set((state) => ({
         user: state.user ? { ...state.user, ...userUpdate } : null,
@@ -232,13 +229,10 @@ const useUserStore = create<UserState>()(
       logoutWithAPI: async () => {
         set({ isLoading: true });
         try {
-          // Clear token from storage
           AuthService.tokenStorage.removeToken();
-          
-          // Clear all TanStack Query cache
+          queryClient.removeQueries();
           queryClient.clear();
-          
-          // Clear local state
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
           set({
             user: null,
             token: null,
@@ -246,12 +240,12 @@ const useUserStore = create<UserState>()(
             isLoading: false,
             error: null,
           });
-          
           toast.success('Successfully logged out!');
         } catch (error) {
-          // Even if logout fails, clear local state and cache
           AuthService.tokenStorage.removeToken();
+          queryClient.removeQueries();
           queryClient.clear();
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
           set({
             user: null,
             token: null,

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useQueryClient } from '@tanstack/react-query';
+import { queryClient } from '@/lib/queryClient';
 import useUserStore from '@/store/useUserStore';
 import { AuthService } from '@/services/auth';
 import LottieLoader from '@/components/LottieLoader';
@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const queryClient = useQueryClient();
   const { loginWithToken } = useUserStore();
   const [error, setError] = useState<string | null>(null);
 

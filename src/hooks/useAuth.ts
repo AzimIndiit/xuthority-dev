@@ -4,49 +4,43 @@ import useUserStore from '@/store/useUserStore';
 import { AuthService, LoginRequest, UserRegisterRequest, VendorRegisterRequest, UpdateProfileRequest, ChangePasswordRequest } from '../services/auth';
 import { FileUploadService } from '../services/fileUpload';
 import toast from 'react-hot-toast';
+import { queryClient } from '@/lib/queryClient';
 
 // Query keys
-export const authKeys = {
-  all: ['auth'] as const,
-  profile: () => [...authKeys.all, 'profile'] as const,
-  publicProfile: (userId: string) => [...authKeys.all, 'public-profile', userId] as const,
+export const queryKeys = {
+  user: ['user'] as const,
+  profile: ['profile'] as const,
+  publicProfile: (userId: string) => ['publicProfile', userId] as const,
 };
 
-// Custom hook for authentication state
+// Hook for authentication state
 export const useAuth = () => {
-  const { user, isLoggedIn, isLoading, error, clearError } = useUserStore();
-
-  return {
-    user,
-    isAuthenticated: isLoggedIn,
-    isLoading,
-    error,
-    clearError,
-  };
+  const { user, isLoggedIn, isLoading, error } = useUserStore();
+  return { user, isLoggedIn, isLoading, error };
 };
 
 // Hook for user profile query
 export const useProfile = () => {
-  const { user, isLoggedIn, getProfileWithAPI } = useUserStore();
+  const { getProfileWithAPI, user } = useUserStore();
 
   return useQuery({
-    queryKey: ['user', 'profile'],
+    queryKey: queryKeys.profile,
     queryFn: async () => {
-      if (isLoggedIn) {
-        await getProfileWithAPI();
+      if (!user) {
+        throw new Error('User not authenticated');
       }
+      await getProfileWithAPI();
       return user;
     },
-    enabled: isLoggedIn,
+    enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 
-// Hook for public profile query
+// Hook for public user profile query
 export const usePublicProfile = (userId: string) => {
   return useQuery({
-    queryKey: authKeys.publicProfile(userId),
+    queryKey: queryKeys.publicProfile(userId),
     queryFn: async () => {
       const response = await AuthService.getPublicProfile(userId);
       if (!response.success) {
@@ -56,7 +50,6 @@ export const usePublicProfile = (userId: string) => {
     },
     enabled: !!userId,
     staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 30 * 60 * 1000, // 30 minutes
   });
 };
 
@@ -71,7 +64,8 @@ export const useLogin = () => {
       const success = await loginWithAPI(credentials);
       if (success) {
         // Invalidate and refetch user data
-        await queryClient.invalidateQueries({ queryKey: ['user'] });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.user });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.profile });
         // Navigate to dashboard or home
         navigate('/');
       }
@@ -94,7 +88,8 @@ export const useRegisterUser = () => {
       const success = await registerUserWithAPI(data);
       if (success) {
         // Invalidate and refetch user data
-        await queryClient.invalidateQueries({ queryKey: ['user'] });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.user });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.profile });
         // Navigate to dashboard or home
         navigate('/');
       }
@@ -117,7 +112,8 @@ export const useRegisterVendor = () => {
       const success = await registerVendorWithAPI(data);
       if (success) {
         // Invalidate and refetch user data
-        await queryClient.invalidateQueries({ queryKey: ['user'] });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.user });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.profile });
         // Navigate to dashboard or home
         navigate('/');
       }
@@ -163,7 +159,8 @@ export const useUpdateProfile = () => {
       // Update local state
       updateUser(data.user);
       // Invalidate and refetch user data
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile });
       toast.success('Profile updated successfully');
     },
     onError: (error: any) => {
@@ -214,7 +211,8 @@ export const useUpdateProfileWithImage = () => {
       // Update local state
       updateUser(data.user);
       // Invalidate and refetch user data
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: queryKeys.user });
+      queryClient.invalidateQueries({ queryKey: queryKeys.profile });
       toast.success('Profile updated successfully');
     },
     onError: (error: any) => {
@@ -278,7 +276,7 @@ export const useResetPassword = () => {
     },
     onSuccess: () => {
       toast.success('Password reset successfully');
-      navigate('/login');
+      navigate('/');
     },
     onError: (error: any) => {
       console.error('Reset password error:', error);

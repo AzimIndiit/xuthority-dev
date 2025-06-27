@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronDown } from "lucide-react";
 import { useReviewStore } from "@/store/useReviewStore";
 import { formatNumber } from "@/utils/formatNumber";
+import { useQueryClient } from "@tanstack/react-query";
 
 const navLinks = [
   { label: "Software", href: "/software" },
@@ -33,6 +34,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
+  const queryClient = useQueryClient();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const { setSelectedSoftware } = useReviewStore();
   const { resetReview } = useReviewStore();
@@ -61,7 +63,10 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
+      localStorage.clear();
+      queryClient.clear();
       resetReview();
+      setDrawerOpen(false)
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -249,11 +254,14 @@ export default function Navbar() {
         {isAuthenticated && user && (
           <div className="flex flex-col  px-4 py-6 border-b border-gray-100">
             <div className="flex items-center gap-2 ju">
-              <img
-                src={user?.avatar || "https://github.com/shadcn.png"}
-                alt="Profile"
-                className="w-16 h-16 rounded-full object-cover border-2 border-gray-200"
-              />
+             
+                <Avatar className="h-16 w-16">
+                          <AvatarImage
+                            src={user?.avatar || ""}
+                            alt={getUserDisplayName(user)}
+                          />
+                          <AvatarFallback className="">{getUserInitials(user)}</AvatarFallback>
+                        </Avatar>
               <div className="flex space-x-6 mt-3 mb-1">
                 <div className="text-center">
                   <div className="font-bold text-gray-900 text-base leading-tight">

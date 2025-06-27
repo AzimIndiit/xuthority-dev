@@ -6,7 +6,7 @@ import useUserStore from "@/store/useUserStore";
 import AppRoutes from "@/routes";
 
 // Create a client
-const queryClient = new QueryClient({
+export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes

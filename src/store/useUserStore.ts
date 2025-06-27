@@ -3,7 +3,8 @@ import { persist } from "zustand/middleware";
 import toast from "react-hot-toast";
 import { AuthService, LoginRequest, User, UserRegisterRequest, VendorRegisterRequest } from "../services/auth";
 
-
+// Import query client to clear cache on logout
+import { queryClient } from "../App";
 
 interface UserState {
   token: string | null;
@@ -44,6 +45,12 @@ const useUserStore = create<UserState>()(
         // toast.success("Successfully logged in!");
       },
       logout: () => {
+        // Clear token from storage
+        AuthService.tokenStorage.removeToken();
+        
+        // Clear all TanStack Query cache
+        queryClient.clear();
+        
         set({ token: null, user: null, isLoggedIn: false });
         // toast.success("Successfully logged out!");
       },
@@ -225,7 +232,13 @@ const useUserStore = create<UserState>()(
       logoutWithAPI: async () => {
         set({ isLoading: true });
         try {
-          // await AuthService.logout();
+          // Clear token from storage
+          AuthService.tokenStorage.removeToken();
+          
+          // Clear all TanStack Query cache
+          queryClient.clear();
+          
+          // Clear local state
           set({
             user: null,
             token: null,
@@ -233,8 +246,12 @@ const useUserStore = create<UserState>()(
             isLoading: false,
             error: null,
           });
+          
+          toast.success('Successfully logged out!');
         } catch (error) {
-          // Even if logout fails, clear local state
+          // Even if logout fails, clear local state and cache
+          AuthService.tokenStorage.removeToken();
+          queryClient.clear();
           set({
             user: null,
             token: null,
@@ -242,6 +259,7 @@ const useUserStore = create<UserState>()(
             isLoading: false,
             error: null,
           });
+          toast.success('Successfully logged out!');
         }
       },
       

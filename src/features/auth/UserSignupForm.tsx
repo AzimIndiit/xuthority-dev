@@ -247,6 +247,7 @@ export function UserSignupForm() {
         >
               <span className="text-gray-500">Already have an account? </span>
               <button
+                type="button"
                 disabled={registerMutation.isPending}
                 onClick={() => setAuthModalView("login")}
                 className="font-semibold text-red-500 hover:underline cursor-pointer"

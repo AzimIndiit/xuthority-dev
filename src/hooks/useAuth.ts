@@ -131,16 +131,14 @@ export const useRegisterVendor = () => {
 
 // Hook for logout mutation
 export const useLogout = () => {
-  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const { logoutWithAPI } = useUserStore();
 
   return useMutation({
     mutationFn: async () => {
       await logoutWithAPI();
-      // Clear all queries
-      await queryClient.clear();
-      // Navigate to home
-      
+      // Navigate to home after logout
+      navigate('/');
     },
     onError: (error: any) => {
       console.error('Logout error:', error);

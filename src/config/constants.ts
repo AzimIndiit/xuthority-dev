@@ -21,5 +21,6 @@ export const companySizeOptions = [
   { value: '11-50 Employees', label: '11-50 Employees' },
   { value: '51-100 Employees', label: '51-100 Employees' },
   { value: '100-200 Employees', label: '100-200 Employees' },
-  { value: '200+ Employees', label: '200+ Employees' },
+  { value: '201-500 Employees', label: '201-500 Employees' },
+  { value: '500+ Employees', label: '500+ Employees' },
 ];

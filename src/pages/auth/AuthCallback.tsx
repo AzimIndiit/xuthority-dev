@@ -25,7 +25,7 @@ const AuthCallback: React.FC = () => {
           setError(`Authentication failed: ${error}`);
           toast.error(`Authentication failed: ${error}`);
           setTimeout(() => {
-            navigate('/login');
+            navigate('/');
           }, 3000);
           return;
         }
@@ -34,7 +34,7 @@ const AuthCallback: React.FC = () => {
           setError('No authentication token received');
           toast.error('No authentication token received');
           setTimeout(() => {
-            navigate('/login');
+            navigate('/');
           }, 3000);
           return;
         }
@@ -55,8 +55,8 @@ const AuthCallback: React.FC = () => {
         if (success) {
           // Invalidate and refetch user data
           await queryClient.invalidateQueries({ queryKey: ['user'] });
-          
-          toast.success(`${provider || 'Social'} login successful!`);
+          toast.dismiss();
+          toast.success(`Login successful!`);
           
           // Redirect to dashboard or home
           navigate('/');
@@ -73,7 +73,7 @@ const AuthCallback: React.FC = () => {
         AuthService.tokenStorage.removeToken();
         
         setTimeout(() => {
-          navigate('/login');
+          navigate('/');
         }, 3000);
       }
     };

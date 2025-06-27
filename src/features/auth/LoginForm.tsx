@@ -140,6 +140,7 @@ export function LoginForm() {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <Button
+            type="button"
             onClick={handleGoogleLogin}
             disabled={loginMutation.isPending}
             variant="outline"
@@ -149,6 +150,7 @@ export function LoginForm() {
             Google
           </Button>
           <Button
+            type="button"
             onClick={handleLinkedInLogin}
             disabled={loginMutation.isPending}
             variant="outline"

@@ -20,10 +20,10 @@ import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
 import toast from "react-hot-toast";
 
 const vendorSignupSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required" }),
-  lastName: z.string().min(1, { message: "Last name is required" }),
+  firstName: z.string().min(1, { message: "First name is required" }).max(50, { message: "First name must be less than 50 characters" }),
+  lastName: z.string().min(1, { message: "Last name is required" }).max(50, { message: "Last name must be less than 50 characters" }),
   email: z.string().email({ message: "Invalid email address" }),
-  companyName: z.string().min(1, { message: "Company name is required" }),
+  companyName: z.string().min(1, { message: "Company name is required" }).max(100, { message: "Company name must be less than 100 characters" }),
   companyEmail: z.string().email({ message: "Invalid company email address" }),
   industry: z.string().min(1, { message: "Please select an industry" }),
   companySize: z.string().min(1, { message: "Please select a company size" }),
@@ -161,6 +161,7 @@ export function VendorSignupForm() {
             {...register("firstName")}
             className="rounded-full h-14 px-4"
             disabled={registerMutation.isPending}
+            maxLength={50}
           />
           {errors.firstName && (
             <p className="text-red-500 text-xs mt-1">
@@ -176,6 +177,7 @@ export function VendorSignupForm() {
             {...register("lastName")}
             className="rounded-full h-14 px-4"
             disabled={registerMutation.isPending}
+            maxLength={50}
           />
           {errors.lastName && (
             <p className="text-red-500 text-xs mt-1">
@@ -191,12 +193,12 @@ export function VendorSignupForm() {
       </div>
       <div className="grid gap-2">
         <Label htmlFor="companyName">Company Name</Label>
-        <Input id="companyName" placeholder="Enter Company Name" {...register("companyName")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} />
+        <Input id="companyName" placeholder="Enter Company Name" {...register("companyName")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} maxLength={100} />
         {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
       </div>
        <div className="grid gap-2">
         <Label htmlFor="companyEmail">Company Email</Label>
-        <Input id="companyEmail" placeholder="Enter Company Email" {...register("companyEmail")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} />
+        <Input id="companyEmail" placeholder="Enter Company Email" {...register("companyEmail")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} maxLength={254} />
         {errors.companyEmail && <p className="text-red-500 text-xs mt-1">{errors.companyEmail.message}</p>}
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

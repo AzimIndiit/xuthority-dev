@@ -143,12 +143,16 @@ api.interceptors.response.use(
     
     // Show error toast for non-401 errors
     if (error.response?.status !== 401) {
+      toast.dismiss()
       toast.error(errorMessage);
     }
     
     return Promise.reject(error);
   }
 );
+
+// Export the axios instance for direct use
+export { api };
 
 // API service class with typed methods
 export class ApiService {

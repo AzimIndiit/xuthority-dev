@@ -25,12 +25,12 @@ export interface MultipleFileUploadRequest {
 
 // File upload service class
 export class FileUploadService {
-  // Upload single file
-  static async uploadFile(file: File): Promise<ApiResponse<FileUploadResponse>> {
+  // Upload single file (backend returns array of files)
+  static async uploadFile(file: File): Promise<ApiResponse<FileUploadResponse[]>> {
     const formData = new FormData();
     formData.append('file', file);
     
-    return await ApiService.post<FileUploadResponse>('/files/upload', formData, {
+    return await ApiService.post<FileUploadResponse[]>('/files/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -52,7 +52,7 @@ export class FileUploadService {
   }
 
   // Upload profile image
-  static async uploadProfileImage(file: File): Promise<ApiResponse<FileUploadResponse>> {
+  static async uploadProfileImage(file: File): Promise<ApiResponse<FileUploadResponse[]>> {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       throw new Error('File must be an image');
@@ -64,7 +64,39 @@ export class FileUploadService {
       throw new Error('File size must be less than 5MB');
     }
 
-    return await this.uploadFile(file);
+    // Backend already returns array, no need to wrap again
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return await ApiService.post<FileUploadResponse[]>('/files/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
+
+  // Upload company avatar image
+  static async uploadCompanyImage(file: File): Promise<ApiResponse<FileUploadResponse[]>> {
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      throw new Error('File must be an image');
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      throw new Error('File size must be less than 5MB');
+    }
+
+    // Backend already returns array, no need to wrap again
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return await ApiService.post<FileUploadResponse[]>('/files/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
   }
 
   // Get file URL from response

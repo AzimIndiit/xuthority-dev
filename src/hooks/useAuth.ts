@@ -6,6 +6,7 @@ import { FileUploadService } from '../services/fileUpload';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
 
+
 // Query keys
 export const queryKeys = {
   user: ['user'] as const,
@@ -57,7 +58,7 @@ export const usePublicProfile = (userId: string) => {
 export const useLogin = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { loginWithAPI, isLoading, error, clearError } = useUserStore();
+  const { loginWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
     mutationFn: async (credentials: LoginRequest) => {
@@ -68,15 +69,16 @@ export const useLogin = () => {
         queryClient.clear();
         localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
         
-        // Set fresh query data
+        // Fetch fresh profile data after successful login
+        await getProfileWithAPI();
+        
+        // Set fresh query data with updated profile
         const user = useUserStore.getState().user;
         if (user) {
           queryClient.setQueryData(queryKeys.user, user);
           queryClient.setQueryData(queryKeys.profile, user);
         }
-        
-        // Navigate to dashboard or home
-        navigate('/');
+         
         return success;
       } else {
         // Throw error if login failed so React Query treats it as failure
@@ -93,7 +95,7 @@ export const useLogin = () => {
 export const useRegisterUser = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { registerUserWithAPI } = useUserStore();
+  const { registerUserWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
     mutationFn: async (data: UserRegisterRequest) => {
@@ -104,7 +106,10 @@ export const useRegisterUser = () => {
         queryClient.clear();
         localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
         
-        // Set fresh query data
+        // Fetch fresh profile data after successful registration
+        await getProfileWithAPI();
+        
+        // Set fresh query data with updated profile
         const user = useUserStore.getState().user;
         if (user) {
           queryClient.setQueryData(queryKeys.user, user);
@@ -129,7 +134,7 @@ export const useRegisterUser = () => {
 export const useRegisterVendor = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { registerVendorWithAPI } = useUserStore();
+  const { registerVendorWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
     mutationFn: async (data: VendorRegisterRequest) => {
@@ -140,7 +145,10 @@ export const useRegisterVendor = () => {
         queryClient.clear();
         localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
         
-        // Set fresh query data
+        // Fetch fresh profile data after successful registration
+        await getProfileWithAPI();
+        
+        // Set fresh query data with updated profile
         const user = useUserStore.getState().user;
         if (user) {
           queryClient.setQueryData(queryKeys.user, user);
@@ -212,10 +220,19 @@ export const useUpdateProfileWithImage = () => {
   const { updateUser } = useUserStore();
 
   return useMutation({
-    mutationFn: async ({ profileData, imageFile }: { profileData: UpdateProfileRequest; imageFile?: File }) => {
+    mutationFn: async ({ 
+      profileData, 
+      imageFile, 
+      companyImageFile 
+    }: { 
+      profileData: UpdateProfileRequest; 
+      imageFile?: File;
+      companyImageFile?: File;
+    }) => {
       let avatarUrl = profileData.avatar;
+      let companyAvatarUrl = (profileData as any).companyAvatar;
 
-      // Upload image if provided
+      // Upload profile image if provided
       if (imageFile) {
         const validation = FileUploadService.validateImageFile(imageFile);
         if (!validation.isValid) {
@@ -224,16 +241,32 @@ export const useUpdateProfileWithImage = () => {
 
         const uploadResponse = await FileUploadService.uploadProfileImage(imageFile);
         if (!uploadResponse.success) {
-          throw new Error(uploadResponse.error?.message || 'Failed to upload image');
+          throw new Error(uploadResponse.error?.message || 'Failed to upload profile image');
         }
         console.log('uploadResponse', uploadResponse)
         avatarUrl = uploadResponse.data[0].url;
       }
 
-      // Update profile with new avatar URL
+      // Upload company image if provided
+      if (companyImageFile) {
+        const validation = FileUploadService.validateImageFile(companyImageFile);
+        if (!validation.isValid) {
+          throw new Error(validation.error);
+        }
+
+        const uploadResponse = await FileUploadService.uploadCompanyImage(companyImageFile);
+        if (!uploadResponse.success) {
+          throw new Error(uploadResponse.error?.message || 'Failed to upload company image');
+        }
+        console.log('company uploadResponse', uploadResponse)
+        companyAvatarUrl = uploadResponse.data[0].url;
+      }
+
+      // Update profile with new avatar URLs
       const updateData = {
         ...profileData,
         avatar: avatarUrl,
+        ...(companyAvatarUrl && { companyAvatar: companyAvatarUrl }),
       };
       console.log("updateData", updateData);
 

@@ -131,8 +131,9 @@ export default function Navbar() {
                         className="flex items-center space-x-2 border-blue-600 rounded-full pl-2 pr-3 py-1.5 h-auto max-w-40"
                         disabled={logoutMutation.isPending}
                       >
-                        <Avatar className="h-8 w-8">
+                        <Avatar className="h-8 w-8 ">
                           <AvatarImage
+                          className="object-cover"
                             src={user?.avatar || ""}
                             alt={getUserDisplayName(user)}
                           />
@@ -254,8 +255,9 @@ export default function Navbar() {
           <div className="flex flex-col  px-4 py-6 border-b border-gray-100">
             <div className="flex items-center gap-2 ju">
              
-                <Avatar className="h-16 w-16">
+                        <Avatar className="h-16 w-16">
                           <AvatarImage
+                          className="object-cover"
                             src={user?.avatar || ""}
                             alt={getUserDisplayName(user)}
                           />

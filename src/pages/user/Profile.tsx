@@ -12,6 +12,7 @@ import ProfileDetailsForm, {
 } from '@/components/user/ProfileDetailsForm';
 import { useProfile } from '@/hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
+import ProfileDetailsFormVendor from '@/components/user/ProfileDetailsFormVendor';
 
 const ProfilePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('profile-details');
@@ -34,6 +35,7 @@ const ProfilePage: React.FC = () => {
 
   const initialProfileData: ProfileFormData = {
     avatar: user?.avatar || '',
+    companyAvatar: user?.companyAvatar || '',
     displayName: getUserDisplayName(user) || '',
     firstName: user?.firstName || '',
     lastName: user?.lastName || '',
@@ -43,9 +45,14 @@ const ProfilePage: React.FC = () => {
     industry: user?.industry || '',
     title: user?.title || '',
     companyName: user?.companyName || '',
+    companyEmail: user?.companyEmail || '',
     companySize: user?.companySize || '',
+    yearFounded: user?.yearFounded || '',
+    hqLocation: user?.hqLocation || '',
+    companyDescription: user?.companyDescription || '',
     linkedinUrl: user?.socialLinks?.linkedin || '',
     twitterUrl: user?.socialLinks?.twitter || '',
+    companyWebsiteUrl: user?.companyWebsiteUrl || '',
   };
 
   const sidebarItems = [
@@ -88,7 +95,7 @@ const ProfilePage: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'profile-details':
-        return <ProfileDetailsForm initialData={initialProfileData} />;
+        return user?.role === 'vendor' ? <ProfileDetailsFormVendor initialData={initialProfileData} /> : <ProfileDetailsForm initialData={initialProfileData} />;
       // Placeholder for other tabs
       default:
         return (

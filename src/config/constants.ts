@@ -7,14 +7,8 @@ export const regionOptions = [
   { value: 'Other', label: 'Other' },
 ];
 
-export const industryOptions = [
-  { value: 'IT and Services', label: 'IT and Services' },
-  { value: 'Healthcare', label: 'Healthcare' },
-  { value: 'Finance', label: 'Finance' },
-  { value: 'Education', label: 'Education' },
-  { value: 'Marketing', label: 'Marketing' },
-  { value: 'Other', label: 'Other' },
-];
+// Industry options are now fetched from the API via useIndustryOptions hook
+// export const industryOptions = [...]; // Removed - now using API
 
 export const companySizeOptions = [
   { value: '1-10 Employees', label: '1-10 Employees' },
@@ -24,3 +18,13 @@ export const companySizeOptions = [
   { value: '201-500 Employees', label: '201-500 Employees' },
   { value: '500+ Employees', label: '500+ Employees' },
 ];
+
+// Generate year founded options (from 1900 to current year)
+const currentYear = new Date().getFullYear();
+export const yearFoundedOptions = Array.from(
+  { length: currentYear - 1899 }, 
+  (_, i) => {
+    const year = currentYear - i;
+    return { value: year.toString(), label: year.toString() };
+  }
+);

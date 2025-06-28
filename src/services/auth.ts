@@ -22,6 +22,12 @@ export interface User {
     twitter?: string;
   };
   avatar?: string;
+  // Vendor-specific fields
+  companyAvatar?: string;
+  yearFounded?: string;
+  hqLocation?: string;
+  companyDescription?: string;
+  companyWebsiteUrl?: string;
   isVerified?: boolean;
   authProvider?: 'email' | 'google' | 'linkedin';
   acceptedTerms?: boolean;
@@ -109,6 +115,11 @@ export interface UpdateProfileRequest {
     twitter?: string;
   };
   avatar?: string;
+  companyAvatar?: string;
+  companyDescription?: string;
+  companyWebsiteUrl?: string;
+  yearFounded?: string;
+  hqLocation?: string;
 }
 
 // Auth service class

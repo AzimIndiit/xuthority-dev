@@ -11,6 +11,7 @@ import WriteReviewPage from '@/pages/review/WriteReviewPage';
 import AuthCallback from '@/pages/auth/AuthCallback';
 
 const About = () => <div>About Page</div>;
+const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
 const AuthLayout = ({ children }: { children?: React.ReactNode }) => (
   <div>{children || <Outlet />}</div>
 );
@@ -87,6 +88,16 @@ const router = createBrowserRouter([
           {
             path: "callback",
             Component: AuthCallback,
+          },
+          {
+            path: "reset-password",
+            Component: (props: any) => (
+              <AuthGuard>
+                <Suspense fallback={<Loader />}>
+                  <ResetPasswordPage {...props} />
+                </Suspense>
+              </AuthGuard>
+            ),
           },
         ],
       },

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -13,7 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check, X } from "lucide-react";
 import useUIStore from "@/store/useUIStore";
 import { useRegisterVendor, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
@@ -29,7 +29,11 @@ const vendorSignupSchema = z.object({
   companySize: z.string().min(1, { message: "Please select a company size" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters" }),
+    .min(8, { message: "Password must be at least 8 characters" })
+    .max(128, { message: "Password must be no more than 128 characters" })
+    .regex(/(?=.*[a-z])/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/(?=.*[A-Z])/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/(?=.*\d)/, { message: "Password must contain at least one number" }),
   terms: z.literal<boolean>(true, {
     errorMap: () => ({
       message: "You must accept the terms and conditions",
@@ -40,9 +44,55 @@ const vendorSignupSchema = z.object({
 
 type VendorSignupFormInputs = z.infer<typeof vendorSignupSchema>;
 
+// Password requirements checker component
+const PasswordRequirementsChecker = ({ password }: { password: string }) => {
+  const requirements = [
+    {
+      label: 'At least 8 characters',
+      test: (pwd: string) => pwd.length >= 8,
+    },
+    {
+      label: 'One uppercase letter (A-Z)',
+      test: (pwd: string) => /[A-Z]/.test(pwd),
+    },
+    {
+      label: 'One lowercase letter (a-z)',
+      test: (pwd: string) => /[a-z]/.test(pwd),
+    },
+    {
+      label: 'One number (0-9)',
+      test: (pwd: string) => /\d/.test(pwd),
+    },
+  ];
+
+  return (
+    <div className="text-xs text-gray-500 mt-2 space-y-1">
+      <p className="font-medium mb-2">Password must contain:</p>
+      <ul className="space-y-1">
+        {requirements.map((req, index) => {
+          const isValid = req.test(password);
+          return (
+            <li key={index} className="flex items-center gap-2">
+              {isValid ? (
+                <Check className="w-3 h-3 text-green-500" />
+              ) : (
+                <X className="w-3 h-3 text-gray-400" />
+              )}
+              <span className={isValid ? 'text-green-600' : 'text-gray-500'}>
+                {req.label}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
 export function VendorSignupForm() {
   const { setAuthModalView, closeAuthModal } = useUIStore();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [password, setPassword] = useState('');
   
   // Use the new authentication hooks
   const registerMutation = useRegisterVendor();
@@ -55,12 +105,20 @@ export function VendorSignupForm() {
     formState: { errors },
     setValue,
     trigger,
+    watch,
   } = useForm<VendorSignupFormInputs>({
     resolver: zodResolver(vendorSignupSchema),
     defaultValues: {
       updates: false,
     },
   });
+
+  // Watch the password field for real-time validation
+  const watchedPassword = watch('password', '');
+  
+  useEffect(() => {
+    setPassword(watchedPassword || '');
+  }, [watchedPassword]);
 
   const onSubmit = async (data: VendorSignupFormInputs) => {
     try {
@@ -211,6 +269,8 @@ export function VendorSignupForm() {
             {errors.password.message}
           </p>
         )}
+        {/* Dynamic Password Requirements Checker */}
+        <PasswordRequirementsChecker password={password} />
       </div>
       <div className="space-y-3 pt-2">
         <div className="flex items-start space-x-2">
@@ -303,18 +363,17 @@ export function VendorSignupForm() {
           </Button>
         </div>
       </div>
-      <div         className={`mt-6 text-center text-sm `}
+      <div className="mt-6 text-center text-sm">
+        <span className="text-gray-500">Already have an account? </span>
+        <button
+          type="button"
+          disabled={registerMutation.isPending}
+          onClick={() => setAuthModalView("login")}
+          className="font-semibold text-red-500 hover:underline cursor-pointer"
         >
-              <span className="text-gray-500">Already have an account? </span>
-              <button
-                type="button"
-                disabled={registerMutation.isPending}
-                onClick={() => setAuthModalView("login")}
-                className="font-semibold text-red-500 hover:underline cursor-pointer"
-              >
-                Log In
-              </button>
-            </div>
+          Log In
+        </button>
+      </div>
     
     </form>
   );

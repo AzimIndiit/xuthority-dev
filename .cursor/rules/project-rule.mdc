@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+{
+  "name": "Project Rules – Scalable React App with Vite, Tailwind, Zustand, React Query",
+  "description": "Defines architecture, folder structure, and coding conventions for a scalable React + Vite web platform using Tailwind, Zustand, Axios, React Query, and more.",
+  "prompt": "/*\n📦 Architecture & Conventions:\n- Use **functional components** and **React hooks**\n- Use **React Query** for all API calls — never useEffect + axios\n- Use **Axios** with a shared base instance, interceptors for tokens, and global error handling\n- Store global state (e.g., auth, theme, notifications) using **Zustand + persist**\n- Extract reusable UI into `components/ui`\n- Follow a **strict design system** (based on Figma tokens) across all screens\n- Handle all async UI states: **loading, error, success, and empty**\n- Use **clsx** or **classnames** to conditionally merge Tailwind classes\n- Use **React Router** for public/protected routes with `<ProtectedRoute />` wrappers\n- **Auth state and tokens persist across page refreshes** using Zustand + localStorage\n- **Implement mobile-first responsive design principles.** Develop styles for **mobile** screens first, then progressively enhance for **tablet** and **desktop** viewports using Tailwind's responsive prefixes (e.g., `md:`, `lg:`).\n- Ensure consistent breakpoint usage by aligning Tailwind's configuration with Figma's defined breakpoints.\n- **Implement responsive typography.** Utilize relative font units (e.g., `rem`, `em`, or Tailwind's `text-sm`, `md:text-base`) to ensure text scales appropriately across different screen sizes, adhering strictly to the font scales defined in the Figma design system.\n- **All UI/UX development must be prompted by a finalized design in Figma.** Components and screens should be built by referencing the design system's components and using defined design tokens, ensuring visual and behavioral consistency across the platform.\n- **Ensure buttons are fully responsive.** Button sizes, padding, and font sizes should adapt across mobile, tablet, and desktop viewports using Tailwind's responsive utilities (e.g., `py-2 px-4 md:py-3 md:px-6`), while maintaining adequate touch targets and adhering to design system specifications for each breakpoint.\n\n📁 Folder Structure (inside `src/`);\ncomponents/\n├── ui/             # Base design system: Button, Input, Modal, etc.\n├── layout/         # Header, Footer, Sidebar\n\nfeatures/\n├── auth/           # LoginForm, SignupForm, useAuth hook\n├── review/         # ReviewCard, ReviewForm, useReview hook\n\nstore/\n├── auth.ts         # Zustand auth store with persist middleware\n\nservices/\n├── api.ts          # Axios base instance\n├── review.ts       # Review-related API calls\n\nhooks/\n├── useDebounce.ts\n├── useAuth.ts\n\nroutes/\n├── ProtectedRoute.tsx\n├── PublicRoute.tsx\n\npages/ or app/\n├── index.tsx\n├── login.tsx\n\ntypes/\n├── review.ts\n\nutils/\n├── clsxMerge.ts\n├── formatDate.ts\n\nstyles/\n├── tailwind.config.ts\n├── global.css\n\nconfig/\n├── constants.ts\n├── routePaths.ts\n\n🔐 Auth & Routing:\n- Use `store/auth.ts` (Zustand + persist) to store: `token`, `user`, `isLoggedIn`\n- Sync auth token in Zustand with Axios headers\n- Wrap protected routes with `<ProtectedRoute />`\n- Redirect to `/login` if unauthenticated\n*/",
+  "autoAttach": {
+    "filePathIncludes": [
+      "src/components/",
+      "src/features/",
+      "src/hooks/",
+      "src/store/",
+      "src/services/",
+      "src/routes/",
+      "src/types/",
+      "src/utils/",
+      "src/pages/",
+      "src/app/",
+      "src/styles/",
+      "src/config/"
+    ],
+    "fileExtension": ["ts", "tsx", "css"],
+    "language": "typescript"
+  }
+} 

@@ -30,7 +30,7 @@ export function ForgotPasswordForm() {
   const onSubmit = async (data: ForgotPasswordFormInputs) => {
     try {
       await forgotPasswordMutation.mutateAsync({ email: data.email });
-      // Show success message and close modal
+      // Close modal after successful email sent
       closeAuthModal();
     } catch (error) {
       // Error is handled by the mutation hook

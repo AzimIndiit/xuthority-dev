@@ -77,8 +77,11 @@ export const useLogin = () => {
         
         // Navigate to dashboard or home
         navigate('/');
+        return success;
+      } else {
+        // Throw error if login failed so React Query treats it as failure
+        throw new Error('Login failed');
       }
-      return success;
     },
     onError: (error: any) => {
       console.error('Login error:', error);
@@ -110,8 +113,11 @@ export const useRegisterUser = () => {
         
         // Navigate to dashboard or home
         navigate('/');
+        return success;
+      } else {
+        // Throw error if registration failed so React Query treats it as failure
+        throw new Error('Registration failed');
       }
-      return success;
     },
     onError: (error: any) => {
       console.error('Registration error:', error);
@@ -143,8 +149,11 @@ export const useRegisterVendor = () => {
         
         // Navigate to dashboard or home
         navigate('/');
+        return success;
+      } else {
+        // Throw error if vendor registration failed so React Query treats it as failure
+        throw new Error('Vendor registration failed');
       }
-      return success;
     },
     onError: (error: any) => {
       console.error('Vendor registration error:', error);
@@ -280,11 +289,29 @@ export const useForgotPassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Password reset email sent successfully');
+      toast.success('Reset email sent successfully');
     },
     onError: (error: any) => {
       console.error('Forgot password error:', error);
       toast.error(error.message || 'Failed to send reset email');
+    },
+  });
+};
+
+// Hook for verifying reset token
+export const useVerifyResetToken = () => {
+  return useMutation({
+    mutationFn: async (data: { token: string }) => {
+      const response = await AuthService.verifyResetToken(data);
+      if (!response.success) {
+        throw new Error(response.error?.message || 'Invalid or expired reset token');
+      }
+      return response.data;
+    },
+    onError: (error: any) => {
+      console.error('Verify reset token error:', error);
+      toast.dismiss()
+      toast.error(error.response.data.message || 'Invalid or expired reset token');
     },
   });
 };
@@ -302,6 +329,7 @@ export const useResetPassword = () => {
       return response.data;
     },
     onSuccess: () => {
+      toast.dismiss()
       toast.success('Password reset successfully');
       navigate('/');
     },

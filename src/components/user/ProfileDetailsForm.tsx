@@ -8,6 +8,7 @@ import { VerifiedBadge } from '@/components/icons/VerifiedBadge';
 import { FormInput } from '../ui/FormInput';
 import { FormSelect } from '../ui/FormSelect';
 import { FormTextarea } from '../ui/FormTextarea';
+import { ChangePasswordModal } from '../ui/ChangePasswordModal';
 import {
   companySizeOptions,
   industryOptions,
@@ -59,6 +60,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   const { user } = useUserStore();
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false);
   const updateProfileMutation = useUpdateProfileWithImage();
 
 
@@ -250,6 +252,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 sm:pt-6 border-t border-gray-200 gap-4 sm:gap-0">
             <button
               type="button"
+              onClick={() => setIsChangePasswordModalOpen(true)}
               className="text-red-600 hover:text-red-700 font-medium text-sm order-2 sm:order-1"
             >
               Looking to change your password?
@@ -264,6 +267,12 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
             </Button>
           </div>
         </form>
+
+        {/* Change Password Modal */}
+        <ChangePasswordModal
+          isOpen={isChangePasswordModalOpen}
+          onOpenChange={setIsChangePasswordModalOpen}
+        />
       </div>
     </FormProvider>
   );

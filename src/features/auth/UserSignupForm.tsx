@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Check, X } from "lucide-react";
 import useUIStore from "@/store/useUIStore";
 import { useRegisterUser, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
@@ -17,7 +17,11 @@ const signupSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters" }),
+    .min(8, { message: "Password must be at least 8 characters" })
+    .max(128, { message: "Password must be no more than 128 characters" })
+    .regex(/(?=.*[a-z])/, { message: "Password must contain at least one lowercase letter" })
+    .regex(/(?=.*[A-Z])/, { message: "Password must contain at least one uppercase letter" })
+    .regex(/(?=.*\d)/, { message: "Password must contain at least one number" }),
   terms: z.literal<boolean>(true, {
     errorMap: () => ({
       message: "You must accept the terms and conditions",
@@ -28,9 +32,55 @@ const signupSchema = z.object({
 
 type SignupFormInputs = z.infer<typeof signupSchema>;
 
+// Password requirements checker component
+const PasswordRequirementsChecker = ({ password }: { password: string }) => {
+  const requirements = [
+    {
+      label: 'At least 8 characters',
+      test: (pwd: string) => pwd.length >= 8,
+    },
+    {
+      label: 'One uppercase letter (A-Z)',
+      test: (pwd: string) => /[A-Z]/.test(pwd),
+    },
+    {
+      label: 'One lowercase letter (a-z)',
+      test: (pwd: string) => /[a-z]/.test(pwd),
+    },
+    {
+      label: 'One number (0-9)',
+      test: (pwd: string) => /\d/.test(pwd),
+    },
+  ];
+
+  return (
+    <div className="text-xs text-gray-500 mt-2 space-y-1">
+      <p className="font-medium mb-2">Password must contain:</p>
+      <ul className="space-y-1">
+        {requirements.map((req, index) => {
+          const isValid = req.test(password);
+          return (
+            <li key={index} className="flex items-center gap-2">
+              {isValid ? (
+                <Check className="w-3 h-3 text-green-500" />
+              ) : (
+                <X className="w-3 h-3 text-gray-400" />
+              )}
+              <span className={isValid ? 'text-green-600' : 'text-gray-500'}>
+                {req.label}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
 export function UserSignupForm() {
   const { setAuthModalView, closeAuthModal } = useUIStore();
   const [passwordVisible, setPasswordVisible] = useState(false);
+  const [password, setPassword] = useState('');
   
   // Use the new authentication hooks
   const registerMutation = useRegisterUser();
@@ -42,12 +92,20 @@ export function UserSignupForm() {
     formState: { errors },
     setValue,
     trigger,
+    watch,
   } = useForm<SignupFormInputs>({
     resolver: zodResolver(signupSchema),
     defaultValues: {
       updates: false,
     },
   });
+
+  // Watch the password field for real-time validation
+  const watchedPassword = watch('password', '');
+  
+  useEffect(() => {
+    setPassword(watchedPassword || '');
+  }, [watchedPassword]);
 
   const onSubmit = async (data: SignupFormInputs) => {
     try {
@@ -150,6 +208,8 @@ export function UserSignupForm() {
             {errors.password.message}
           </p>
         )}
+        {/* Dynamic Password Requirements Checker */}
+        <PasswordRequirementsChecker password={password} />
       </div>
       <div className="space-y-3 pt-2">
         <div className="flex items-start space-x-2">
@@ -198,64 +258,60 @@ export function UserSignupForm() {
           </label>
         </div>
       </div>
-
+      
       <Button
         type="submit"
         className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 h-14 rounded-full text-base"
         disabled={registerMutation.isPending}
       >
-        {registerMutation.isPending ? "Creating Account..." : "Sign Up"}
+        {registerMutation.isPending ? "Creating Account..." : "Sign Up as User"}
       </Button>
-
-      {/* Social Signup Buttons */}
-      <div className="flex flex-col gap-3">
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-white px-2 text-gray-500">Or continue with</span>
-          </div>
+      
+      {/* Social Login Buttons */}
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
         </div>
-        
-        <div className="grid grid-cols-2 gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleGoogleLogin}
-            disabled={registerMutation.isPending}
-            className="w-full py-3 rounded-full border-gray-300"
-          >
-            <GoogleIcon />
-            Google
-          </Button>
-          
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleLinkedInLogin}
-            disabled={registerMutation.isPending}
-            className="w-full py-3 rounded-full border-gray-300"
-          >
-            <LinkedInIcon />
-            LinkedIn
-          </Button>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-background px-2 text-muted-foreground">
+            Or Continue With
+          </span>
         </div>
       </div>
-      
-      <div         className={`mt-6 text-center text-sm `}
+      <div className="grid grid-cols-2 gap-4">
+        <Button
+          type="button"
+          onClick={handleGoogleLogin}
+          disabled={registerMutation.isPending}
+          variant="outline"
+          className="w-full py-3 rounded-full border-gray-300"
         >
-              <span className="text-gray-500">Already have an account? </span>
-              <button
-                type="button"
-                disabled={registerMutation.isPending}
-                onClick={() => setAuthModalView("login")}
-                className="font-semibold text-red-500 hover:underline cursor-pointer"
-              >
-                Log In
-              </button>
-            </div>
-    
+          <GoogleIcon />
+          Google
+        </Button>
+        <Button
+          type="button"
+          onClick={handleLinkedInLogin}
+          disabled={registerMutation.isPending}
+          variant="outline"
+          className="w-full py-3 rounded-full border-gray-300"
+        >
+          <LinkedInIcon />
+          LinkedIn
+        </Button>
+      </div>
+      <div className="mt-6 text-center text-sm">
+        <span className="text-gray-500">Already have an account? </span>
+        <button
+          type="button"
+          disabled={registerMutation.isPending}
+          onClick={() => setAuthModalView("login")}
+          className="font-semibold text-red-500 hover:underline cursor-pointer"
+        >
+          Log In
+        </button>
+      </div>
+
     </form>
   );
 } 

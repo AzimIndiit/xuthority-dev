@@ -81,6 +81,7 @@ const useUserStore = create<UserState>()(
         set({ isLoading: true, error: null });
         try {
           const response = await AuthService.login(credentials);
+          console.log('response', response)
           if (response.success && response.data) {
             // Map API response to UserInfo format
             const userInfo: User = {
@@ -103,11 +104,14 @@ const useUserStore = create<UserState>()(
               isLoading: false,
               error: response.error?.message || 'Login failed',
             });
-            toast.error(response.error?.message || 'Login failed');
+            console.log('response', response)
             return false;
           }
         } catch (error: any) {
-          const errorMessage = error.response?.data?.error?.message || 'Login failed';
+          console.log('error', error)
+          toast.dismiss()
+          toast.error(error.response?.data?.error?.message || 'Login failed');
+          const errorMessage = error.response?.data?.message || error.message || 'Login failed';
           set({
             isLoading: false,
             error: errorMessage,

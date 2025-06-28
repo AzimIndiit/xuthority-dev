@@ -3,6 +3,7 @@ export const routePaths = {
   LOGIN: "/login",
   SIGNUP: "/signup",
   FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/auth/reset-password",
   PROFILE: "/profile",
   CATEGORIES: "/categories",
   SOFTWARE_CATEGORY: "/:category",

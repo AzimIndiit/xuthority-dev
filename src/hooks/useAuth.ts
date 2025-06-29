@@ -32,12 +32,14 @@ export const useProfile = () => {
       if (!currentUser) {
         throw new Error('User not authenticated');
       }
+     
       await getProfileWithAPI();
       // Return the latest user data from store
       return useUserStore.getState().user;
     },
     enabled: !!user,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // 5 minutes
+    gcTime: 0,
   });
 };
 
@@ -71,9 +73,9 @@ export const useLogin = () => {
         queryClient.removeQueries();
         queryClient.clear();
         localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
-        
-        // Fetch fresh profile data after successful login
-        await getProfileWithAPI();
+
+          // Fetch fresh profile data after successful login
+        // await getProfileWithAPI();
         
         // Set fresh query data with updated profile
         const user = useUserStore.getState().user;

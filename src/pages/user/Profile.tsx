@@ -6,8 +6,11 @@ import {
   HeartIcon,
   BellIcon,
   LogOutIcon,
-  Users,
-  UserPlus,
+  Badge,
+  ShoppingCart,
+  HelpCircle,
+  Grid,
+  CreditCard,
 } from 'lucide-react';
 import ProfileLayout from '@/components/layout/ProfileLayout';
 import ProfileDetailsForm, {
@@ -22,6 +25,8 @@ import ConfirmationModal from '@/components/ui/ConfirmationModal';
 const ProfilePage: React.FC = () => {
   const { tab } = useParams<{ tab?: string }>();
   const navigate = useNavigate();
+  const logoutMutation = useLogout();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   // Initialize activeTab based on URL parameter
   const getInitialTab = () => {
@@ -100,34 +105,67 @@ console.log('user', user)
     companyWebsiteUrl: user?.companyWebsiteUrl || '',
   };
 
-  const sidebarItems = [
-    {
-      id: 'profile-details',
-      label: 'Profile Details',
-      icon: <UserIcon className="w-5 h-5" />,
-    },
-    {
-      id: 'my-reviews',
-      label: 'My Reviews',
-      icon: <MessageSquare className="w-5 h-5" />,
-    },
-
-    {
-      id: 'my-favourites',
-      label: 'My Favourites',
-      icon: <HeartIcon className="w-5 h-5" />,
-    },
-    {
-      id: 'notifications',
-      label: 'Notifications',
-      icon: <BellIcon className="w-5 h-5" />,
-    },
-    {
-      id: 'logout',
-      label: 'Logout',
-      icon: <LogOutIcon className="w-5 h-5" />,
-    },
-  ];
+  // Sidebar items based on user role (no hooks inside)
+  const sidebarItems = user?.role === 'vendor'
+    ? [
+        {
+          id: 'products',
+          label: 'Products',
+          icon: <Grid className="w-5 h-5" />,
+        },
+        {
+          id: 'my-subscription',
+          label: 'My Subscription',
+          icon: <CreditCard className="w-5 h-5" />,
+        },
+        {
+          id: 'dispute-management',
+          label: 'Dispute Management',
+          icon: <HelpCircle className="w-5 h-5" />,
+        },
+        {
+          id: 'my-badges',
+          label: 'My Badges',
+          icon: <Badge className="w-5 h-5" />,
+        },
+        {
+          id: 'notifications',
+          label: 'Notifications',
+          icon: <BellIcon className="w-5 h-5" />,
+        },
+        {
+          id: 'logout',
+          label: 'Logout',
+          icon: <LogOutIcon className="w-5 h-5" />,
+        },
+      ]
+    : [
+        {
+          id: 'profile-details',
+          label: 'Profile Details',
+          icon: <UserIcon className="w-5 h-5" />,
+        },
+        {
+          id: 'my-reviews',
+          label: 'My Reviews',
+          icon: <MessageSquare className="w-5 h-5" />,
+        },
+        {
+          id: 'my-favourites',
+          label: 'My Favourites',
+          icon: <HeartIcon className="w-5 h-5" />,
+        },
+        {
+          id: 'notifications',
+          label: 'Notifications',
+          icon: <BellIcon className="w-5 h-5" />,
+        },
+        {
+          id: 'logout',
+          label: 'Logout',
+          icon: <LogOutIcon className="w-5 h-5" />,
+        },
+      ];
 
   // Dynamic breadcrumb based on active tab
   const getBreadcrumb = () => {
@@ -148,9 +186,6 @@ console.log('user', user)
       current: 'My Profile',
     };
   };
-
-  const logoutMutation = useLogout();
-  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleLogoutConfirm = async () => {
     setShowLogoutModal(false);

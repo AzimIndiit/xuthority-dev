@@ -20,9 +20,10 @@ import { useNavigate } from "react-router-dom";
 import { useUpdateProfileWithImage } from "@/hooks/useAuth";
 import { getUserDisplayName, getUserInitials } from "@/utils/userHelpers";
 import useUserStore from "@/store/useUserStore";
+import toast from "react-hot-toast";
 
 // Zod schema for profile validation, exported for reuse
-export const profileSchema = z.object({
+export const profileVendorSchema = z.object({
   avatar: z.string().optional(),
   companyAvatar: z.string().optional(),
   displayName: z.string().optional(),
@@ -58,14 +59,14 @@ export const profileSchema = z.object({
     .refine((val) => !val || val.length <= 200, "Company website URL must be less than 200 characters"),
 });
 
-export type ProfileFormData = z.infer<typeof profileSchema>;
+export type ProfileVendorFormData = z.infer<typeof profileVendorSchema>;
 
 interface ProfileDetailsFormProps {
-  initialData: ProfileFormData;
-  onSubmit?: (data: ProfileFormData) => void;
+  initialData: ProfileVendorFormData;
+  onSubmit?: (data: ProfileVendorFormData) => void;
 }
 
-const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
+const ProfileDetailsFormVendor: React.FC<ProfileDetailsFormProps> = ({
   initialData,
   onSubmit,
 }) => {
@@ -82,34 +83,30 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   // Get industry options from API
   const { options: industryOptions } = useIndustryOptions();
 
-  const formMethods = useForm<ProfileFormData>({
+  const formMethods = useForm<ProfileVendorFormData>({
     mode: "onChange",
     
-    resolver: zodResolver(profileSchema),
+    resolver: zodResolver(profileVendorSchema),
     defaultValues: initialData,
   });
 
-  console.log("formMethods", formMethods.formState.errors);
   //set default values
   useEffect(() => {
     formMethods.reset(initialData);
   }, [initialData]);
-  console.log("initialData", user, initialData);
-  
-  // Add form error debugging
-  console.log("Form errors:", formMethods.formState.errors);
-  console.log("Form is valid:", formMethods.formState.isValid);
+
+
 
   const handleImageSelect = (file: File) => {
     // Validate file
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      toast.error("Please select an image file");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       // 5MB
-      alert("File size must be less than 5MB");
+      toast.error("File size must be less than 5MB");
       return;
     }
 
@@ -120,13 +117,13 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   const handleCompanyImageSelect = (file: File) => {
     // Validate file
     if (!file.type.startsWith("image/")) {
-      alert("Please select an image file");
+      toast.error("Please select an image file");
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       // 5MB
-      alert("File size must be less than 5MB");
+      toast.error("File size must be less than 5MB");
       return;
     }
 
@@ -134,9 +131,8 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
     setCompanyPreviewUrl(URL.createObjectURL(file));
   };
 
-  const handleSubmit = async (data: ProfileFormData) => {
+  const handleSubmit = async (data: ProfileVendorFormData) => {
     try {
-      console.log('data', data)
       
       // Helper function to clean empty strings
       const cleanValue = (value: string | undefined) => {
@@ -445,4 +441,4 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   );
 };
 
-export default ProfileDetailsForm;
+export default ProfileDetailsFormVendor;

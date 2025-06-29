@@ -2,7 +2,7 @@ import React from 'react';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { ChevronRightIcon } from 'lucide-react';
 import { formatNumber } from '@/utils/formatNumber';
-import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
+import { getTruncatedDisplayName, getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 import { User } from '@/services/auth';
 
 interface SidebarItem {
@@ -16,6 +16,8 @@ interface ProfileSidebarProps {
   sidebarItems: SidebarItem[];
   activeTab: string;
   onTabChange: (tabId: string) => void;
+  onFollowersClick?: () => void;
+  onFollowingClick?: () => void;
 }
 
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
@@ -23,6 +25,8 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   sidebarItems,
   activeTab,
   onTabChange,
+  onFollowersClick,
+  onFollowingClick,
 }) => {
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
@@ -33,23 +37,31 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
           <AvatarFallback className="text-lg">{getUserInitials(user)}</AvatarFallback>
         </Avatar>
         <div className="flex items-center space-x-6">
-          <div className="text-center">
-            <div className="text-xl font-black text-gray-800">
-              {formatNumber(user?.followers)}
+          <button
+            onClick={onFollowersClick}
+            className="text-center  rounded-lg p-2 transition-all duration-200 cursor-pointer group"
+            disabled={!onFollowersClick}
+          >
+            <div className="text-xl font-black text-gray-800 ">
+              {formatNumber(user?.followers || 0)}
             </div>
-            <div className="text-sm text-gray-500">Followers</div>
-          </div>
-          <div className="text-center">
-            <div className="text-xl font-black text-gray-800">
-              {formatNumber(user?.following)}
+            <div className="text-sm text-gray-500 ">Followers</div>
+          </button>
+          <button
+            onClick={onFollowingClick}
+            className="text-center rounded-lg p-2 transition-all duration-200 cursor-pointer group"
+            disabled={!onFollowingClick}
+          >
+            <div className="text-xl font-black text-gray-800 ">
+              {formatNumber(user?.following || 0)}
             </div>
-            <div className="text-sm text-gray-500">Following</div>
-          </div>
+            <div className="text-sm text-gray-500 ">Following</div>
+          </button>
         </div>
       </div>
 
       <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900">{getUserDisplayName(user)}</h3>
+        <h3 className="text-xl font-bold text-gray-900">{getTruncatedDisplayName(user, 15)}</h3>
         <p className="text-sm text-gray-500">{user?.email}</p>
       </div>
 
@@ -62,10 +74,10 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
           <button
             key={item.id}
             onClick={() => onTabChange(item.id)}
-            className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors duration-200  ${
+            className={`w-full flex items-center justify-between px-4 py-3.5 text-left transition-colors duration-200 cursor-pointer  ${
               activeTab === item.id
                 ? 'bg-blue-600 text-white rounded-full'
-                : 'text-gray-700 rounded-lg'
+                : 'text-gray-700 rounded-full hover:bg-gray-50'
             }`}
           >
             <div className="flex items-center space-x-4">

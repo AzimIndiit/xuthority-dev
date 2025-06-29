@@ -27,11 +27,14 @@ export const useProfile = () => {
   return useQuery({
     queryKey: queryKeys.profile,
     queryFn: async () => {
-      if (!user) {
+      // Get the latest user from store (not the closure)
+      const currentUser = useUserStore.getState().user;
+      if (!currentUser) {
         throw new Error('User not authenticated');
       }
       await getProfileWithAPI();
-      return user;
+      // Return the latest user data from store
+      return useUserStore.getState().user;
     },
     enabled: !!user,
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -202,7 +205,10 @@ export const useUpdateProfile = () => {
     onSuccess: (data: { user: any }) => {
       // Update local state
       updateUser(data.user);
-      // Invalidate and refetch user data
+      // Directly update React Query cache with fresh data
+      queryClient.setQueryData(queryKeys.user, data.user);
+      queryClient.setQueryData(queryKeys.profile, data.user);
+      // Also invalidate to ensure consistency
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
       queryClient.invalidateQueries({ queryKey: queryKeys.profile });
       toast.success('Profile updated successfully');
@@ -279,7 +285,10 @@ export const useUpdateProfileWithImage = () => {
     onSuccess: (data: { user: any }) => {
       // Update local state
       updateUser(data.user);
-      // Invalidate and refetch user data
+      // Directly update React Query cache with fresh data
+      queryClient.setQueryData(queryKeys.user, data.user);
+      queryClient.setQueryData(queryKeys.profile, data.user);
+      // Also invalidate to ensure consistency
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
       queryClient.invalidateQueries({ queryKey: queryKeys.profile });
       toast.success('Profile updated successfully');

@@ -264,18 +264,30 @@ export default function Navbar() {
                           <AvatarFallback className="">{getUserInitials(user)}</AvatarFallback>
                         </Avatar>
               <div className="flex space-x-6 mt-3 mb-1">
-                <div className="text-center">
+                <button
+                  onClick={() => {
+                    navigate('/profile/followers')
+                    setDrawerOpen(false)
+                  }}
+                  className="text-center hover:bg-gray-50 rounded-lg p-1 transition-colors duration-200"
+                >
                   <div className="font-bold text-gray-900 text-base leading-tight">
                     {formatNumber(user?.followers)}
                   </div>
                   <div className="text-xs text-gray-500">Followers</div>
-                </div>
-                <div className="text-center">
+                </button>
+                <button
+                  onClick={() => {
+                    navigate('/profile/following')
+                    setDrawerOpen(false)
+                  }}
+                  className="text-center hover:bg-gray-50 rounded-lg p-1 transition-colors duration-200"
+                >
                   <div className="font-bold text-gray-900 text-base leading-tight">
                     {formatNumber(user?.following)}
                   </div>
                   <div className="text-xs text-gray-500">Following</div>
-                </div>
+                </button>
               </div>
             </div>
             <div className="flex justify-between items-center gap-2">

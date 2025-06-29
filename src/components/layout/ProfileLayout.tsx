@@ -18,6 +18,8 @@ interface ProfileLayoutProps {
     current: string;
   };
   children: React.ReactNode;
+  onFollowersClick?: () => void;
+  onFollowingClick?: () => void;
 }
 
 const ProfileLayout: React.FC<ProfileLayoutProps> = ({
@@ -26,7 +28,9 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
   activeTab,
   onTabChange,
   breadcrumb,
-  children
+  children,
+  onFollowersClick,
+  onFollowingClick
 }) => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -39,6 +43,8 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
               sidebarItems={sidebarItems}
               activeTab={activeTab}
               onTabChange={onTabChange}
+              onFollowersClick={onFollowersClick}
+              onFollowingClick={onFollowingClick}
             />
           </div>
 

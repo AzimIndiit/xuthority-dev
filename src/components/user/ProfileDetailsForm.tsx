@@ -34,11 +34,7 @@ export const profileSchema = z.object({
   industry: z.string().min(1, "Please select an industry"),
   title: z.string().min(2, "Title must be at least 2 characters").max(100, "Title must be less than 100 characters"),
   companyName: z.string().min(2, "Company name must be at least 2 characters").max(100, "Company name must be less than 100 characters"),
-  companyEmail: z.string().email("Invalid company email address"),
   companySize: z.string().min(1, "Please select company size"),
-  yearFounded: z.string().min(1, "Please select year founded"),
-  hqLocation: z.string().min(2, "HQ location must be at least 2 characters"),
-  companyDescription: z.string().min(10, "Company description must be at least 10 characters"),
   linkedinUrl: z
     .string()
     .url("Invalid LinkedIn URL")
@@ -51,11 +47,7 @@ export const profileSchema = z.object({
     .optional()
     .or(z.literal(""))
     .refine((val) => !val || val.length <= 200, "Twitter URL must be less than 200 characters"),
-  companyWebsiteUrl: z
-    .string()
-    .url("Invalid company website URL")
-    .optional()
-    .or(z.literal("")),
+  
 });
 
 export type ProfileFormData = z.infer<typeof profileSchema>;
@@ -91,7 +83,6 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   useEffect(() => {
     formMethods.reset(initialData);
   }, [initialData]);
-  console.log("initialData", user, initialData);
 
   const handleImageSelect = (file: File) => {
     // Validate file
@@ -145,12 +136,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
           },
           avatar: data.avatar,
           // Vendor fields (only included if they exist in the form)
-          ...(data.companyEmail && { companyEmail: data.companyEmail }),
-          ...(data.yearFounded && { yearFounded: data.yearFounded }),
-          ...(data.hqLocation && { hqLocation: data.hqLocation }),
-          ...(data.companyDescription && { companyDescription: data.companyDescription }),
-          ...(data.companyWebsiteUrl && { companyWebsiteUrl: data.companyWebsiteUrl }),
-          ...(data.companyAvatar && { companyAvatar: data.companyAvatar }),
+          
         },
         imageFile: selectedImageFile || undefined,
         companyImageFile: selectedCompanyImageFile || undefined,

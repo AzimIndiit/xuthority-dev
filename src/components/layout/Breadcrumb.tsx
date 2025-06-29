@@ -11,6 +11,9 @@ import {
 
 // A map to provide custom names for path segments.
 const breadcrumbNameMap: { [key: string]: string } = {
+  'profile': 'Profile',
+  'followers': 'Followers',
+  'following': 'Following',
   // Example: 'user-profile': 'User Profile'
 };
 
@@ -36,9 +39,15 @@ const Breadcrumb = () => {
             {pathnames.map((value, index) => {
               const to = `/${pathnames.slice(0, index + 1).join("/")}`;
               const isLast = index === pathnames.length - 1;
-              const name =
-                breadcrumbNameMap[value] ||
-                value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
+              
+              // Special handling for profile tabs
+              let name = breadcrumbNameMap[value];
+              if (!name) {
+                name = value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
+              }
+
+              // For profile tabs, make the link go to the profile base page
+              const linkTo = value === 'followers' || value === 'following' ? '/profile' : to;
 
               return (
                 <React.Fragment key={to}>
@@ -50,7 +59,7 @@ const Breadcrumb = () => {
                       </BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink asChild className="text-gray-700 hover:text-blue-600 capitalize">
-                        <Link to={to}>{name}</Link>
+                        <Link to={linkTo}>{name}</Link>
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>

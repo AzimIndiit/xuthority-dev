@@ -30,6 +30,7 @@ const ProductDetailPage = lazy(
 
 // Lazy load user and vendor routes
 const UserProfile = lazy(() => import("@/pages/user/Profile"));
+const FollowersPage = lazy(() => import("@/pages/user/FollowersPage"));
 
 const Loader = () => (
   <div className="w-full flex justify-center items-center min-h-[100dvh] text-lg font-semibold">
@@ -121,6 +122,22 @@ const router = createBrowserRouter([
                 Component: (props: any) => (
                   <Suspense fallback={<Loader />}>
                     <UserProfile {...props} />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "/profile/:tab",
+                Component: (props: any) => (
+                  <Suspense fallback={<Loader />}>
+                    <UserProfile {...props} />
+                  </Suspense>
+                ),
+              },
+              {
+                path: "/user/:userId/followers",
+                Component: (props: any) => (
+                  <Suspense fallback={<Loader />}>
+                    <FollowersPage {...props} />
                   </Suspense>
                 ),
               },

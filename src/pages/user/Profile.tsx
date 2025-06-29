@@ -1,10 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   UserIcon,
   MessageSquare,
   HeartIcon,
   BellIcon,
   LogOutIcon,
+  Users,
+  UserPlus,
 } from 'lucide-react';
 import ProfileLayout from '@/components/layout/ProfileLayout';
 import ProfileDetailsForm, {
@@ -12,14 +15,39 @@ import ProfileDetailsForm, {
 } from '@/components/user/ProfileDetailsForm';
 import { useProfile } from '@/hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
-import ProfileDetailsFormVendor from '@/components/user/ProfileDetailsFormVendor';
+import ProfileDetailsFormVendor, { ProfileVendorFormData } from '@/components/user/ProfileDetailsFormVendor';
+import FollowersFollowing from '@/components/user/FollowersFollowing';
 
 const ProfilePage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('profile-details');
+  const { tab } = useParams<{ tab?: string }>();
+  const navigate = useNavigate();
   
+  // Initialize activeTab based on URL parameter
+  const getInitialTab = () => {
+    if (tab === 'followers' || tab === 'following') {
+      return tab;
+    }
+    return 'profile-details';
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab());
+  const [followTab, setFollowTab] = useState<'followers' | 'following'>(
+    tab === 'following' ? 'following' : 'followers'
+  );
+  
+  // Update activeTab when URL parameter changes
+  useEffect(() => {
+    const newTab = getInitialTab();
+    setActiveTab(newTab);
+    if (tab === 'followers' || tab === 'following') {
+      setFollowTab(tab);
+      
+    }
+  }, [tab]);
+
   // Use the useProfile hook to trigger React Query
   const { data: user, isLoading, error } = useProfile();
-
+console.log('user', user)
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -42,8 +70,24 @@ const ProfilePage: React.FC = () => {
     email: user?.email || '',
     region: user?.region || '',
     description: user?.description || '',
+    companyName: user?.companyName || '',
+    companySize: user?.companySize || '',
     industry: user?.industry || '',
     title: user?.title || '',
+    linkedinUrl: user?.socialLinks?.linkedin || '',
+    twitterUrl: user?.socialLinks?.twitter || '',
+  };
+
+  const initialProfileVendorData: ProfileVendorFormData = {
+    avatar: user?.avatar || '',
+    companyAvatar: user?.companyAvatar || '',
+    displayName: getUserDisplayName(user) || '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    region: user?.region || '',
+    description: user?.description || '',
+    industry: user?.industry || '',
     companyName: user?.companyName || '',
     companyEmail: user?.companyEmail || '',
     companySize: user?.companySize || '',
@@ -66,6 +110,7 @@ const ProfilePage: React.FC = () => {
       label: 'My Reviews',
       icon: <MessageSquare className="w-5 h-5" />,
     },
+
     {
       id: 'my-favourites',
       label: 'My Favourites',
@@ -83,19 +128,78 @@ const ProfilePage: React.FC = () => {
     },
   ];
 
-  const breadcrumb = {
-    home: 'Home',
-    current: 'My Profile',
+  // Dynamic breadcrumb based on active tab
+  const getBreadcrumb = () => {
+    if (activeTab === 'followers') {
+      return {
+        home: 'Home',
+        current: 'Profile / Followers',
+      };
+    }
+    if (activeTab === 'following') {
+      return {
+        home: 'Home',
+        current: 'Profile / Following',
+      };
+    }
+    return {
+      home: 'Home',
+      current: 'My Profile',
+    };
   };
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
+    // Update URL when tab changes
+    if (tabId === 'followers' || tabId === 'following') {
+      navigate(`/profile/${tabId}`);
+    } else {
+      navigate('/profile');
+    }
+  };
+
+  const handleFollowersClick = () => {
+    navigate('/profile/followers');
+  };
+
+  const handleFollowingClick = () => {
+    navigate('/profile/following');
   };
 
   const renderContent = () => {
     switch (activeTab) {
       case 'profile-details':
-        return user?.role === 'vendor' ? <ProfileDetailsFormVendor initialData={initialProfileData} /> : <ProfileDetailsForm initialData={initialProfileData} />;
+        return user?.role === 'vendor' ? <ProfileDetailsFormVendor initialData={initialProfileVendorData} /> : <ProfileDetailsForm initialData={initialProfileData} />;
+      case 'followers':
+        return (
+          <FollowersFollowing
+            userId={user._id}
+            activeTab="followers"
+            onTabChange={(tab) => {
+              setFollowTab(tab);
+              if (tab === 'following') {
+                setActiveTab('following');
+              }
+            }}
+            showRemoveButton={true} // Current user can remove their followers
+            className="shadow-sm"
+          />
+        );
+      case 'following':
+        return (
+          <FollowersFollowing
+            userId={user._id}
+            activeTab="following"
+            onTabChange={(tab) => {
+              setFollowTab(tab);
+              if (tab === 'followers') {
+                setActiveTab('followers');
+              }
+            }}
+            showRemoveButton={false} // Can't remove people you're following from this view
+            className="shadow-sm"
+          />
+        );
       // Placeholder for other tabs
       default:
         return (
@@ -115,7 +219,9 @@ const ProfilePage: React.FC = () => {
       sidebarItems={sidebarItems}
       activeTab={activeTab}
       onTabChange={handleTabChange}
-      breadcrumb={breadcrumb}
+      breadcrumb={getBreadcrumb()}
+      onFollowersClick={handleFollowersClick}
+      onFollowingClick={handleFollowingClick}
     >
       {renderContent()}
     </ProfileLayout>

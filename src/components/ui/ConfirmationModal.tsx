@@ -42,11 +42,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         </DialogHeader>
         <DialogFooter className="pt-4 sm:justify-end gap-2">
           <DialogClose asChild>
-            <Button type="button" variant="outline" >
+            <Button type="button" className='rounded-full' variant="outline" >
               {cancelText}
             </Button>
           </DialogClose>
-          <Button type="button" variant={confirmVariant} onClick={onConfirm} > 
+          <Button type="button" className='rounded-full bg-blue-600 text-white hover:bg-blue-700' variant={confirmVariant} onClick={onConfirm} > 
             {confirmText}
           </Button>
         </DialogFooter>

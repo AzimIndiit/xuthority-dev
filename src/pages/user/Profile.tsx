@@ -13,10 +13,11 @@ import ProfileLayout from '@/components/layout/ProfileLayout';
 import ProfileDetailsForm, {
   ProfileFormData,
 } from '@/components/user/ProfileDetailsForm';
-import { useProfile } from '@/hooks/useAuth';
+import { useProfile, useLogout } from '@/hooks/useAuth';
 import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 import ProfileDetailsFormVendor, { ProfileVendorFormData } from '@/components/user/ProfileDetailsFormVendor';
 import FollowersFollowing from '@/components/user/FollowersFollowing';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 const ProfilePage: React.FC = () => {
   const { tab } = useParams<{ tab?: string }>();
@@ -148,7 +149,20 @@ console.log('user', user)
     };
   };
 
+  const logoutMutation = useLogout();
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogoutConfirm = async () => {
+    setShowLogoutModal(false);
+    await logoutMutation.mutateAsync();
+    // Optionally, redirect or clear state here if needed
+  };
+
   const handleTabChange = (tabId: string) => {
+    if (tabId === 'logout') {
+      setShowLogoutModal(true);
+      return;
+    }
     setActiveTab(tabId);
     // Update URL when tab changes
     if (tabId === 'followers' || tabId === 'following') {
@@ -214,17 +228,29 @@ console.log('user', user)
   };
 
   return (
-    <ProfileLayout
-      user={userForProfile}
-      sidebarItems={sidebarItems}
-      activeTab={activeTab}
-      onTabChange={handleTabChange}
-      breadcrumb={getBreadcrumb()}
-      onFollowersClick={handleFollowersClick}
-      onFollowingClick={handleFollowingClick}
-    >
-      {renderContent()}
-    </ProfileLayout>
+    <>
+      <ProfileLayout
+        user={userForProfile}
+        sidebarItems={sidebarItems}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+        breadcrumb={getBreadcrumb()}
+        onFollowersClick={handleFollowersClick}
+        onFollowingClick={handleFollowingClick}
+      >
+        {renderContent()}
+      </ProfileLayout>
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onOpenChange={setShowLogoutModal}
+        onConfirm={handleLogoutConfirm}
+        title="Logout?"
+        description="Are you sure, You want to logout?"
+        confirmText={logoutMutation.isPending ? "Logging out..." : "Yes I'm Sure"}
+        cancelText="Cancel"
+        confirmVariant="default"
+      />
+    </>
   );
 };
 

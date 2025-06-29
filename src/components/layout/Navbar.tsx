@@ -18,6 +18,7 @@ import { ChevronDown } from "lucide-react";
 import { useReviewStore } from "@/store/useReviewStore";
 import { formatNumber } from "@/utils/formatNumber";
 import { queryClient } from "@/lib/queryClient";
+import ConfirmationModal from "../ui/ConfirmationModal";
 
 const navLinks = [
   { label: "Software", href: "/software" },
@@ -46,6 +47,8 @@ export default function Navbar() {
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const navigate = useNavigate();
   
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  
   // Auto-close drawer on desktop (lg and up)
   useEffect(() => {
     const handleResize = () => {
@@ -69,6 +72,12 @@ export default function Navbar() {
     } catch (error) {
       console.error('Logout error:', error);
     }
+  };
+
+  const handleLogoutClick = () => setShowLogoutModal(true);
+  const handleLogoutConfirm = async () => {
+    setShowLogoutModal(false);
+    await handleLogout();
   };
 
   return (
@@ -151,7 +160,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem 
-                        onClick={handleLogout}
+                        onClick={handleLogoutClick}
                         disabled={logoutMutation.isPending}
                       >
                         {logoutMutation.isPending ? "Logging out..." : "Log out"}
@@ -350,7 +359,7 @@ export default function Navbar() {
           {isLoggedIn && user && (
             <li>
               <a
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="flex items-center justify-between px-6 py-3 text-base text-gray-900 hover:bg-gray-50 transition-colors"
               >
                 Log Out
@@ -401,6 +410,16 @@ export default function Navbar() {
           )}
         </div>
       </aside>
+      <ConfirmationModal
+        isOpen={showLogoutModal}
+        onOpenChange={setShowLogoutModal}
+        onConfirm={handleLogoutConfirm}
+        title="Logout?"
+        description="Are you sure, You want to logout?"
+        confirmText={logoutMutation.isPending ? "Logging out..." : "Yes I'm Sure"}
+        cancelText="Cancel"
+        confirmVariant="default"
+      />
     </>
   );
 }

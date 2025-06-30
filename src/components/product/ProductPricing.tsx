@@ -79,7 +79,8 @@ const pricingData = [
   },
 ];
 
-const ProductPricing = () => {
+const ProductPricing = ({pricing}: {pricing: any}) => {
+  console.log('pricing', pricing)
   return (
     <div className="relative  py-16 sm:py-24">
      
@@ -92,7 +93,7 @@ const ProductPricing = () => {
           </p>
         </div>
         <div className="mt-16 flex items-stretch gap-x-4 sm:gap-x-8 overflow-x-auto py-4">
-          {pricingData.map((plan) => (
+            {pricing?.map((plan: any) => (
             <div key={plan.planName} className="w-80 sm:w-96 flex-shrink-0">
               <PricingCard {...plan} />
             </div>

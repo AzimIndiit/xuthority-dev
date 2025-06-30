@@ -18,7 +18,7 @@ export const StyledAccordion = ({
   isOpenByDefault = false,
 }: StyledAccordionProps) => {
   const hasItems = items && items.length > 0;
-
+console.log('hasItems', items)
   return (
     <Accordion
       type="single"
@@ -37,8 +37,8 @@ export const StyledAccordion = ({
         {hasItems && (
           <AccordionContent className="bg-white px-6 py-4 rounded-b-xl">
             <ul className="list-disc pl-5 space-y-2 text-gray-700 text-base">
-              {items.map((item, index) => (
-                <li key={`${item}-${index}`}>{item}</li>
+              {items.map((item: any, index: any) => (
+                <li key={`${item.value}-${index}`}>{item.value}</li>
               ))}
             </ul>
           </AccordionContent>

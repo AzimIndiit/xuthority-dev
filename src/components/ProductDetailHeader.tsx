@@ -2,6 +2,7 @@ import React from "react";
 import { Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StarRating from "./ui/StarRating";
+import useUserStore from "@/store/useUserStore";
 
 interface Product {
   name: string;
@@ -10,6 +11,7 @@ interface Product {
   logoUrl: string;
   bannerUrl: string;
   entryPrice: string;
+  brandColors?: string;
 }
 
 interface ProductDetailHeaderProps {
@@ -19,6 +21,8 @@ interface ProductDetailHeaderProps {
 export default function ProductDetailHeader({
   product,
 }: ProductDetailHeaderProps) {
+  const {user} = useUserStore();
+
   return (
     <>
       {/* Banner */}
@@ -32,9 +36,10 @@ export default function ProductDetailHeader({
         <div className="relative sm:-mt-4">
           <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
             {/* Logo */}
-            <div className="flex-shrink-0 absolute -top-4 left-0 ">
+            <div className="flex-shrink-0 absolute -top-4 left-0 " >
               <img
-                className="h-24 w-24 sm:h-34 sm:w-34 rounded-xl bg-white  shadow-lg border-2  sm:border-3 border-white object-contain"
+                style={{background:`${product.brandColors}`}}
+                className="h-24 w-24 sm:h-34 sm:w-34 rounded-xl  shadow-lg border-2  sm:border-3 border-white object-contain"
                 src={product.logoUrl}
                 alt={`${product.name} logo`}
               />
@@ -50,12 +55,12 @@ export default function ProductDetailHeader({
                       <h1 className="text-base lg:text-2xl font-bold text-gray-900">
                         {product.name}
                       </h1>
-                      <Button
+                    {user?.role !== 'vendor' &&  <Button
                         className="hidden lg:block bg-blue-600 hover:bg-blue-700 text-white"
                         size="lg"
                       >
                         Follow
-                      </Button>
+                      </Button>}
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                       <StarRating rating={product.rating} />
@@ -64,13 +69,13 @@ export default function ProductDetailHeader({
                       </span>
                     </div>
                   </div>
-                  <div className="  justify-end  flex-wrap text-xs sm:text-sm gap-2 hidden sm:flex">
-                    <Button
+                  <div className={` justify-end  flex-wrap text-xs sm:text-sm gap-2 hidden sm:flex`}>
+                    {user?.role !== 'vendor' && <Button
                       className="hidden sm:block lg:hidden bg-blue-600 hover:bg-blue-700 text-white"
                       size="lg"
                     >
                       Follow
-                    </Button>
+                    </Button>}
                     <Button
                       size="lg"
                       variant="outline"
@@ -82,11 +87,11 @@ export default function ProductDetailHeader({
                   </div>
                 </div>
 
-                <div className=" flex-wrap items-center justify-between gap-4  w-full hidden sm:flex">
-                  <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
+                <div className={` flex-wrap items-center ${user?.role !== 'vendor' ? 'justify-between' : 'justify-end'} gap-4  w-full hidden sm:flex`}>
+                {user?.role !== 'vendor' &&  <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
                     <Heart className="w-5 h-5" />
                     <span>Save to My List</span>
-                  </button>
+                  </button>}
 
                   <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
                     <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 ml-2">
@@ -103,18 +108,18 @@ export default function ProductDetailHeader({
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-between gap-4  w-full mt-4 sm:hidden">
-          <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
+        <div className={`flex items-center ${user?.role !== 'vendor' ? 'justify-between' : 'justify-end'} gap-4  w-full mt-4 sm:hidden`}>
+        {user?.role !== 'vendor' &&  <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
             <Heart className="w-5 h-5" />
             <span>Save to My List</span>
-          </button>
+          </button>}
           <div className="flex   text-xs sm:text-sm gap-2">
-            <Button
+            {user?.role !== 'vendor' && <Button
               className="bg-blue-600 hover:bg-blue-700 text-white"
               size="sm"
             >
               Follow
-            </Button>
+            </Button>}
             <Button
               size="sm"
               variant="outline"

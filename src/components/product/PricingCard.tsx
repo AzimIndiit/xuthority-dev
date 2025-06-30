@@ -4,7 +4,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PricingCardProps {
-  planName: string;
+  name: string;
   seats: string;
   description: string;
   price: string;
@@ -15,7 +15,7 @@ interface PricingCardProps {
 }
 
 const PricingCard: React.FC<PricingCardProps> = ({
-  planName,
+  name,
   seats,
   description,
   price,
@@ -48,7 +48,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
         </div>
         <div>
           <p className={cn("text-sm font-medium", isPopular ? "text-blue-200" : "text-gray-500")}>{seats}</p>
-          <h3 className="text-2xl font-bold">{planName}</h3>
+          <h3 className="text-2xl font-bold">{name}</h3>
         </div>
       </div>
 
@@ -66,10 +66,10 @@ const PricingCard: React.FC<PricingCardProps> = ({
       <p className="mt-8 text-base font-semibold">What's included</p>
 
       <ul className="mt-4 flex-1 space-y-3">
-        {features.map((feature, index) => (
+        {features?.map((feature: any, index: any) => (
           <li key={index} className="flex items-center gap-3">
             <CheckCircle2 className={cn("h-6 w-6 flex-shrink-0", isPopular ? "text-white" : "text-blue-600")} />
-            <span className='text-sm'>{feature}</span>
+            <span className='text-sm'>{feature.value}</span>
           </li>
         ))}
       </ul>

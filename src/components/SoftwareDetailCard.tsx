@@ -1,10 +1,16 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
-import { Users, Building2, Network, Heart, Star } from "lucide-react";
+import { Users, Building2, Network, Heart, Star, Edit, Delete, DeleteIcon, Trash } from "lucide-react";
 import StarRating from "./ui/StarRating";
+import useUserStore from "@/store/useUserStore";
+import { formatCurrency } from "@/utils/formatCurrency";
+import ConfirmationModal from "./ui/ConfirmationModal";
+import { useState } from "react";
+import { useDeleteProduct } from "@/hooks/useProducts";
 
 interface SoftwareDetailCardProps {
+  id: string;
   logo?: string;
   name: string;
   rating: number;
@@ -20,6 +26,7 @@ interface SoftwareDetailCardProps {
   onTry?: () => void;
   compareChecked?: boolean;
   onCompareChange?: (checked: boolean) => void;
+  slug?: string;
 }
 
 function renderStars(rating: number) {
@@ -44,6 +51,7 @@ function renderStars(rating: number) {
 }
 
 export default function SoftwareDetailCard({
+  id,
   logo = "https://placehold.co/64x64?text=Logo",
   name,
   rating,
@@ -59,15 +67,32 @@ export default function SoftwareDetailCard({
   onTry,
   compareChecked = false,
   onCompareChange,
+
+  slug
 }: SoftwareDetailCardProps) {
+  const {user, isLoggedIn} = useUserStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const minPrice = Array.isArray(entryPrice) && entryPrice.length > 0
+  ? Math.min(...entryPrice.map(p => Number(p.price) || 0))
+  : null;
+const deleteMutation = useDeleteProduct();
   const viewProductPage = () => {
-    const slug = name
-      .toLowerCase()
-      .replace(/ /g, "-")
-      .replace(/[^\w-]+/g, "");
-    const subCategory = "sub-category";
-    navigate(`/software/${subCategory}/${slug}`);
+    navigate(`/product-detail/${slug}`);
+  };
+
+  const onEdit = () => {
+    navigate(`/profile/products/edit-product`,{
+      state: {
+        productID: id
+      }
+    });
+  };
+
+  const onDelete = () => {
+    setShowDeleteModal(true);
+
   };
   return (
     <div className="relative w-full mx-auto h-full">
@@ -77,7 +102,7 @@ export default function SoftwareDetailCard({
         onClick={viewProductPage}
       >
         <div
-          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg ${logoBackground} flex items-center justify-center  border border-white`}
+          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg flex items-center justify-center  border border-white`} style={{backgroundColor: logoBackground}}
         >
           <img
             src={logo}
@@ -89,7 +114,7 @@ export default function SoftwareDetailCard({
       <Card className="relative bg-white rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
         {/* Logo space is handled above */}
         {/* Logo and Compare */}
-        <div className="flex items-start gap-4 ">
+       {user?.role!=='vendor' && <div className="flex items-start gap-4 ">
           <div className="flex-1" />
           <div className="flex-1 flex justify-end items-start">
             <label className="flex items-center gap-2 select-none cursor-pointer text-xs sm:text-sm text-gray-500">
@@ -102,9 +127,9 @@ export default function SoftwareDetailCard({
               Compare Product
             </label>
           </div>
-        </div>
+        </div>}
         {/* Name, Rating, Review, Write Review */}
-        <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-4">
+        <div className="flex sm:flex-row flex-col sm:items-start justify-between gap-4 mt-8">
           <div>
             <div
               onClick={viewProductPage}
@@ -119,12 +144,27 @@ export default function SoftwareDetailCard({
               </span>
             </div>
           </div>
-          <Button
+        {user?.role!=='vendor' ?  <Button
             className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-none px-4 py-2 text-xs sm:text-sm shadow"
             onClick={onWriteReview}
           >
             Write A Review
+          </Button> :
+        <div className="flex items-center gap-2 absolute top-4 right-4">
+             <Button
+           leftIcon={Edit}
+            className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
+            onClick={onEdit}
+          >
           </Button>
+          <Button
+           leftIcon={Trash}
+            className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
+            onClick={onDelete}
+          >
+          </Button>
+</div>
+          }
         </div>
         {/* Description */}
         <div>
@@ -133,23 +173,21 @@ export default function SoftwareDetailCard({
           </div>
           <div className="text-gray-700 text-xs sm:text-sm mt-1 line-clamp-4">
             {description}{" "}
-            <a href="#" className="text-blue-600 font-medium hover:underline">
-              See More
-            </a>
+           
           </div>
         </div>
         {/* Other Info */}
-        <div>
-          <div className="font-semibold text-gray-900 text-sm sm:text-base mb-2">
+        <div className="">
+          <div className="font-semibold text-gray-900 text-sm sm:text-base mb-2 ">
             Other Info
           </div>
           <div className="divide-y divide-gray-200">
-            <div className="flex items-center gap-2 py-2">
+            <div className="flex items-start justify-start gap-2 py-2">
               <Users className="w-5 h-5 text-gray-500" />
               <span className="font-medium text-gray-900 text-xs sm:text-sm">
                 Users
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1">
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1">
                 ({users})
               </span>
             </div>
@@ -158,7 +196,7 @@ export default function SoftwareDetailCard({
               <span className="font-medium text-gray-900 text-xs sm:text-sm">
                 Industries
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1">
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1">
                 ({industries})
               </span>
             </div>
@@ -167,14 +205,14 @@ export default function SoftwareDetailCard({
               <span className="font-medium text-gray-900 text-xs sm:text-sm">
                 Market Segment
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1">
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1">
                 ({marketSegment})
               </span>
             </div>
           </div>
         </div>
         {/* Bottom Actions */}
-        <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4 ">
+       {location.pathname !== '/profile/products' && <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4 ">
           <button
             onClick={onSave}
             className="flex items-center gap-1 text-gray-500 hover:text-red-500 !text-[11px] xl:!text-[12px]  font-medium sm:px-2 py-1 rounded transition"
@@ -183,7 +221,7 @@ export default function SoftwareDetailCard({
           </button>
           <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
             <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 sm:ml-2">
-              Entry Level Price: {entryPrice}
+              Entry Level Price: {formatCurrency(minPrice || 0)}
             </Button>
             <Button
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 sm:ml-2"
@@ -192,8 +230,18 @@ export default function SoftwareDetailCard({
               Try For Free
             </Button>
           </div>
-        </div>
+        </div>}
       </Card>
+      <ConfirmationModal
+        isOpen={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+        onConfirm={()=>deleteMutation.mutate(id)}
+        title="Delete Product?"
+        description="Are you sure, You want to delete this product?"
+        confirmText={deleteMutation.isPending ? "Deleting..." : "Yes I'm Sure"}
+        cancelText="Cancel"
+        confirmVariant="default"
+      />
     </div>
   );
 }

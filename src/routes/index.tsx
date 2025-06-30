@@ -9,6 +9,8 @@ import CommunityPage from "@/pages/software/CommunityPage";
 import DisputesPage from '@/pages/software/DisputesPage';
 import WriteReviewPage from '@/pages/review/WriteReviewPage';
 import AuthCallback from '@/pages/auth/AuthCallback';
+import ProductsPage from '../pages/user/ProductsPage';
+import AddProductPage from '../pages/user/AddProductPage';
 
 const About = () => <div>About Page</div>;
 const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
@@ -30,7 +32,7 @@ const ProductDetailPage = lazy(
 
 // Lazy load user and vendor routes
 const UserProfile = lazy(() => import("@/pages/user/Profile"));
-const FollowersPage = lazy(() => import("@/pages/user/FollowersPage"));
+
 
 const Loader = () => (
   <div className="w-full flex justify-center items-center min-h-[100dvh] text-lg font-semibold">
@@ -134,18 +136,15 @@ const router = createBrowserRouter([
                 ),
               },
               {
-                path: "/user/:userId/followers",
+                path: "/profile/:tab/:subTab",
                 Component: (props: any) => (
                   <Suspense fallback={<Loader />}>
-                    <FollowersPage {...props} />
+                    <UserProfile {...props} />
                   </Suspense>
                 ),
               },
-             
-              // ...other user routes
             ],
           },
-       
         ],
       },
       { 
@@ -177,7 +176,13 @@ const router = createBrowserRouter([
           },
         ],
       },
-     
+      {
+        path: "/product-detail/:productSlug",
+        children: [
+          { index: true, Component: ProductDetailPage },
+         
+        ],
+      },
     ],
   },
 ]);

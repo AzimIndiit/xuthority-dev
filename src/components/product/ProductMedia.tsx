@@ -71,7 +71,7 @@ const IDCSpotlightCard = () => (
   </div>
 );
 
-const ProductMedia = () => {
+const ProductMedia = ({mediaUrls}: {mediaUrls: string[]}) => {
   return (
     <div className="py-16 sm:py-24">
       
@@ -83,31 +83,31 @@ const ProductMedia = () => {
           <MediaCard
             className="col-span-1 md:col-span-2 lg:col-span-1 lg:row-span-2 min-h-[250px]"
             type="image"
-            imgSrc="https://placehold.co/400x450/e0f2fe/0ea5e9"
+            imgSrc={mediaUrls[0]}
           />
 
           <MediaCard
             className="col-span-1 md:col-span-2 lg:col-span-2 min-h-[250px]"
             type="image"
-            imgSrc="https://placehold.co/800x450/e0f2fe/0ea5e9"
+            imgSrc={mediaUrls[1]}
           />
 
           <MediaCard
             className="col-span-1 md:col-span-1 lg:col-span-2 min-h-[250px]"
             type="image"
-            imgSrc="https://placehold.co/800x450/f0f9ff/0284c7"
+            imgSrc={mediaUrls[2]}
           />
 
           <MediaCard
             className="col-span-1 md:col-span-1 lg:col-span-1 min-h-[250px]"
             type="image"
-            imgSrc="https://placehold.co/800x450/e0f2fe/0ea5e9"
+            imgSrc={mediaUrls[3]}
           />
 
           <MediaCard
             className="col-span-1 md:col-span-2 lg:col-span-2 min-h-[250px]"
             type="video"
-            imgSrc="https://placehold.co/800x450/e0f2fe/0ea5e9"
+            imgSrc={mediaUrls[4]}
           />
         </div>
     </div>

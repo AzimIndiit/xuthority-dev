@@ -1,4 +1,6 @@
 import React from "react";
+import { useParams } from "react-router-dom";
+import { useProductBySlug } from "@/hooks/useProducts";
 import ProductNav from "@/components/product/ProductNav";
 import ProductOverview from "@/components/product/ProductOverview";
 import ProductDetailHeader from "@/components/ProductDetailHeader";
@@ -7,80 +9,48 @@ import ProductMedia from "@/components/product/ProductMedia";
 import ProductCompanyInfo from "@/components/product/ProductCompanyInfo";
 import ProductReviews from "@/components/product/ProductReviews";
 import { Review } from '@/types/review';
+import { Product } from "@/services/product";
+import { formatCurrency } from '@/utils/formatCurrency';
 
 export default function ProductDetailPage() {
-  // Dummy data
-  const product = {
-    name: "Cloudflare Application Security & Performance",
-    rating: 4.7,
-    reviewCount: 2306,
-    logoUrl: "https://placehold.co/128x128/fce7f3/4a044e?text=Logo", // Placeholder
-    bannerUrl: "https://placehold.co/1200x300/6d28d9/ffffff?text=Banner", // Placeholder
-    entryPrice: "$ Free",
-  };
+  const { productSlug } = useParams<{ productSlug: string }>();
+  const { data, isLoading, isError } = useProductBySlug(productSlug || "");
+  const product : Product = data?.data;
 
+  // Optionally, handle loading and error states
+  if (isLoading) {
+    return <div className="text-center py-12">Loading product...</div>;
+  }
+  if (isError || !product) {
+    return <div className="text-center py-12 text-red-500">Product not found.</div>;
+  }
+
+  // Dummy review data for now (replace with real data if available)
   const reviewData = {
-    productName: "Cloudflare Application Security and Performance",
-    rating: 4.7,
-    reviewCount: 2306,
-    ratingDistribution: [
-      { stars: 5, count: 987, percentage: 50 },
-      { stars: 4, count: 786, percentage: 35 },
-      { stars: 3, count: 655, percentage: 10 },
-      { stars: 2, count: 235, percentage: 5 },
-      { stars: 1, count: 12, percentage: 2 },
-    ],
-    popularMentions: [
-      'All Reviews', 'Automations', 'Team', 'Team Members', 'Time Tracking',
-      'Communication', 'Difference', 'Features', 'Organization', 'Platform',
-      'Project Board', 'Projects', 'Task Lists', 'Task', 'Time Zones', 'Track',
-    ],
+    productName: product.name,
+    rating: product.avgRating,
+    reviewCount: product.totalReviews,
+    ratingDistribution: [],
+    popularMentions: [],
   };
+  const reviews: Review[] = [];
 
-  const reviews: Review[] = [
-    {
-      id: '1',
-      title: 'Reliable Security with Seamless Performance',
-      rating: 4,
-      date: 'Jan 18, 2025',
-      content: 'Cloudflare delivers a powerful combination of security and performance, ensuring that web applications remain protected from cyber threats without compromising speed. With an advanced firewall, real-time DDoS mitigation, and a global CDN, Cloudflare helps businesses safeguard sensitive data, prevent downtime, and enhance user experience.',
-      author: {
-        name: 'Calista Mayasari',
-        avatarUrl: 'https://i.pravatar.cc/48?u=1',
-        title: 'Senior Payroll Administrator, Enterprise(> 1000 emp.)',
-        verified: true,
-      },
-      tags: ['Validated Reviewer', 'Review source: Seller invite', 'Incentivized Review'],
-    },
-    {
-      id: '2',
-      title: 'Great for Speed, But Pricing Could Be Better',
-      rating: 3,
-      date: 'Jan 16, 2025',
-      content: 'Cloudflare excels in accelerating website performance and fortifying security with its intelligent caching, load balancing, and threat detection features. Websites experience reduced latency and improved uptime, making it a great tool for businesses looking to enhance their digital presence. However, some of the premium features, such as advanced bot management and enterprise-level security controls.',
-      author: {
-        name: 'Carolyn Wilson',
-        avatarUrl: 'https://i.pravatar.cc/48?u=2',
-        title: 'Facilities Manager, Mid-Market(51-1000 emp.)',
-        verified: true,
-      },
-      tags: ['Validated Reviewer', 'Review source: Seller invite', 'Incentivized Review'],
-    },
-    {
-        id: '3',
-        title: 'Comprehensive Protection, But Learning Curve Exists',
-        rating: 4,
-        date: 'Jan 15, 2025',
-        content: "Cloudflare provides an extensive suite of security and performance tools, from web application firewalls to advanced traffic management, ensuring that businesses can protect and optimize their online assets. While the platform offers powerful capabilities, configuring its advanced settings and custom rules may be challenging for users unfamiliar with web security.",
-        author: {
-          name: 'Diego Díaz',
-          avatarUrl: 'https://i.pravatar.cc/48?u=3',
-          title: 'Co-CEO, Small-Business(50 or fewer emp.)',
-          verified: true,
-        },
-        tags: ['Validated Reviewer', 'Review source: Seller invite', 'Incentivized Review'],
-      },
-  ];
+  // Get minimum price from pricing array and format as currency
+  const minPrice = Array.isArray(product.pricing) && product.pricing.length > 0
+    ? Math.min(...product.pricing.map(p => Number(p.price) || 0))
+    : null;
+
+  // Map API product to ProductDetailHeader type
+  const headerProduct = {
+    name: product.name,
+    rating: product.avgRating ?? 0,
+    reviewCount: product.totalReviews ?? 0,
+    logoUrl: product.logoUrl || '',
+    bannerUrl: product.mediaUrls[0] || 'https://placehold.co/1200x300/6d28d9/ffffff?text=Banner',
+    entryPrice: minPrice !== null ? formatCurrency(minPrice) : 'N/A',
+    brandColors: product.brandColors || '#ffffff',
+
+  };
 
   const handleSearch = (query: string) => {
     console.log("Search query:", query);
@@ -94,12 +64,12 @@ export default function ProductDetailPage() {
 
   return (
     <div className="bg-white min-h-[100vh]">
-      <ProductDetailHeader product={product} />
+      <ProductDetailHeader product={headerProduct} />
       <ProductNav />
       <main className="w-full">
         <section id="product-overview" className="bg-[#F7F7F7]">
           <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
-            <ProductOverview />
+            <ProductOverview product={product} />
           </div>
         </section>
         <section id="pricing">
@@ -116,23 +86,23 @@ export default function ProductDetailPage() {
           <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
             {/* Wavy line background */}
 
-            <ProductPricing />
+      {product.pricing &&      <ProductPricing pricing={product.pricing} />}
           </div>
         </section>
         <section id="media">
           <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
-            <ProductMedia />
+            <ProductMedia mediaUrls={product.mediaUrls || []} />
           </div>
         </section>
         <section id="company-info">
-            <ProductCompanyInfo />
+            <ProductCompanyInfo companyDescription={product.userId} />
         </section>
         <section id="reviews">
             <ProductReviews
               {...reviewData}
               reviews={reviews}
-              onSearch={handleSearch}
-              onFilterChange={handleFilterChange}
+              onSearch={() => {}}
+              onFilterChange={() => {}}
             />
         </section>
         {/* You can add more sections here for other tabs */}

@@ -26,23 +26,20 @@ const DetailItem: React.FC<DetailItemProps> = ({
   </div>
 );
 
-const ProductOverview = () => {
+const ProductOverview = ({product}: {product: any}) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const fullText =
-    `Cloudflare is the cloud for the "everywhere world". At Cloudflare, we have our eyes set on an ambitious goal -- to help build a better Internet. Today, everything needs to be connected to everything everywhere, all the time. This hyperconnectivity creates new challenges related to security, performance, resilience and privacy. As the world's first connectivity cloud, Cloudflare helps connect and protect millions of customers globally. Everyone from individuals to the world's largest enterprises use our unified platform of networking, security, and developer services to succeed in the ever-evolving digital landscape.`;
+  const fullText = product.description;
   const truncatedText = fullText.substring(0, 350) + "...";
 
   const productDetails = {
-    name: "Cloudflare Application Security and Performance",
-    description:
-      "Cloudflare Application Security and Performance solutions provide performance, reliability, and security for all of your web applications and APIs, wherever they are hosted and wherever your users are.",
-    website: "www.cloudflare.com",
-    languages:
-      "German, English, French, Italian, Japanese, Korean, Dutch, Polish, Portuguese, Russian, Spanish, Swedish, Turkish, Chinese (Traditional)",
-    users: "Web Developer, Software Engineer",
-    industries: "Marketing & Advertising, IT and Services",
-    marketSegment: "63% Small-Business, 29% Mid-Market",
+    name: product.name,
+    description: product.description,
+    website: product.websiteUrl || 'N/A',
+    languages: product.languages?.map((language: any) => language.name).join(', ')  || 'N/A',
+    users: product.whoCanUse?.map((user: any) => user.name).join(', ') || 'N/A',
+    industries: product.industries?.map((industry: any) => industry.name).join(', ') || 'N/A',
+    marketSegment: product.marketSegment?.map((marketSegment: any) => marketSegment.name).join(', ') || 'N/A',
   };
 
   return (
@@ -62,10 +59,10 @@ const ProductOverview = () => {
         )}
       </p>
 
-      <div className="mt-10">
+      {/* <div className="mt-10">
         <h3 className="text-xl font-bold text-gray-900">Product Description</h3>
         <p className="mt-3 text-gray-700">{productDetails.description}</p>
-      </div>
+      </div> */}
 
       <div className="mt-10">
         <h3 className="text-xl font-bold text-gray-900">Other Details</h3>
@@ -87,8 +84,11 @@ const ProductOverview = () => {
               </p>
             </DetailItem>
             <DetailItem icon={Globe} >
-              <p className="font-semibold">Languages</p>
-              <p className="text-gray-600">{productDetails.languages}</p>
+            <p>
+                <span className="font-semibold">Languages</span> (
+                {productDetails.languages})
+              </p>
+             
             </DetailItem>
           </div>
           {/* Right Column */}
@@ -114,8 +114,8 @@ const ProductOverview = () => {
           </div>
         </div>
       </div>
-      <ProductFeatures />
-      <ProductIntegrations />
+      {product.features && <ProductFeatures features={product.features} />}
+      {product.integrations && <ProductIntegrations integrations={product.integrations} />}
     </div>
   );
 };

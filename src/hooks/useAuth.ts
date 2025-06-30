@@ -4,7 +4,7 @@ import useUserStore from '@/store/useUserStore';
 import { AuthService, LoginRequest, UserRegisterRequest, VendorRegisterRequest, UpdateProfileRequest, ChangePasswordRequest } from '../services/auth';
 import { FileUploadService } from '../services/fileUpload';
 import toast from 'react-hot-toast';
-import { queryClient } from '@/lib/queryClient';
+
 
 
 // Query keys
@@ -183,7 +183,7 @@ export const useLogout = () => {
     mutationFn: async () => {
       await logoutWithAPI();
       // Navigate to home after logout
-      navigate('/');
+      // navigate('/');
     },
     onError: (error: any) => {
       console.error('Logout error:', error);

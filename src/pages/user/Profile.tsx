@@ -21,18 +21,22 @@ import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 import ProfileDetailsFormVendor, { ProfileVendorFormData } from '@/components/user/ProfileDetailsFormVendor';
 import FollowersFollowing from '@/components/user/FollowersFollowing';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import ProductsPage from './ProductsPage';
+import AddProductPage from './AddProductPage';
+import EditProductPage from './EditProductPage';
 
 const ProfilePage: React.FC = () => {
-  const { tab } = useParams<{ tab?: string }>();
+  const { tab, subTab } = useParams<{ tab?: string, subTab?: string }>();
   const navigate = useNavigate();
   const logoutMutation = useLogout();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   
   // Initialize activeTab based on URL parameter
   const getInitialTab = () => {
-    if (tab === 'followers' || tab === 'following') {
+    if (tab && tab !== 'profile-details') {
       return tab;
     }
+   
     return 'profile-details';
   };
   
@@ -47,9 +51,8 @@ const ProfilePage: React.FC = () => {
     setActiveTab(newTab);
     if (tab === 'followers' || tab === 'following') {
       setFollowTab(tab);
-      
     }
-  }, [tab]);
+  }, [tab, subTab]);
 
   // Use the useProfile hook to trigger React Query
   const { data: user, isLoading, error } = useProfile();
@@ -108,10 +111,16 @@ console.log('user', user)
   // Sidebar items based on user role (no hooks inside)
   const sidebarItems = user?.role === 'vendor'
     ? [
+      {
+        id: 'profile-details',
+        label: 'Profile Details',
+        icon: <UserIcon className="w-5 h-5" />,
+      },
         {
           id: 'products',
           label: 'Products',
           icon: <Grid className="w-5 h-5" />,
+         
         },
         {
           id: 'my-subscription',
@@ -167,7 +176,7 @@ console.log('user', user)
         },
       ];
 
-  // Dynamic breadcrumb based on active tab
+  // Dynamic breadcrumb based on active tab and subTab
   const getBreadcrumb = () => {
     if (activeTab === 'followers') {
       return {
@@ -179,6 +188,18 @@ console.log('user', user)
       return {
         home: 'Home',
         current: 'Profile / Following',
+      };
+    }
+    if (activeTab === 'products') {
+      if (subTab === 'add-product') {
+        return {
+          home: 'Home',
+          current: 'Profile / Products / Add Product',
+        };
+      }
+      return {
+        home: 'Home',
+        current: 'Profile / Products',
       };
     }
     return {
@@ -194,16 +215,17 @@ console.log('user', user)
   };
 
   const handleTabChange = (tabId: string) => {
+    console.log('tabId', tabId)
     if (tabId === 'logout') {
       setShowLogoutModal(true);
       return;
     }
     setActiveTab(tabId);
     // Update URL when tab changes
-    if (tabId === 'followers' || tabId === 'following') {
+    if (tabId === 'followers' || tabId === 'following' || tabId === 'products') {
       navigate(`/profile/${tabId}`);
     } else {
-      navigate('/profile');
+      navigate(`/profile`);
     }
   };
 
@@ -216,6 +238,14 @@ console.log('user', user)
   };
 
   const renderContent = () => {
+    // Handle subTab routing for products
+    if (activeTab === 'products' && subTab === 'add-product') {
+      return <AddProductPage />;
+    }
+    if (activeTab === 'products' && subTab === 'edit-product') {
+      return <EditProductPage  />;
+    }
+
     switch (activeTab) {
       case 'profile-details':
         return user?.role === 'vendor' ? <ProfileDetailsFormVendor initialData={initialProfileVendorData} /> : <ProfileDetailsForm initialData={initialProfileData} />;
@@ -249,6 +279,9 @@ console.log('user', user)
             className="shadow-sm"
           />
         );
+      case 'products':
+        return <ProductsPage />;  
+
       // Placeholder for other tabs
       default:
         return (
@@ -261,7 +294,7 @@ console.log('user', user)
         );
     }
   };
-
+console.log(' activeTab',  activeTab)
   return (
     <>
       <ProfileLayout

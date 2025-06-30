@@ -29,11 +29,11 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   onFollowingClick,
 }) => {
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6">
+    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 ">
       {/* Profile Header */}
       <div className="flex items-center space-x-4 mb-4">
         <Avatar className="w-16 h-16">
-          <AvatarImage src={user?.avatar || ''} alt="Profile" />
+          <AvatarImage className="object-cover" src={user?.avatar || ''} alt="Profile" />
           <AvatarFallback className="text-lg">{getUserInitials(user)}</AvatarFallback>
         </Avatar>
         <div className="flex items-center space-x-6">

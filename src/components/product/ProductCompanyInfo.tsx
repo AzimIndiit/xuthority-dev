@@ -7,6 +7,7 @@ import {
   Linkedin,
   UserCheck,
 } from "lucide-react";
+import { getUserDisplayName } from "@/utils/userHelpers";
 
 // A custom X/Twitter Icon
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -38,21 +39,20 @@ const DetailItem = ({
   </div>
 );
 
-const ProductCompanyInfo = () => {
+const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => {
   const companyData = {
-    name: "Cloudflare Application Security & Performance",
-    logoUrl: "https://placehold.co/64x64/f87171/ffffff?text=C",
-    description:
-      "Cloudflare, Inc. (NYSE: NET) is the leading connectivity cloud company. It empowers organizations to make their employees, applications and networks faster and more secure everywhere, while reducing complexity and cost. Cloudflare's connectivity cloud delivers the most full-featured, unified platform of cloud-native products and developer tools, so any organization can gain the control they need to work, develop, and accelerate their business. Powered by one of the world's largest and most interconnected networks, Cloudflare blocks billions of threats online for its customers every day. It is trusted by millions of organizations – from the largest brands to entrepreneurs and small businesses to nonprofits, humanitarian groups, and governments across the globe.",
-    seller: "Cloudflare, Inc.",
-    website: "www.cloudflare.com",
-    founded: "2009",
-    hq: "San Francisco, California",
-    twitter: "@Cloudflare",
-    twitterFollowers: "212,895",
-    linkedin: "www.linkedin.com",
-    linkedinEmployees: "4,964",
-    ownership: "NYSE: NET",
+    name: companyDescription.companyName,
+    logoUrl: companyDescription.companyAvatar,
+    description: companyDescription.description,
+    seller: getUserDisplayName(companyDescription),
+    website: companyDescription.companyWebsiteUrl,
+    founded: companyDescription.yearFounded,
+    hq: companyDescription.hqLocation,
+    twitter: companyDescription.socialLinks.twitter,
+    twitterFollowers: companyDescription.twitterFollowers,
+    linkedin: companyDescription.socialLinks.linkedin,
+    linkedinEmployees: companyDescription.linkedinEmployees,
+    ownership:getUserDisplayName(companyDescription),
   };
 
   return (

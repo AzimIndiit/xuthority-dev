@@ -17,11 +17,11 @@ const integrations = [
   { name: 'Zapier', logoUrl: 'https://www.vectorlogo.zone/logos/zapier/zapier-icon.svg' },
 ];
 
-const IntegrationCard = ({ name, logoUrl }: { name: string, logoUrl: string }) => (
+const   IntegrationCard = ({ name, image }: { name: string, image: string }) => (
   <div className="flex flex-col items-center text-center gap-3">
     <div className="w-28 h-28 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-5 transition-all duration-300 hover:shadow-md hover:border-gray-300">
       <img
-        src={logoUrl}
+        src={image}
         alt={`${name} logo`}
         className="w-full h-full object-contain"
       />
@@ -31,7 +31,7 @@ const IntegrationCard = ({ name, logoUrl }: { name: string, logoUrl: string }) =
 );
 
 
-const ProductIntegrations = () => {
+const ProductIntegrations = ({integrations}: {integrations: any}) => {
   return (
     <div className="pb-10">
       <h2 className="text-xl font-bold text-gray-900 mb-8">
@@ -39,7 +39,7 @@ const ProductIntegrations = () => {
       </h2>
       <div className="border bg-white rounded-2xl p-8">
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-x-6 gap-y-8 place-items-center">
-          {integrations.map((integration) => (
+          {integrations.map((integration: any) => (
             <IntegrationCard key={integration.name} {...integration} />
           ))}
         </div>

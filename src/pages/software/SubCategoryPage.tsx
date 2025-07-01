@@ -90,6 +90,7 @@ const SubCategoryPage = () => {
   } = useProductsByCategory(
     category || '',
     subCategory || '',
+    "",
     page,
     PAGE_SIZE,
     apiPayload

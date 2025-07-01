@@ -32,6 +32,7 @@ export interface PaginatedProducts {
 export function useProductsByCategory(
   category: string, 
   subCategory: string, 
+  searchQuery: string,
   page: number, 
   limit: number,
   filters?: FilterOptions
@@ -42,6 +43,7 @@ export function useProductsByCategory(
     'category', 
     category, 
     subCategory, 
+    searchQuery,
     page, 
     limit,
     filters?.segment,
@@ -53,7 +55,7 @@ export function useProductsByCategory(
 
   return useQuery({
     queryKey,
-    queryFn: () => fetchProductsByCategory(category, subCategory, page, limit, filters),
+    queryFn: () => fetchProductsByCategory(category, subCategory, searchQuery, page, limit, filters),
     enabled: !!category && !!subCategory,
     // Cache configuration to prevent unnecessary API calls
     staleTime: 5 * 60 * 1000, // 5 minutes - data is considered fresh for 5 minutes

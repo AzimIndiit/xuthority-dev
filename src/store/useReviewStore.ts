@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { LinkedInVerificationData } from '@/types/review';
 
 interface ReviewState {
   // Software Selection
-  selectedSoftware: string | null;
+  selectedSoftware: {id: string, name: string, logoUrl: string} | null;
   
   // Review Steps
   currentStep: number;
@@ -19,17 +20,18 @@ interface ReviewState {
   
   // Verification Data
   verificationData: {
-    method?: 'screenshot' | 'vendor-invitation' | 'company-email' | null;
+    method?: 'screenshot' | 'vendor-invitation' | 'company-email' | 'linkedin' | null;
     screenshot?: File | null;
     vendorInvitationLink?: string;
     companyEmail?: string;
+    linkedInData?: LinkedInVerificationData;
     isVerified?: boolean;
   };
 }
 
 interface ReviewActions {
   // Software Selection Actions
-  setSelectedSoftware: (software: string | null) => void;
+  setSelectedSoftware: (software: {id: string, name: string, logoUrl: string} | null) => void;
   
   // Step Management Actions
   setCurrentStep: (step: number) => void;
@@ -47,12 +49,8 @@ interface ReviewActions {
   removeCon: (index: number) => void;
   
   // Verification Actions
-  setVerificationMethod: (method: ReviewState['verificationData']['method']) => void;
-  setScreenshot: (screenshot: File | null) => void;
-  setVendorInvitationLink: (link: string) => void;
-  setCompanyEmail: (email: string) => void;
-  setVerificationStatus: (isVerified: boolean) => void;
-  
+  setVerificationData: (data: any) => void;
+
   // Reset Actions
   resetReview: () => void;
   resetVerification: () => void;
@@ -69,6 +67,7 @@ const initialState: ReviewState = {
     screenshot: null,
     vendorInvitationLink: '',
     companyEmail: '',
+    linkedInData: undefined,
     isVerified: false,
   },
 };
@@ -150,31 +149,12 @@ export const useReviewStore = create<ReviewStore>()(
         })),
       
       // Verification Actions
-      setVerificationMethod: (method) =>
+      setVerificationData: (data) =>
         set((state) => ({
-          verificationData: { ...state.verificationData, method }
+          verificationData: { ...state.verificationData, ...data }
         })),
       
-      setScreenshot: (screenshot) =>
-        set((state) => ({
-          verificationData: { ...state.verificationData, screenshot }
-        })),
-      
-      setVendorInvitationLink: (vendorInvitationLink) =>
-        set((state) => ({
-          verificationData: { ...state.verificationData, vendorInvitationLink }
-        })),
-      
-      setCompanyEmail: (companyEmail) =>
-        set((state) => ({
-          verificationData: { ...state.verificationData, companyEmail }
-        })),
-      
-      setVerificationStatus: (isVerified) =>
-        set((state) => ({
-          verificationData: { ...state.verificationData, isVerified }
-        })),
-      
+     
       // Reset Actions
       resetReview: () => 
         set(initialState),
@@ -206,6 +186,7 @@ export const useVerificationData = () => useReviewStore((state) => state.verific
 
 // Add this helper hook to get user name from auth store if you have one
 export const useUserName = () => {
+   
   // Replace this with actual user name from your auth store
   // Example: return useAuthStore((state) => state.user?.name) || "User";
   return "Nikol"; // Placeholder

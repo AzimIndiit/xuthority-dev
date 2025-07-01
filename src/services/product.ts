@@ -69,6 +69,7 @@ export interface FilterOptions {
 export async function fetchProductsByCategory(
   category: string, 
   subCategory: string, 
+  searchQuery: string,
   page = 1, 
   limit = 10,
   filters?: FilterOptions
@@ -116,7 +117,7 @@ export async function fetchProductsByCategory(
     }
   }
 
-  return ApiService.get<PaginatedProducts>(`/products/category/${category}/${subCategory}?${params.toString()}`);
+  return ApiService.get<PaginatedProducts>(`/products/category/${category}/${subCategory}?${params.toString()}&search=${searchQuery}`);
 }
 
 export async function updateProduct(id: string, product: any): Promise<ApiResponse<Product>> {

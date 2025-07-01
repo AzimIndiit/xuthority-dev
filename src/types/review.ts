@@ -16,8 +16,43 @@ export interface Review {
 export interface Software {
   id: string;
   name: string;
-  logo: string;
-  rating: number;
-  reviewsCount: number;
-  logoBackground?: string;
+  logoUrl?: string;
+  description?: string;
+  category?: string;
+  rating?: number;
+  reviewCount?: number;
+}
+
+export interface ReviewData {
+  rating?: number;
+  title?: string;
+  description?: string;
+  pros?: string[];
+  cons?: string[];
+}
+
+export interface LinkedInVerificationData {
+  linkedInId: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  profileUrl: string;
+  profilePicture?: string;
+  headline?: string;
+  industry?: string;
+}
+
+export interface VerificationData {
+  method?: 'screenshot' | 'vendor-invitation' | 'company-email' | 'linkedin' | null;
+  screenshot?: File | null;
+  vendorInvitationLink?: string;
+  companyEmail?: string;
+  linkedInData?: LinkedInVerificationData;
+  isVerified?: boolean;
+}
+
+export interface ReviewFormData {
+  software: Software;
+  verification: VerificationData;
+  review: ReviewData;
 }

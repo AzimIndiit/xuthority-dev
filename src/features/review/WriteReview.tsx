@@ -8,6 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { useReviewStore, useSelectedSoftware } from "@/store/useReviewStore";
 import { ChevronLeft } from "lucide-react";
 import StarRating from "@/components/ui/StarRating";
+import { useMutation } from '@tanstack/react-query';
+import { createReview } from '@/services/review';
+import { toast } from 'react-hot-toast';
 
 interface WriteReviewProps {
   setShowStepper?: (show: boolean) => void;
@@ -63,7 +66,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
     reviewData, 
     updateReviewData, 
     nextStep,
-    setCurrentStep 
+    setCurrentStep,
+    verificationData
   } = useReviewStore();
 
   const {
@@ -71,7 +75,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -90,22 +94,62 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
 
   const watchedRating = watch("rating");
   const watchedSubRatings = watch("subRatings");
-console.log('watchedSubRatings', watchedSubRatings)
+
+  const mutation = useMutation({
+    mutationFn: createReview,
+    onSuccess: () => {
+      toast.success('Review submitted successfully!');
+      nextStep();
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.error?.message || 'Failed to submit review');
+    },
+  });
+
   const onSubmit = async (data: FormValues) => {
     try {
-      // Update store with form data
       updateReviewData({
         rating: data.rating,
         title: data.title,
         description: data.description,
       });
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      // Move to next step
-      nextStep();
+      // Map verificationData from store to ReviewVerification type
+      let verification: any = undefined;
+      if (verificationData && verificationData.method) {
+        let verificationType: 'company_email' | 'linkedin' | 'vendor_invite' | 'screenshot' = 'company_email';
+        let verificationDataField: any = {};
+        if (verificationData.method === 'company-email') {
+          verificationType = 'company_email';
+          verificationDataField = { companyEmail: verificationData.companyEmail };
+        } else if (verificationData.method === 'vendor-invitation') {
+          verificationType = 'vendor_invite';
+          verificationDataField = { vendorInvitationLink: verificationData.vendorInvitationLink };
+        } else if (verificationData.method === 'screenshot') {
+          verificationType = 'screenshot';
+          verificationDataField = { screenshot: verificationData.screenshot };
+        } else if (verificationData.method === 'linkedin') {
+          verificationType = 'linkedin';
+          verificationDataField = {};
+        }
+        verification = {
+          isVerified: verificationData.isVerified || false,
+          verificationType,
+          verificationData: verificationDataField,
+        };
+      }
+      const payload = {
+        product: selectedSoftware.id || '',
+        overallRating: data.rating,
+        title: data.title,
+        content: data.description,
+        subRatings: Object.fromEntries(
+          Object.entries(data.subRatings).map(([k, v]) => [k, v === 'N/A' ? 0 : parseInt(v)])
+        ),
+        verification,
+      };
+      mutation.mutate(payload);
     } catch (error) {
-      console.error("Error submitting review:", error);
+      toast.error('Error preparing review data');
     }
   };
 
@@ -125,7 +169,6 @@ console.log('watchedSubRatings', watchedSubRatings)
     label: string; 
   }) => {
     const currentRating = watchedSubRatings[category as keyof typeof watchedSubRatings] || '';
-    
     return (
       <div className="rounded-lg border border-gray-200">
         <div className="flex items-center justify-between mb-3 bg-blue-50 px-2 py-1">
@@ -182,9 +225,8 @@ console.log('watchedSubRatings', watchedSubRatings)
 
       <div className="max-w-2xl">
         <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Write a review for {selectedSoftware ? selectedSoftware.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()) : 'this software'}
+          Write a review for {selectedSoftware ? selectedSoftware.name : 'this software'}
         </h1>
-        
         {/* Disclaimer */}
         <div className="text-sm text-gray-600 mb-8 space-y-1">
           <p>• Your review will only be published after it has been reviewed by our team and passed quality checks.</p>
@@ -262,10 +304,10 @@ console.log('watchedSubRatings', watchedSubRatings)
           <div className="flex justify-end pt-4">
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={mutation.isPending}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold min-w-32"
             >
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {mutation.isPending ? "Submitting..." : "Submit"}
             </Button>
           </div>
         </form>

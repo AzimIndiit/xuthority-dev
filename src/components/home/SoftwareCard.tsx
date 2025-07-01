@@ -7,6 +7,7 @@ import useUIStore from "@/store/useUIStore";
 import { useReviewStore } from "@/store/useReviewStore";
 
 interface SoftwareCardProps {
+  id: string;
   name: string;
   logo: string;
   rating: number;
@@ -15,8 +16,8 @@ interface SoftwareCardProps {
   logoBackground?: string;
 }
 
-export default function SoftwareCard({ name, logo, rating, reviewCount, logoBackground = "bg-white",slug }: SoftwareCardProps) {
-  const { isLoggedIn } = useUserStore();
+export default function SoftwareCard({id, name, logo, rating, reviewCount, logoBackground = "bg-white",slug }: SoftwareCardProps) {
+  const { isLoggedIn ,user  } = useUserStore();
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const navigate = useNavigate();
@@ -43,14 +44,14 @@ export default function SoftwareCard({ name, logo, rating, reviewCount, logoBack
                       </span>
                     </div>
         </div>
-        <div className="mt-auto ">
+      {user?.role === "user" &&  <div className="mt-auto ">
           <Button 
             onClick={() => {
               if(!isLoggedIn) {
                 openAuthModal();
                 return;
               }
-              setSelectedSoftware(name);
+              setSelectedSoftware({id,name,logoUrl:logo});
               setCurrentStep(2);
               navigate("/write-review");
             }}
@@ -59,7 +60,7 @@ export default function SoftwareCard({ name, logo, rating, reviewCount, logoBack
           >
             Write A Review
           </Button>
-        </div>
+        </div>}
       </Card>
     </div>
   );

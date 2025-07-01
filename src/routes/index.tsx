@@ -3,6 +3,7 @@ import { Suspense, lazy } from "react";
 import { ProtectedRoute, RoleRoute } from "./ProtectedRoute";
 import useUserStore from "@/store/useUserStore";
 import LottieLoader from "@/components/LottieLoader";
+import ScrollToTop from "@/components/ScrollToTop";
 import SoftwareCategoryPage from "@/pages/software/SoftwareCategoryPage";
 import SubCategoryPage from "@/pages/software/SubCategoryPage";
 import CommunityPage from "@/pages/software/CommunityPage";
@@ -11,11 +12,15 @@ import WriteReviewPage from '@/pages/review/WriteReviewPage';
 import AuthCallback from '@/pages/auth/AuthCallback';
 import ProductsPage from '../pages/user/ProductsPage';
 import AddProductPage from '../pages/user/AddProductPage';
+import UserOnlyRoute from './UserOnlyRoute';
 
 const About = () => <div>About Page</div>;
 const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
 const AuthLayout = ({ children }: { children?: React.ReactNode }) => (
-  <div>{children || <Outlet />}</div>
+  <div>
+    <ScrollToTop />
+    {children || <Outlet />}
+  </div>
 );
 const Login = () => <div>Login Page</div>;
 const Register = () => <div>Register Page</div>;
@@ -147,14 +152,11 @@ const router = createBrowserRouter([
           },
         ],
       },
-      { 
-        element: <ProtectedRoute  />,
+      {
+        element: <UserOnlyRoute>
+          <WriteReviewPage />
+        </UserOnlyRoute>,
         path: "/write-review",
-        Component: (props: any) => (
-          <Suspense fallback={<Loader />}>
-            <WriteReviewPage {...props} />
-          </Suspense>
-        ),
       },
       {
         path: "/:category",

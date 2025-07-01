@@ -36,6 +36,9 @@ const ReviewStepper: React.FC<{setShowStepper: (show: boolean) => void}> = ({set
             <div
               key={index}
               onClick={() => {
+                // Only work on mobile devices (screen width < 768px)
+                if (window.innerWidth >= 768) return;
+                
                 if(!isLoggedIn) {
                   openAuthModal();
                   return;

@@ -4,14 +4,16 @@ import { Input } from '@/components/ui/input';
 import useDebounce from '@/hooks/useDebounce';
 
 interface ReviewCategorySearchProps {
-  popularMentions: string[];
+  popularMentions: {label: string, value: string, slug: string}[];
   onSearch: (query: string) => void;
+  selectedCategory: string;
+  setSelectedCategory: (category: string) => void;
 }
 
-const ReviewCategorySearch: React.FC<ReviewCategorySearchProps> = ({ popularMentions, onSearch }) => {
+const ReviewCategorySearch: React.FC<ReviewCategorySearchProps> = ({ popularMentions, onSearch, selectedCategory, setSelectedCategory }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-
+console.log(popularMentions,'popularMentions',selectedCategory);
   useEffect(() => {
     onSearch(debouncedSearchQuery);
   }, [debouncedSearchQuery, onSearch]);
@@ -32,14 +34,20 @@ const ReviewCategorySearch: React.FC<ReviewCategorySearchProps> = ({ popularMent
       <div className="flex flex-wrap gap-2 ">
         {popularMentions.slice(0, 8).map((mention) => (
           <button
-            key={mention}
+            key={mention.value}
+            onClick={() => {
+              setSelectedCategory( mention.label === 'All Categories' ? "All Categories" : mention.slug);
+              setSearchQuery("");
+            }}
             className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
-              mention === 'All Categories'
+              mention.label === 'All Categories' 
+                && mention.label === selectedCategory 
+                || mention.slug === selectedCategory
                 ? 'bg-red-600 text-white'
                 : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
             }`}
           >
-            {mention}
+            {mention.label}
           </button>
         ))}
       </div>

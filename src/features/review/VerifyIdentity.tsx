@@ -83,31 +83,61 @@ const options = [
 
 const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   const navigate = useNavigate();
-  const setCurrentStep = useReviewStore((state) => state.setCurrentStep);
+  const { 
+    setCurrentStep,
+    verificationData,
+    setVerificationData
+  } = useReviewStore();
+  
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [screenshotModalOpen, setScreenshotModalOpen] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showVendorInvitationModal, setShowVendorInvitationModal] = useState(false);
+ 
 
-  // Handler to show OTP modal after company verification
-  const handleCompanyVerified = () => {
-    setCompanyModalOpen(false);
+
+  // Handler for OTP verification
+  const handleOtpVerified = () => {
+    setOtpModalOpen(false);
+    toast.success('OTP verified successfully!');
     setCurrentStep(3);
-    setTimeout(() => setOtpModalOpen(true), 300); // slight delay for smooth transition
   };
 
   const handleResendOtp = () => {
-    // TODO: Implement resend logic
-    // For now, just a placeholder
-    // alert('OTP resent!');
-    setCurrentStep(3);
     toast.success("OTP resent!");
   };
 
+  const handleCompanyVerified = (companyEmail: string) => {
+    setCompanyModalOpen(false);
+    setOtpModalOpen(true);
+  };
+
+  // Handler for screenshot upload
   const handleScreenshotUploaded = (file: File) => {
-    console.log(file);
+   
+    setScreenshotModalOpen(false);
+    toast.success('Screenshot uploaded successfully!');
     setCurrentStep(3);
+  };
+
+  // Handler for vendor invitation
+  const handleVendorInvitationSuccess = (invitationLink: string) => {
+    setVerificationData({
+      vendorInvitationLink: invitationLink,
+      method: "vendor-invitation",
+      isVerified: true,
+    });
+    setShowVendorInvitationModal(false);
+    toast.success('Vendor invitation submitted successfully!');
+    setCurrentStep(3);
+  };
+
+  // Handler for LinkedIn verification
+  const handleLinkedInVerification = () => {
+    // Redirect to LinkedIn OAuth verification endpoint
+    const backendUrl = (import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:8081/api/v1';
+    window.location.href = `${backendUrl}/auth/linkedin/verify`;
   };
 
   const handleSkipVerification = () => {
@@ -116,29 +146,19 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
 
   const handleVerifyNow = () => {
     setShowVerificationModal(false);
-    // Redirect back to verification flow or close modal to show verification options
   };
 
   const handleBackToHome = () => {
     setShowVerificationModal(false);
     navigate("/");
-    // Navigate to home page
-    // You can use your router navigation here
   };
 
   const handleVendorInvitationClick = () => {
     setShowVendorInvitationModal(true);
   };
 
-  const handleVendorInvitationSuccess = (invitationLink: string) => {
-    console.log("Invitation link submitted:", invitationLink);
-    setShowVendorInvitationModal(false);
-    // Handle success - proceed to next step
-  };
-
   const handleChooseDifferentOption = () => {
     setShowVendorInvitationModal(false);
-    // Show other verification options or go back to verification choice screen
   };
 
   return (
@@ -165,8 +185,9 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
             style={{ minHeight: '180px'}}
             onClick={() => {
               if (idx === 0) setCompanyModalOpen(true);
-              if (idx === 3) setScreenshotModalOpen(true);
+              if (idx === 1) handleLinkedInVerification();
               if (idx === 2) handleVendorInvitationClick();
+              if (idx === 3) setScreenshotModalOpen(true);
             }}
           >
             <div className="mb-4 sm:mb-6">{option.icon}</div>
@@ -188,11 +209,14 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
         open={companyModalOpen}
         onClose={() => setCompanyModalOpen(false)}
         onSuccess={handleCompanyVerified}
+
       />
       <OtpVerifyModal
         open={otpModalOpen}
         onClose={() => setOtpModalOpen(false)}
         onResend={handleResendOtp}
+        onSuccess={handleOtpVerified}
+        email={verificationData.companyEmail || ''}
       />
       <UploadScreenshotModal
         open={screenshotModalOpen}

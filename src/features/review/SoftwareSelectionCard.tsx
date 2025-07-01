@@ -6,10 +6,23 @@ import { RadioGroupItem } from "@/components/ui/radio-group";
 interface SoftwareSelectionCardProps {
   software: Software;
   isSelected: boolean;
+  id: string;
+  name: string;
+  logoUrl: string;
+  rating: number;
+  reviewCount: number;
+  slug: string;
+  logoBackground: string;
 }
 
 const SoftwareSelectionCard: React.FC<SoftwareSelectionCardProps> = ({
-  software,
+  id,
+  name,
+  logoUrl,
+  rating,
+  reviewCount,
+  slug,
+  logoBackground,
   isSelected,
 }) => {
   return (
@@ -20,27 +33,27 @@ const SoftwareSelectionCard: React.FC<SoftwareSelectionCardProps> = ({
     >
       <div className="absolute -top-8  left-4  z-10 cursor-pointer">
         <div
-          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg ${software.logoBackground} flex items-center justify-center  border border-white`}
+          className={`w-14 h-14 sm:w-16 sm:h-16 rounded-lg flex items-center justify-center  border border-white`} style={{ backgroundColor: logoBackground }}
         >
           <img
-            src={software.logo}
-            alt={software.name}
+            src={logoUrl}
+            alt={name}
             className="w-10 h-10  object-contain rounded-lg"
           />
         </div>
       </div>
       <div className="flex flex-col flex-grow items-start text-left mt-6">
-        <h4 className="font-bold text-gray-900 capitalize">{software.name}</h4>
+        <h4 className="font-bold text-gray-900 capitalize">{name}</h4>
         <div className="flex lg:flex-row flex-col items-start lg:items-center gap-2 mt-1">
-          <StarRating rating={software.rating} />
+          <StarRating rating={rating} />
           <span className="text-sm text-gray-600">
-            ({software.reviewsCount})
+            ({reviewCount})
           </span>
         </div>
       </div>
       <RadioGroupItem
-        value={software.id}
-        id={software.id}
+        value={id}
+        id={id}
         className="absolute top-4 right-4 h-6 w-6"
         checked={isSelected}
       />

@@ -13,11 +13,12 @@ import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useCreateOTP } from "@/hooks/useOTP";
 
 interface CompanyVerifyModalProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (companyEmail: string) => void;
 }
 
 const schema = z.object({
@@ -37,12 +38,16 @@ const CompanyVerifyModal: React.FC<CompanyVerifyModalProps> = ({ open, onClose, 
     resolver: zodResolver(schema),
     mode: 'onBlur',
   });
+const createOTP = useCreateOTP();
 
   const onSubmit = async (data: FormValues) => {
-    // Simulate async submit
-    await new Promise((res) => setTimeout(res, 1200));
-    onSuccess(); // Call onSuccess after submit
-    // reset();
+    try {
+      const response = await createOTP.mutateAsync({email: data.companyEmail, type: 'review_verification'});
+      onSuccess(data.companyEmail);
+
+    } catch (error) {
+      // Error is already handled by the hook
+    }
   };
 
   return (
@@ -65,7 +70,7 @@ const CompanyVerifyModal: React.FC<CompanyVerifyModalProps> = ({ open, onClose, 
               {...register('companyName')}
               aria-invalid={!!errors.companyName}
               aria-describedby="company-name-error"
-              disabled={isSubmitting}
+              disabled={createOTP.isPending}
             />
             {errors.companyName && (
               <div className="text-red-500 text-sm mt-1" id="company-name-error">{errors.companyName.message}</div>
@@ -80,7 +85,7 @@ const CompanyVerifyModal: React.FC<CompanyVerifyModalProps> = ({ open, onClose, 
               {...register('companyEmail')}
               aria-invalid={!!errors.companyEmail}
               aria-describedby="company-email-error"
-              disabled={isSubmitting}
+              disabled={createOTP.isPending}
             />
             {errors.companyEmail && (
               <div className="text-red-500 text-sm mt-1" id="company-email-error">{errors.companyEmail.message}</div>
@@ -90,9 +95,9 @@ const CompanyVerifyModal: React.FC<CompanyVerifyModalProps> = ({ open, onClose, 
             type="submit"
             className="w-full rounded-full py-4 text-lg font-semibold mt-2 bg-blue-600 hover:bg-blue-700 text-white h-12"
             size="lg"
-            disabled={isSubmitting}
+            disabled={createOTP.isPending}
           >
-            {isSubmitting ? 'Submitting...' : 'Continue'}
+            {createOTP.isPending ? 'Sending OTP...' : 'Continue'}
           </Button>
         </form>
         <DialogFooter className="flex flex-col items-center mt-2 w-full  text-center">

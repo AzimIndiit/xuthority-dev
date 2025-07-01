@@ -47,7 +47,7 @@ const Breadcrumb = () => {
               }
 
               // For profile tabs, make the link go to the profile base page
-              const linkTo = value === 'followers' || value === 'following' ? '/profile' : to;
+              const linkTo = value === 'followers' || value === 'following' ? '/profile' : value === 'product-detail' ? '/' : to;
 
               return (
                 <React.Fragment key={to}>

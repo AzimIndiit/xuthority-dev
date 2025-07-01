@@ -4,11 +4,13 @@ import Footer from "./Footer";
 import { AuthModal } from "@/features/auth/AuthModal";
 import Breadcrumb from "./Breadcrumb";
 import { Toaster } from "react-hot-toast";
+import ScrollToTop from "@/components/ScrollToTop";
 
 // Root layout with Navbar
 function RootLayout() {
   return (
     <>
+      <ScrollToTop />
       <Navbar />
       <Breadcrumb />
       <main className="flex-1">

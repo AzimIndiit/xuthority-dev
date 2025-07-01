@@ -107,6 +107,7 @@ export default function SoftwareGrid() {
   } = useProductsByCategory(
     'software',
     activeCategory || '',
+    "",
     1,
     8,
     {}
@@ -201,6 +202,7 @@ export default function SoftwareGrid() {
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 !gap-y-12">
                 {products.map((product) => (
                   <SoftwareCard
+                    id={product._id}
                     slug={product.slug}
                     key={product._id}
                     name={product.name}

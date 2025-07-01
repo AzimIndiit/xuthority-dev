@@ -14,11 +14,14 @@ import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import OtpInput from '@/components/ui/OtpInput';
+import {  useResendOTP, useVerifyOTP } from '@/hooks/useOTP';
 
 interface OtpVerifyModalProps {
   open: boolean;
   onClose: () => void;
   onResend: () => void;
+  onSuccess?: () => void;
+  email: string;
 }
 
 const schema = z.object({
@@ -27,7 +30,7 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-const OtpVerifyModal: React.FC<OtpVerifyModalProps> = ({ open, onClose, onResend }) => {
+const OtpVerifyModal: React.FC<OtpVerifyModalProps> = ({ open, onClose, onResend, onSuccess, email }) => {
   const inputRefs = Array.from({ length: 6 }, () => useRef<HTMLInputElement>(null));
   const {
     control,
@@ -42,18 +45,31 @@ const OtpVerifyModal: React.FC<OtpVerifyModalProps> = ({ open, onClose, onResend
     mode: 'onBlur',
   });
 
+  const verifyOTP = useVerifyOTP();
+  const resendOTP = useResendOTP();
   const otp = watch('otp');
 
   const handleOtpChange = (val: string) => {
-
     setValue('otp', val);
     clearErrors('otp');
   };
 
   const onSubmit = async (data: FormValues) => {
-    // Simulate async submit
-    await new Promise((res) => setTimeout(res, 1200));
-    // onClose(); // Optionally close modal on success
+    try {
+      await verifyOTP.mutateAsync({email, otp: data.otp, type: 'review_verification'});
+      
+    } catch (error) {
+      // Error is already handled by the hook
+    }
+  };
+
+  const handleResendClick = async () => {
+    try {
+      await resendOTP.mutateAsync({email, type: 'review_verification'});
+    
+    } catch (error) {
+      // Error is already handled by the hook
+    }
   };
 
   return (
@@ -72,7 +88,7 @@ const OtpVerifyModal: React.FC<OtpVerifyModalProps> = ({ open, onClose, onResend
             <OtpInput
               value={otp}
               onChange={handleOtpChange}
-              disabled={isSubmitting}
+              disabled={verifyOTP.isPending}
               autoFocus
             />
             {errors.otp && (
@@ -83,20 +99,19 @@ const OtpVerifyModal: React.FC<OtpVerifyModalProps> = ({ open, onClose, onResend
             type="submit"
             className="w-full rounded-full py-4 text-lg font-semibold mt-2 bg-blue-600 hover:bg-blue-700 text-white h-12"
             size="lg"
-
-            disabled={otp.length < 6 || isSubmitting}
+            disabled={otp.length < 6 || verifyOTP.isPending}
           >
-            {isSubmitting ? 'Verifying...' : 'Verify OTP'}
+            {verifyOTP.isPending ? 'Verifying...' : 'Verify OTP'}
           </Button>
         </form>
         <div className="flex justify-center mt-6">
           <button
             type="button"
             className="text-blue-600 underline text-base hover:text-blue-800"
-            onClick={onResend}
-            disabled={isSubmitting}
+            onClick={handleResendClick}
+            disabled={resendOTP.isPending}
           >
-            Resend OTP
+            {resendOTP.isPending ? 'Resending...' : 'Resend OTP'}
           </button>
         </div>
       </DialogContent>

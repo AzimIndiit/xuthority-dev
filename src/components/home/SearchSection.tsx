@@ -62,7 +62,7 @@ console.log('results',results?.softwares?.length === 0 && results?.solutions?.le
   }
 console.log('results', results)
   return (
-    <section className=" flex flex-col items-center justify-center min-h-[90dvh] w-full bg-gradient-to-br from-yellow-100 via-yellow-50 to-yellow-200  px-4 sm:px-6 lg:px-8 py-12">
+    <section className=" flex flex-col items-center justify-center min-h-[90dvh] w-full bg-gradient-to-br from-yellow-100 via-yellow-50 to-yellow-200  px-4 sm:px-6 lg:px-8 py-12" style={{backgroundImage: 'url(/svg/home_bg.svg)',backgroundSize: 'cover',backgroundPosition: 'center' ,backgroundRepeat: 'no-repeat'}}>
       <div className="w-full lg:max-w-screen-xl mx-auto">
         <h1 className="text-4xl lg:text-6xl font-bold text-center mb-3 sm:mb-4 mt-8 md:mt-0 px-4 leading-[1.2]">
           Find the right software with Us!

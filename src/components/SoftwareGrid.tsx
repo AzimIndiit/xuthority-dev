@@ -4,6 +4,7 @@ import SoftwareCard from "./home/SoftwareCard";
 import { useSoftwareOptions } from "@/hooks/useSoftwareOptions";
 import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
+import { useNavigate } from "react-router-dom";
 
 const DUMMY_LOGO = "https://placehold.co/48x48/png";
 
@@ -91,7 +92,7 @@ function ProductSkeleton() {
 
 export default function SoftwareGrid() {
   const {options:softwareOptions,isLoading:softwareLoading}=useSoftwareOptions(1,10)
-
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState(softwareOptions[0]?.slug);
 
   useEffect(() => {
@@ -100,6 +101,7 @@ export default function SoftwareGrid() {
   const {
     data: productsResult,
     isLoading,
+    isFetching,
     isError,
     error
   } = useProductsByCategory(
@@ -112,7 +114,7 @@ export default function SoftwareGrid() {
   const products=Array.isArray(productsResult?.data) ? productsResult?.data : []
 
   return (
-    <section className="py-8 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50">
+    <section className="py-8 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50" >
       <div className="w-full lg:max-w-screen-xl mx-auto">
         <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 text-gray-900">
           The Most Widely Used Software Categories.
@@ -124,7 +126,9 @@ export default function SoftwareGrid() {
               <h2 className="text-xl font-bold">Softwares</h2>
               <button
                 className="text-red-600 font-semibold text-sm flex items-center gap-1 hover:underline"
-                onClick={() => {/* handle see all */}}
+                onClick={() => {
+                  navigate  (`/software`)
+                }}
               >
                 See All Softwares <span aria-hidden>→</span>
               </button>
@@ -169,6 +173,9 @@ export default function SoftwareGrid() {
             </nav>
             <div className="">
               <Button
+                onClick={() => {
+                  navigate  (`/software`)
+                }}
                 variant="outline"
                 className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold flex items-center justify-center gap-2 "
               >
@@ -179,16 +186,16 @@ export default function SoftwareGrid() {
           </aside>
 
           {/* Software Cards Grid */}
-          <div className="flex-1 w-full mt-10">
+          <div className="flex-1 w-full mt-10min-h-[30vh] sm:min-h-[40vh] mt-10">
             {/* Loader for the whole grid */}
-            {isLoading ? (
-              <div className="flex justify-center items-center min-h-[200px] py-8">
+            {isLoading || softwareLoading || isFetching ? (
+              <div className="flex justify-center items-center min-h-[400px]">
                 <LottieLoader />
               </div>
             ) : products.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-[200px] py-8">
-                <img src="/no-data.svg" alt="No products" className="w-32 h-32 mb-4 opacity-70" />
-                <div className="text-gray-500 text-lg font-medium">No products found in this category.</div>
+              <div className="flex flex-col items-center justify-center min-h-[400px]">
+                <img src="/svg/no_data.svg" alt="No products" className="w-32 h-32 sm:w-64 sm:h-64 mb-4" />
+                <div className="text-gray-500 text-sm sm:text-lg font-medium">No products found in this category.</div>
               </div>
             ) : (
               <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 !gap-y-12">

@@ -11,27 +11,24 @@ interface SoftwareCardProps {
   logo: string;
   rating: number;
   reviewCount: number;
+  slug?: string;
   logoBackground?: string;
 }
 
-export default function SoftwareCard({ name, logo, rating, reviewCount, logoBackground = "bg-white" }: SoftwareCardProps) {
+export default function SoftwareCard({ name, logo, rating, reviewCount, logoBackground = "bg-white",slug }: SoftwareCardProps) {
   const { isLoggedIn } = useUserStore();
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const navigate = useNavigate();
   const viewProductPage = () => {
-    const slug = name
-      .toLowerCase()
-      .replace(/ /g, "-")
-      .replace(/[^\w-]+/g, "");
-    const subCategory = "sub-category";
-    navigate(`/software/${subCategory}/${slug}`);
+   
+    navigate(`/product-detail/${slug}`);
   };
   return (
     <div className="relative flex flex-col items-center w-full max-w-xs sm:max-w-sm md:max-w-md mx-auto h-full">
       {/* Floating Logo */}
       <div className="absolute -top-8  left-4 md:left-6 z-10 cursor-pointer" onClick={viewProductPage}>
-        <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-md ${logoBackground} flex items-center justify-center  border border-white`}>
+        <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-md  flex items-center justify-center  border border-white`} style={{ backgroundColor: logoBackground }}>
           <img src={logo} alt={name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-md" />
         </div>
       </div>

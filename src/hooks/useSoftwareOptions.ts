@@ -1,12 +1,14 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SoftwareService } from '@/services/software';
 import { useMemo } from 'react';
 
-export const useSoftwareOptions = (searchTerm?: string) => {
+export const useSoftwareOptions = (page: number = 1, limit: number = 10, searchTerm: string = '') => {
   const { data, isLoading, error } = useQuery({
-    queryKey: ['softwares', searchTerm],
-    queryFn: () => SoftwareService.getActiveSoftwares({ search: searchTerm }),
+    queryKey: ['softwares', searchTerm, page, limit],
+    queryFn: () => SoftwareService.getActiveSoftwares({ search: searchTerm, page, limit }),
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const options = useMemo(() => {
@@ -14,6 +16,7 @@ export const useSoftwareOptions = (searchTerm?: string) => {
     return data.data.map((item) => ({
       value: item._id,
       label: item.name,
+      slug: item.slug,
     }));
   }, [data]);
 

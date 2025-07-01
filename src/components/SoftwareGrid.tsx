@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
 import SoftwareCard from "./home/SoftwareCard";
+import { useSoftwareOptions } from "@/hooks/useSoftwareOptions";
+import { useProductsByCategory } from "@/hooks/useProducts";
+import LottieLoader from "@/components/LottieLoader";
 
 const DUMMY_LOGO = "https://placehold.co/48x48/png";
 
@@ -76,8 +79,37 @@ const softwareData = [
   }
 ];
 
+function ProductSkeleton() {
+  return (
+    <div className="animate-pulse flex flex-col items-center bg-white rounded-xl border p-4 min-h-[180px]">
+      <div className="w-16 h-16 bg-gray-200 rounded-full mb-4" />
+      <div className="h-4 w-24 bg-gray-200 rounded mb-2" />
+      <div className="h-3 w-16 bg-gray-100 rounded" />
+    </div>
+  );
+}
+
 export default function SoftwareGrid() {
-  const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const {options:softwareOptions,isLoading:softwareLoading}=useSoftwareOptions(1,10)
+
+  const [activeCategory, setActiveCategory] = useState(softwareOptions[0]?.slug);
+
+  useEffect(() => {
+    setActiveCategory(softwareOptions[0]?.slug)
+  }, [softwareOptions])
+  const {
+    data: productsResult,
+    isLoading,
+    isError,
+    error
+  } = useProductsByCategory(
+    'software',
+    activeCategory || '',
+    1,
+    8,
+    {}
+  );
+  const products=Array.isArray(productsResult?.data) ? productsResult?.data : []
 
   return (
     <section className="py-8 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50">
@@ -98,17 +130,17 @@ export default function SoftwareGrid() {
               </button>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2">
-              {categories.map((cat) => (
+              {softwareOptions.map((cat) => (
                 <button
-                  key={cat}
+                  key={cat.slug}
                   className={`px-5 py-2 rounded-xl text-sm  whitespace-nowrap font-medium transition-colors ${
-                    cat === activeCategory
+                    cat.slug === activeCategory
                       ? "bg-red-600 text-white"
                       : "bg-white border border-gray-200 text-black"
                   }`}
-                  onClick={() => setActiveCategory(cat)}
+                  onClick={() => setActiveCategory(cat.slug)}
                 >
-                  {cat}
+                  {cat.label}
                 </button>
               ))}
             </div>
@@ -118,18 +150,18 @@ export default function SoftwareGrid() {
           <aside className="hidden sm:block w-48 lg:w-64 flex-shrink-0 mb-4 md:mb-0 space-y-4 rounded-t-xl overflow-hidden md:static lg:sticky lg:top-10">
             <nav className="bg-white border border-gray-200 rounded-xl  ">
               <ul className="divide-y divide-gray-200">
-                {categories.map((cat) => (
-                  <li key={cat}>
+                  {softwareOptions.map((cat) => (
+                  <li key={cat.slug}>
                     <Button
-                      variant={cat === activeCategory ? "default" : "ghost"}
+                      variant={cat.slug === activeCategory ? "default" : "ghost"}
                       className={`w-full justify-start rounded-none px-6 py-4 text-left transition-colors font-medium text-sm sm:text-sm md:text-sm lg:text-base ${
-                        cat === activeCategory
+                        cat.slug === activeCategory
                           ? "bg-red-600 text-white hover:bg-red-700"
                           : "text-gray-900 hover:bg-gray-50"
                       }`}
-                      onClick={() => setActiveCategory(cat)}
+                      onClick={() => setActiveCategory(cat.slug)}
                     >
-                      {cat}
+                      {cat.label}
                     </Button>
                   </li>
                 ))}
@@ -148,18 +180,31 @@ export default function SoftwareGrid() {
 
           {/* Software Cards Grid */}
           <div className="flex-1 w-full mt-10">
-            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 !gap-y-12">
-              {softwareData.map((software) => (
-                <SoftwareCard
-                  key={software.name}
-                  name={software.name}
-                  logo={software.logo}
-                  rating={software.rating}
-                  reviewCount={software.reviewCount}
-                  logoBackground={software.logoBackground}
-                />
-              ))}
-            </div>
+            {/* Loader for the whole grid */}
+            {isLoading ? (
+              <div className="flex justify-center items-center min-h-[200px] py-8">
+                <LottieLoader />
+              </div>
+            ) : products.length === 0 ? (
+              <div className="flex flex-col items-center justify-center min-h-[200px] py-8">
+                <img src="/no-data.svg" alt="No products" className="w-32 h-32 mb-4 opacity-70" />
+                <div className="text-gray-500 text-lg font-medium">No products found in this category.</div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 !gap-y-12">
+                {products.map((product) => (
+                  <SoftwareCard
+                    slug={product.slug}
+                    key={product._id}
+                    name={product.name}
+                    logo={product.logoUrl}
+                    rating={product.avgRating || 0}
+                    reviewCount={product.totalReviews || 0}
+                    logoBackground={product.brandColors || "bg-white"}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

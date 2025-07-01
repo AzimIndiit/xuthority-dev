@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { SolutionService } from '@/services/solution';
 import { useMemo } from 'react';
 
@@ -7,6 +7,8 @@ export const useSolutionOptions = (searchTerm?: string) => {
     queryKey: ['solutions', searchTerm],
     queryFn: () => SolutionService.getActiveSolutions({ search: searchTerm }),
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const options = useMemo(() => {

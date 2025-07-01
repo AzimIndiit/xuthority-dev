@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { UserRoleService } from '@/services/userRole';
 import { useMemo } from 'react';
 
@@ -7,6 +7,8 @@ export const useUserRoleOptions = (searchTerm?: string) => {
     queryKey: ['userRoles', searchTerm],
     queryFn: () => UserRoleService.getActiveUserRoles({ search: searchTerm }),
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 
   const options = useMemo(() => {

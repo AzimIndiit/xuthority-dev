@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { MarketSegmentService } from '@/services/marketSegment';
 import { useMemo } from 'react';
 
@@ -7,6 +7,9 @@ export const useMarketSegmentOptions = (searchTerm?: string) => {
     queryKey: ['marketSegments', searchTerm],
     queryFn: () => MarketSegmentService.getActiveMarketSegments({ search: searchTerm }),
     staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    placeholderData: keepPreviousData,
+    
   });
 
   const options = useMemo(() => {

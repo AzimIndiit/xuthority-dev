@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '@/services/product';
 import SoftwareDetailCard from '@/components/SoftwareDetailCard';
+import { ArrowLeftIcon } from 'lucide-react';
 
 const PAGE_SIZE = 6;
 
@@ -15,11 +16,15 @@ const ProductsPage: React.FC = () => {
   const products  =Array.isArray(data?.data) ? data.data : [];
   const pagination = data?.meta?.pagination;
   const totalPages = pagination?.pages ?? 1;
-console.log('products', products)
   return (
     <div className="max-w-7xl mx-auto py-8 px-2">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Products</h1>
+      <div className='flex items-center gap-2'>
+      <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span> <h1 className="text-2xl font-bold">Products</h1>
+      </div>
         <Button
           className="bg-blue-600 text-white px-4 py-2 rounded-full"
           onClick={() => navigate('/profile/products/add-product')}

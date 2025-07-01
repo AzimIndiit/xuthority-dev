@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { addProduct, fetchProducts, Product, fetchProductBySlug, fetchProductById, updateProduct, deleteProduct } from '../services/product';
+import { addProduct, fetchProducts, Product, fetchProductBySlug, fetchProductById, updateProduct, deleteProduct, fetchProductsByCategory } from '../services/product';
 import FileUploadService from '@/services/fileUpload';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
@@ -13,6 +13,14 @@ export function useProducts(page: number, limit: number) {
     queryKey: ['products', page, limit],
     queryFn: () => fetchProducts(page, limit),
 
+  });
+}
+
+export function useProductsByCategory(category: string, subCategory: string, page: number, limit: number) {
+  return useQuery({
+    queryKey: ['products', 'category', category, subCategory, page, limit],
+    queryFn: () => fetchProductsByCategory(category, subCategory, page, limit),
+    enabled: !!category && !!subCategory,
   });
 } 
 
@@ -162,6 +170,14 @@ export function useDeleteProduct() {
   return useMutation({
     mutationFn: async (id: string) => {
       return deleteProduct(id);
+    },
+    onSuccess: (data) => {
+      toast.success("Product deleted successfully");
+      queryClient.invalidateQueries({ queryKey: queryKeys.products });
+    },
+    onError: (error: any) => {
+      console.error("Product delete error:", error);
+      toast.error(error.response.data.message || "Failed to delete product");
     },
   });
 }

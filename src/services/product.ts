@@ -57,6 +57,10 @@ export async function fetchProductById(id: string): Promise<ApiResponse<Product>
   return ApiService.get<Product>(`/products/${id}`);
 }
 
+export async function fetchProductsByCategory(category: string, subCategory: string, page = 1, limit = 10): Promise<ApiResponse<PaginatedProducts>> {
+  return ApiService.get<PaginatedProducts>(`/products/category/${category}/${subCategory}?page=${page}&limit=${limit}`);
+}
+
 export async function updateProduct(id: string, product: any): Promise<ApiResponse<Product>> {
   return ApiService.put(`/products/${id}`, product);
 }

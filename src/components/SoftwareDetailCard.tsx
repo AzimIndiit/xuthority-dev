@@ -150,19 +150,21 @@ const deleteMutation = useDeleteProduct();
           >
             Write A Review
           </Button> :
+           location.pathname === '/profile/products' && 
+
         <div className="flex items-center gap-2 absolute top-4 right-4">
-             <Button
-           leftIcon={Edit}
-            className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
-            onClick={onEdit}
-          >
-          </Button>
-          <Button
-           leftIcon={Trash}
-            className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
-            onClick={onDelete}
-          >
-          </Button>
+        <Button
+      leftIcon={Edit}
+       className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
+       onClick={onEdit}
+     >
+     </Button>
+     <Button
+      leftIcon={Trash}
+       className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
+       onClick={onDelete}
+     >
+     </Button>
 </div>
           }
         </div>
@@ -235,7 +237,10 @@ const deleteMutation = useDeleteProduct();
       <ConfirmationModal
         isOpen={showDeleteModal}
         onOpenChange={setShowDeleteModal}
-        onConfirm={()=>deleteMutation.mutate(id)}
+        onConfirm={()=>{
+          deleteMutation.mutate(id);
+          setShowDeleteModal(false);
+        }}
         title="Delete Product?"
         description="Are you sure, You want to delete this product?"
         confirmText={deleteMutation.isPending ? "Deleting..." : "Yes I'm Sure"}

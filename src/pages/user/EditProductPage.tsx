@@ -354,7 +354,7 @@ const EditProductPage: React.FC = () => {
   return (
     <div className="max-w-5xl mx-auto py-8 sm:px-2">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Add Product</h1>
+        <h1 className="text-2xl font-bold">Edit Product</h1>
         <Button onClick={() => navigate('/profile/products')} className="bg-blue-600 text-white px-4 py-2 rounded-full" variant="default" leftIcon={ArrowLeftIcon}>Back To Products</Button>
       </div>
       <FormProvider {...methods}>

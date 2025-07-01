@@ -60,7 +60,7 @@ pricing: z
   .array(
     z.object({
       name: z.string().min(1, 'Pricing name is required'),
-      price: z.string().min(1, 'Price is required'),
+      price: z.number().min(0, 'Price must be a positive number'),
       seats: z.string().min(1, 'No of seats is required'),
       description: z.string().min(1, 'Pricing description is required'),
       features: z
@@ -92,7 +92,7 @@ const defaultValues: FormData = {
   logoUrl: '',
   mediaUrls: [],
   features: [{ title: '', description: [{value: ''}] }],
-  pricing: [{ name: '', price: '', seats: '', description: '', features: [{value: ''}] }],
+  pricing: [{ name: '', price: 0, seats: '', description: '', features: [{value: ''}] }],
 };
 
 interface PricingFeaturesFieldArrayProps {
@@ -217,7 +217,7 @@ const AddProductPage: React.FC = () => {
     resolver: zodResolver(schema),
     defaultValues,
   });
-  const { handleSubmit, control, setValue,reset,getValues, formState: { isSubmitting } ,watch ,formState:{errors},clearErrors} = methods;
+  const { handleSubmit, control, setValue,reset,getValues, formState: { isSubmitting } ,watch ,formState:{errors},clearErrors,setError} = methods;
   console.log(errors,"errors");
   const { fields: featureFields, append: appendFeature, remove: removeFeature } = useFieldArray({
     control,
@@ -484,7 +484,7 @@ console.log('mediaUrls', mediaFiles)
                 disabled={addProductMutation.isPending}
                 type="button"
                 className="bg-blue-600 text-white rounded-full flex items-center justify-center  w-12 h-12 shadow-md hover:bg-blue-700 transition"
-                onClick={() => appendPricing({ name: '', price: '', seats: '', description: '', features: [{value: ''}] })}
+                onClick={() => appendPricing({ name: '', price:0, seats: '', description: '', features: [{value: ''}] })}
                 title="Add Pricing Plan"
               >
                 +
@@ -508,7 +508,51 @@ console.log('mediaUrls', mediaFiles)
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <FormInput name={`pricing.${idx}.name`} label="Plan Name" maxLength={100} placeholder="Enter plan name" disabled={addProductMutation.isPending} />
-                  <FormInput name={`pricing.${idx}.price`} label="Price" maxLength={100} placeholder="Enter price" disabled={addProductMutation.isPending} />
+                  <FormInput 
+                    name={`pricing.${idx}.price`} 
+                    label="Price" 
+                    type="number" 
+                    min={0} 
+                    max={1000} 
+                    step={1}
+                  
+                    onKeyDown={(e) => {
+                      // Prevent minus and plus signs
+                      if (e.key === '-' || e.key === '+') {
+                        e.preventDefault();
+                        return;
+                      }
+                      
+                      // Allow only numbers and decimal point
+                      if ((e.key >= '0' && e.key <= '9') || e.key === '.') {
+                        const currentValue = (e.target as HTMLInputElement).value;
+                        
+                        // Prevent multiple decimal points
+                        if (e.key === '.' && currentValue.includes('.')) {
+                          e.preventDefault();
+                          return;
+                        }
+                        
+                        // Check decimal places
+                        if (currentValue.includes('.')) {
+                          const decimalPlaces = currentValue.split('.')[1]?.length || 0;
+                          if (decimalPlaces >= 2 && e.key !== '.') {
+                            e.preventDefault();
+                            return;
+                          }
+                        }
+                        
+                        const newValue = currentValue + e.key;
+                        if (parseFloat(newValue) > 1000) {
+                          e.preventDefault();
+                        }
+                      } else if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
+                        e.preventDefault();
+                      }
+                    }}
+                    placeholder="Enter price" 
+                    disabled={addProductMutation.isPending} 
+                  />
                   <FormInput name={`pricing.${idx}.seats`} label="No of Seats" maxLength={100} placeholder="Enter no of seats" disabled={addProductMutation.isPending} />
                 </div>
                 <FormTextarea name={`pricing.${idx}.description`} className="mb-6" label="Plan Description" rows={3} maxLength={500} placeholder="Enter plan description" disabled={addProductMutation.isPending} />

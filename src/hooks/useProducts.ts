@@ -3,6 +3,7 @@ import { addProduct, fetchProducts, Product, fetchProductBySlug, fetchProductByI
 import FileUploadService from '@/services/fileUpload';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
+import { FilterOptions } from '@/services/product';
 
 export const queryKeys = {
   products: ['products'] as const,
@@ -16,11 +17,51 @@ export function useProducts(page: number, limit: number) {
   });
 }
 
-export function useProductsByCategory(category: string, subCategory: string, page: number, limit: number) {
+export interface PaginatedProducts {
+  data: any[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+}
+
+export function useProductsByCategory(
+  category: string, 
+  subCategory: string, 
+  page: number, 
+  limit: number,
+  filters?: FilterOptions
+) {
+  // Create a stable query key that only changes when actual values change
+  const queryKey = [
+    'products', 
+    'category', 
+    category, 
+    subCategory, 
+    page, 
+    limit,
+    filters?.segment,
+    filters?.categories?.join(','),
+    filters?.industries?.join(','),
+    filters?.price?.join(','),
+    filters?.sortBy
+  ];
+
   return useQuery({
-    queryKey: ['products', 'category', category, subCategory, page, limit],
-    queryFn: () => fetchProductsByCategory(category, subCategory, page, limit),
+    queryKey,
+    queryFn: () => fetchProductsByCategory(category, subCategory, page, limit, filters),
     enabled: !!category && !!subCategory,
+    // Cache configuration to prevent unnecessary API calls
+    staleTime: 5 * 60 * 1000, // 5 minutes - data is considered fresh for 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache for 10 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus
+    refetchOnMount: false, // Don't refetch when component mounts if data exists
+    refetchOnReconnect: false, // Don't refetch when network reconnects
+    placeholderData: (previousData) => previousData, // Show previous data while new data is loading
   });
 } 
 

@@ -1,5 +1,5 @@
 import SoftwareDetailCard from "@/components/SoftwareDetailCard";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,12 +24,62 @@ const SubCategoryPage = () => {
   const { subCategory, category } = useParams<{ subCategory: string, category: string }>();
   const [page, setPage] = useState(1);
   const [sortValue, setSortValue] = useState<string | null>("ratings-desc");
-  const [filters, setFilters] = useState({
+  
+  // Local filter state (for UI only)
+  const [localFilters, setLocalFilters] = useState({
     segment: "all",
-    categories: ["Project Management", "Accounting"],
-    industries: ["IT & Services", "Computer Software"],
+    categories: [],
+    industries: [],
     price: [10, 250],
   });
+  
+  // Applied filter state (sent to API)
+  const [appliedFilters, setAppliedFilters] = useState({
+    segment: "all",
+    categories: [],
+    industries: [],
+    price: [10, 250],
+  });
+
+  // Memoize API payload to prevent unnecessary API calls
+  const apiPayload = useMemo(() => {
+    return {
+      segment: appliedFilters.segment,
+      categories: appliedFilters.categories,
+      industries: appliedFilters.industries,
+      price: appliedFilters.price as [number, number],
+      sortBy: sortValue
+    };
+  }, [appliedFilters, sortValue]);
+
+  // Handle local filter changes (UI only)
+  const handleFilterChange = (newFilters: any) => {
+    setLocalFilters(newFilters);
+    // Don't update applied filters or trigger API call
+  };
+
+  const handleSortChange = (newSortValue: string) => {
+    setSortValue(newSortValue);
+    setPage(1); // Reset to first page when sort changes
+  };
+
+  const handleApplyFilters = () => {
+    // Apply local filters to API filters
+    setAppliedFilters(localFilters);
+    setPage(1);
+  };
+
+  const handleClearFilters = () => {
+    const resetFilters = {
+      segment: "all",
+      categories: [],
+      industries: [],
+      price: [10, 250],
+    };
+    setLocalFilters(resetFilters);
+    setAppliedFilters(resetFilters);
+    setPage(1);
+  };
 
   // Fetch products by category and subcategory
   const {
@@ -37,30 +87,34 @@ const SubCategoryPage = () => {
     isLoading,
     isError,
     error
-  } = useProductsByCategory(category || '', subCategory || '', page, PAGE_SIZE);
+  } = useProductsByCategory(
+    category || '',
+    subCategory || '',
+    page,
+    PAGE_SIZE,
+    apiPayload
+  );
 
-  const products = Array.isArray(productsResult?.data) ? productsResult?.data : [];
-  const pagination = productsResult?.meta?.pagination || {
-    page: 1,
-    limit: PAGE_SIZE,
-    total: 0,
-    pages: 1,
-    hasNext: false,
-    hasPrev: false
-  };
+  // Memoize pagination calculations
+  const pagination = useMemo(() => {
+    return productsResult?.meta?.pagination || {
+      page: 1,
+      limit: PAGE_SIZE,
+      total: 0,
+      pages: 1,
+      hasNext: false,
+      hasPrev: false
+    };
+  }, [productsResult?.meta?.pagination]);
+
+  const products = useMemo(() => {
+    return Array.isArray(productsResult?.data) ? productsResult?.data : [];
+  }, [productsResult?.data]);
 
   const total = pagination.total;
   const totalPages = pagination.pages;
   const start = (page - 1) * PAGE_SIZE + 1;
   const end = Math.min(page * PAGE_SIZE, total);
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <LottieLoader />
-      </div>
-    );
-  }
 
   if (isError) {
     return (
@@ -72,6 +126,11 @@ const SubCategoryPage = () => {
 
   return (
     <section className="flex justify-center items-center py-8">
+        {isLoading ?(
+          <div className="flex justify-center items-center py-8">
+            <LottieLoader />
+          </div>
+        ):(
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         {/* Heading and controls */}
         <div className="flex flex-col flex-wrap md:flex-row md:items-center sm:justify-between mb-6 gap-2">
@@ -81,8 +140,13 @@ const SubCategoryPage = () => {
             Available
           </h2>
           <div className="flex gap-2 sm:gap-4 items-start sm:items-center">
-            <SortByDropdown value={sortValue} onChange={setSortValue} />
-            <FilterDropdown filters={filters} onFilterChange={setFilters} />
+            <SortByDropdown value={sortValue} onChange={handleSortChange} />
+            <FilterDropdown 
+              filters={localFilters} 
+              onFilterChange={handleFilterChange} 
+              onApply={handleApplyFilters}
+              onClear={handleClearFilters}
+            />
           </div>
         </div>
 
@@ -169,6 +233,7 @@ const SubCategoryPage = () => {
           </div>
         )}
       </div>
+        )}
     </section>
   );
 };

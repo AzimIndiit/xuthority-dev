@@ -43,7 +43,7 @@ interface SortByDropdownProps {
 
 export default function SortByDropdown({ value, onChange }: SortByDropdownProps) {
   const activeGroup = SORT_OPTIONS.find(group => group.options.some(opt => opt.value === value));
-
+  console.log('activeGroup', activeGroup)
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>

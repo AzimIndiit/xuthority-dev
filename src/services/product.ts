@@ -57,8 +57,66 @@ export async function fetchProductById(id: string): Promise<ApiResponse<Product>
   return ApiService.get<Product>(`/products/${id}`);
 }
 
-export async function fetchProductsByCategory(category: string, subCategory: string, page = 1, limit = 10): Promise<ApiResponse<PaginatedProducts>> {
-  return ApiService.get<PaginatedProducts>(`/products/category/${category}/${subCategory}?page=${page}&limit=${limit}`);
+export interface FilterOptions {
+  segment?: string;
+  categories?: string[];
+  industries?: string[];
+  price?: [number, number];
+  sortBy?: string;
+  sortOrder?: string;
+}
+
+export async function fetchProductsByCategory(
+  category: string, 
+  subCategory: string, 
+  page = 1, 
+  limit = 10,
+  filters?: FilterOptions
+): Promise<ApiResponse<PaginatedProducts>> {
+  const params = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString()
+  });
+
+  if (filters) {
+    if (filters.segment && filters.segment !== 'all') {
+      params.append('segment', filters.segment);
+    }
+    if (filters.categories && filters.categories.length > 0) {
+      params.append('categories', filters.categories.join(','));
+    }
+    if (filters.industries && filters.industries.length > 0) {
+      params.append('industries', filters.industries.join(','));
+    }
+    if (filters.price) {
+      params.append('minPrice', filters.price[0].toString());
+      params.append('maxPrice', filters.price[1].toString());
+    }
+    if (filters.sortBy) {
+      // Handle custom sort values
+      if (filters.sortBy === 'ratings-desc') {
+        params.append('sortBy', 'avgRating');
+        params.append('sortOrder', 'desc');
+      } else if (filters.sortBy === 'ratings-asc') {
+        params.append('sortBy', 'avgRating');
+        params.append('sortOrder', 'asc');
+      } else if (filters.sortBy === 'pricing-desc') {
+        params.append('sortBy', 'pricing');
+        params.append('sortOrder', 'desc');
+      } else if (filters.sortBy === 'pricing-asc') {
+        params.append('sortBy', 'pricing');
+        params.append('sortOrder', 'asc');
+      } else if (filters.sortBy === 'reviewCounts-desc') {
+        params.append('sortBy', 'totalReviews');
+        params.append('sortOrder', 'desc');
+      } else if (filters.sortBy === 'reviewCounts-asc') {
+        params.append('sortBy', 'totalReviews');
+        params.append('sortOrder', 'asc');
+      }
+    }
+  }
+
+  return ApiService.get<PaginatedProducts>(`/products/category/${category}/${subCategory}?${params.toString()}`);
 }
 
 export async function updateProduct(id: string, product: any): Promise<ApiResponse<Product>> {

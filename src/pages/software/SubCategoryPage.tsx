@@ -171,7 +171,7 @@ const SubCategoryPage = () => {
                    openAuthModal();
                    return;
                  }
-                 setSelectedSoftware(product.name);
+                 setSelectedSoftware({id:product._id,name:product.name,logoUrl:product.logoUrl});
                  setCurrentStep(2);
                  navigate("/write-review");
                }}

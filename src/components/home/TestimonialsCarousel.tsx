@@ -181,7 +181,7 @@ export default function TestimonialsCarousel() {
                   <div className="bg-white rounded-xl shadow-sm p-7 flex flex-col justify-between min-h-[320px] mx-2 flex-1">
                     <p className="text-gray-800 text-base mb-8">{t.text}</p>
                     <div className="flex items-center justify-between mt-auto">
-                      <span className="text-red-600 text-xl font-buffalo">
+                      <span className="text-red-600 text-3xl font-family-buffalo">
                         {t.name}
                       </span>
                       <img

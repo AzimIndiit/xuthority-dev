@@ -18,7 +18,7 @@ import { useLanguageOptions } from '@/hooks/useLanguageOptions';
 import { useMarketSegmentOptions } from '@/hooks/useMarketSegmentOptions';
 import { ArrowLeftIcon, X } from 'lucide-react';
 import { FileUpload } from '@/types/file';
-import { toast } from 'react-hot-toast';
+import { useToast } from '@/hooks/useToast';
 import { useFetchProductById, useUpdateProduct } from '@/hooks/useProducts';
 const fileOrString = z.union([z.instanceof(File), z.string()]);
 const MAX_FILE_SIZE_MB = 10;
@@ -215,6 +215,7 @@ const EditProductPage: React.FC = () => {
   const [isLogoDragActive, setIsLogoDragActive] = useState(false);
   const [isMediaDragActive, setIsMediaDragActive] = useState(false);
   const navigate = useNavigate();
+  const toast = useToast();
   const methods = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues,

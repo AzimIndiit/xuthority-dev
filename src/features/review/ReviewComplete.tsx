@@ -14,10 +14,14 @@ const ReviewComplete: React.FC<ReviewCompleteProps> = ({ setShowStepper }) => {
   const navigate = useNavigate();
   const { resetReview } = useReviewStore();
   const userName = useUserName();
+
   
   const handleGoHome = () => {
-    resetReview(); // Clear the review data
+
     navigate("/"); // Navigate to home page
+    setTimeout(() => {
+      resetReview();
+    }, 1000);
   };
 
   return (

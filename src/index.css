@@ -4,12 +4,13 @@
 @custom-variant dark (&:is(.dark *));
 @font-face {
   font-family: 'Buffalo';
-  src: url('/fonts/Buffalo-Regular.woff') format('woff');
-  font-weight: normal;
+  src:url('/fonts/Buffalo-Regular.woff2') format('woff2') ;
+  font-weight: normal;  
   font-style: normal;
+  font-display: swap;
 }
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif, 'Buffalo';
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
@@ -55,6 +56,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --font-family-buffalo: Buffalo, sans-serif;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

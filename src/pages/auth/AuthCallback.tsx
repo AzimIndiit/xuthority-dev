@@ -4,13 +4,14 @@ import { queryClient } from '@/lib/queryClient';
 import useUserStore from '@/store/useUserStore';
 import { AuthService } from '@/services/auth';
 import LottieLoader from '@/components/LottieLoader';
-import toast from 'react-hot-toast';
+import { useToast } from '@/hooks/useToast';
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { loginWithToken } = useUserStore();
   const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     const handleAuthCallback = async () => {
@@ -22,7 +23,7 @@ const AuthCallback: React.FC = () => {
 
         if (error) {
           setError(`Authentication failed: ${error}`);
-          toast.error(`Authentication failed: ${error}`);
+          toast.auth.error(`Authentication failed: ${error}`);
           setTimeout(() => {
             navigate('/');
           }, 3000);
@@ -31,7 +32,7 @@ const AuthCallback: React.FC = () => {
 
         if (!token) {
           setError('No authentication token received');
-          toast.error('No authentication token received');
+          toast.auth.error('No authentication token received');
           setTimeout(() => {
             navigate('/');
           }, 3000);
@@ -63,7 +64,7 @@ const AuthCallback: React.FC = () => {
           queryClient.setQueryData(['profile'], profileResponse.data.user);
           
           toast.dismiss();
-          toast.success(`Login successful!`);
+          toast.auth.success(`Login successful!`);
           
           // Redirect to dashboard or home
           navigate('/');
@@ -74,7 +75,7 @@ const AuthCallback: React.FC = () => {
       } catch (err: any) {
         console.error('Auth callback error:', err);
         setError(err.message || 'Authentication failed');
-        toast.error(err.message || 'Authentication failed');
+        toast.auth.error(err.message || 'Authentication failed');
         
         // Clear any stored tokens and cache
         localStorage.clear();

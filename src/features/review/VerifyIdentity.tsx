@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import CompanyVerifyModal from "./CompanyVerifyModal";
 import OtpVerifyModal from "./OtpVerifyModal";
-import toast from "react-hot-toast";
+import { useToast } from "@/hooks/useToast";
 import UploadScreenshotModal from "./UploadScreenshotModal";
 import VerificationRequiredModal from "@/features/review/VerificationRequiredModal";
 import VendorInvitationModal from "@/features/review/VendorInvitationModal";
@@ -88,6 +88,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
     verificationData,
     setVerificationData
   } = useReviewStore();
+  const toast = useToast();
   
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
@@ -100,12 +101,12 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   // Handler for OTP verification
   const handleOtpVerified = () => {
     setOtpModalOpen(false);
-    toast.success('OTP verified successfully!');
+    toast.verification.success('OTP verified successfully!');
     setCurrentStep(3);
   };
 
   const handleResendOtp = () => {
-    toast.success("OTP resent!");
+    toast.otp.success("OTP resent!");
   };
 
   const handleCompanyVerified = (companyEmail: string) => {
@@ -117,7 +118,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   const handleScreenshotUploaded = (file: File) => {
    
     setScreenshotModalOpen(false);
-    toast.success('Screenshot uploaded successfully!');
+    toast.verification.success('Screenshot uploaded successfully!');
     setCurrentStep(3);
   };
 
@@ -129,7 +130,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
       isVerified: true,
     });
     setShowVendorInvitationModal(false);
-    toast.success('Vendor invitation submitted successfully!');
+    toast.verification.success('Vendor invitation submitted successfully!');
     setCurrentStep(3);
   };
 

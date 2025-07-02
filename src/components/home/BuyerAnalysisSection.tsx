@@ -21,9 +21,10 @@ export default function BuyerAnalysisSection() {
         {/* Illustration */}
         <div className="w-full sm:w-1/2 flex justify-center mb-8 md:mb-0">
           <img
-            src="https://placehold.co/420x260?text=Analysis+Illustration"
+            src="/svg/home/home_section_2.svg"
+    
             alt="Buyer analysis illustration"
-                   className="w-full h-full object-cover"
+            className="w-full h-40 sm:h-60 object-contain " 
           />
         </div>
       </div>

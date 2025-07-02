@@ -53,6 +53,7 @@ interface ReviewActions {
 
   // Reset Actions
   resetReview: () => void;
+  resetReviewData: () => void;
   resetVerification: () => void;
 }
 
@@ -158,6 +159,13 @@ export const useReviewStore = create<ReviewStore>()(
       // Reset Actions
       resetReview: () => 
         set(initialState),
+      
+      resetReviewData: () =>
+        set((state) => ({
+          ...state,
+          reviewData: initialState.reviewData,
+          verificationData: initialState.verificationData
+        })),
       
       resetVerification: () =>
         set((state) => ({

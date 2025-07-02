@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { useUpdateProfileWithImage } from "@/hooks/useAuth";
 import { getUserDisplayName, getUserInitials } from "@/utils/userHelpers";
 import useUserStore from "@/store/useUserStore";
-import toast from "react-hot-toast";
+import { useToast } from "@/hooks/useToast";
 
 // Zod schema for profile validation, exported for reuse
 export const profileVendorSchema = z.object({
@@ -72,6 +72,7 @@ const ProfileDetailsFormVendor: React.FC<ProfileDetailsFormProps> = ({
 }) => {
   const navigate = useNavigate();
   const { user } = useUserStore();
+  const toast = useToast();
   const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [selectedCompanyImageFile, setSelectedCompanyImageFile] = useState<File | null>(null);

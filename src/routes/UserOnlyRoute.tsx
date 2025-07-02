@@ -1,16 +1,17 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "react-hot-toast";
+import { useToast } from "@/hooks/useToast";
 import useUserStore from "@/store/useUserStore";
 
 export default function UserOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user, isLoggedIn } = useUserStore();
   const navigate = useNavigate();
+  const toast = useToast();
 
   useEffect(() => {
     if (!isLoggedIn || user?.role !== "user") {
       toast.dismiss();  
-      toast.error("You don't have permission");
+      toast.auth.error("You don't have permission");
       navigate("/", { replace: true });
     }
   }, [isLoggedIn, user, navigate]);

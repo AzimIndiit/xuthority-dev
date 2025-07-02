@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,8 +9,10 @@ import { useReviewStore, useSelectedSoftware } from "@/store/useReviewStore";
 import { ChevronLeft } from "lucide-react";
 import StarRating from "@/components/ui/StarRating";
 import { useMutation } from '@tanstack/react-query';
-import { createReview } from '@/services/review';
-import { toast } from 'react-hot-toast';
+import { createReview, updateReview, Review } from '@/services/review';
+import { useToast } from '@/hooks/useToast';
+import { useUserHasReviewed } from '@/hooks/useReview';
+import { queryClient } from "@/lib/queryClient";
 
 interface WriteReviewProps {
   setShowStepper?: (show: boolean) => void;
@@ -67,14 +69,22 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
     updateReviewData, 
     nextStep,
     setCurrentStep,
-    verificationData
+    verificationData,
+    resetReviewData
   } = useReviewStore();
+  const toast = useToast();
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [existingReview, setExistingReview] = useState<Review | null>(null);
+  
+  // Check if user has already reviewed this product
+  const { hasReviewed, review: userReview, isLoading: isCheckingReview } = useUserHasReviewed(selectedSoftware?.id);
 
   const {
     register,
     handleSubmit,
     setValue,
     watch,
+    reset,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -95,14 +105,67 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   const watchedRating = watch("rating");
   const watchedSubRatings = watch("subRatings");
 
-  const mutation = useMutation({
+  // Set edit mode and populate form when existing review is found
+  useEffect(() => {
+    if (userReview) {
+      setIsEditMode(true);
+      setExistingReview(userReview);
+      
+      // Populate form with existing review data
+      const formData = {
+        rating: userReview.overallRating,
+        title: userReview.title,
+        description: userReview.content,
+        subRatings: {
+          easeOfUse: userReview.subRatings?.easeOfUse ? userReview.subRatings.easeOfUse.toString() : 'N/A',
+          customerSupport: userReview.subRatings?.customerSupport ? userReview.subRatings.customerSupport.toString() : 'N/A',
+          features: userReview.subRatings?.features ? userReview.subRatings.features.toString() : 'N/A',
+          pricing: userReview.subRatings?.pricing ? userReview.subRatings.pricing.toString() : 'N/A',
+          technicalSupport: userReview.subRatings?.technicalSupport ? userReview.subRatings.technicalSupport.toString() : 'N/A',
+        },
+      };
+      
+      reset(formData);
+      updateReviewData({
+        rating: userReview.overallRating,
+        title: userReview.title,
+        description: userReview.content,
+      });
+    }
+  }, [userReview, reset, updateReviewData]);
+
+  const createMutation = useMutation({
     mutationFn: createReview,
     onSuccess: () => {
-      toast.success('Review submitted successfully!');
-      nextStep();
+      toast.review.success('Review submitted successfully!');
+      // Invalidate product-related queries to refresh ratings and review data
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product'] });
+      queryClient.invalidateQueries({ queryKey: ['userReview'] });
+      setCurrentStep(4);
+      // Reset the review data after successful submission (preserving step and software)
+      resetReviewData();
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.error?.message || 'Failed to submit review');
+      toast.review.error(err?.response?.data?.error?.message || 'Failed to submit review');
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ reviewId, payload }: { reviewId: string; payload: any }) => 
+      updateReview(reviewId, payload),
+    onSuccess: () => {
+      toast.review.success('Review updated successfully!');
+      // Invalidate product-related queries to refresh ratings and review data
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['product'] });
+      queryClient.invalidateQueries({ queryKey: ['userReview'] });
+      setCurrentStep(4);
+      // Reset the review data after successful update (preserving step and software)
+      resetReviewData();
+    },
+    onError: (err: any) => {
+      toast.review.error(err?.response?.data?.error?.message || 'Failed to update review');
     },
   });
 
@@ -113,43 +176,64 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
         title: data.title,
         description: data.description,
       });
-      // Map verificationData from store to ReviewVerification type
-      let verification: any = undefined;
-      if (verificationData && verificationData.method) {
-        let verificationType: 'company_email' | 'linkedin' | 'vendor_invite' | 'screenshot' = 'company_email';
-        let verificationDataField: any = {};
-        if (verificationData.method === 'company-email') {
-          verificationType = 'company_email';
-          verificationDataField = { companyEmail: verificationData.companyEmail };
-        } else if (verificationData.method === 'vendor-invitation') {
-          verificationType = 'vendor_invite';
-          verificationDataField = { vendorInvitationLink: verificationData.vendorInvitationLink };
-        } else if (verificationData.method === 'screenshot') {
-          verificationType = 'screenshot';
-          verificationDataField = { screenshot: verificationData.screenshot };
-        } else if (verificationData.method === 'linkedin') {
-          verificationType = 'linkedin';
-          verificationDataField = {};
-        }
-        verification = {
-          isVerified: verificationData.isVerified || false,
-          verificationType,
-          verificationData: verificationDataField,
+
+      const subRatingsPayload = Object.fromEntries(
+        Object.entries(data.subRatings).map(([k, v]) => [k, v === 'N/A' ? 0 : parseInt(v)])
+      );
+
+      if (isEditMode && existingReview) {
+        // Update existing review
+        const updatePayload = {
+          overallRating: data.rating,
+          title: data.title,
+          content: data.description,
+          subRatings: subRatingsPayload,
         };
+        
+        updateMutation.mutate({ 
+          reviewId: existingReview._id, 
+          payload: updatePayload 
+        });
+      } else {
+        // Create new review
+        let verification: any = undefined;
+        if (verificationData && verificationData.method) {
+          let verificationType: 'company_email' | 'linkedin' | 'vendor_invite' | 'screenshot' = 'company_email';
+          let verificationDataField: any = {};
+          if (verificationData.method === 'company-email') {
+            verificationType = 'company_email';
+            verificationDataField = { companyEmail: verificationData.companyEmail };
+          } else if (verificationData.method === 'vendor-invitation') {
+            verificationType = 'vendor_invite';
+            verificationDataField = { vendorInvitationLink: verificationData.vendorInvitationLink };
+          } else if (verificationData.method === 'screenshot') {
+            verificationType = 'screenshot';
+            verificationDataField = { screenshot: verificationData.screenshot };
+          } else if (verificationData.method === 'linkedin') {
+            verificationType = 'linkedin';
+            verificationDataField = {};
+          }
+          verification = {
+            isVerified: verificationData.isVerified || false,
+            verificationType,
+            verificationData: verificationDataField,
+          };
+        }
+
+        const createPayload = {
+          product: selectedSoftware?.id || '',
+          overallRating: data.rating,
+          title: data.title,
+          content: data.description,
+          subRatings: subRatingsPayload,
+          verification,
+        };
+        
+        createMutation.mutate(createPayload);
       }
-      const payload = {
-        product: selectedSoftware.id || '',
-        overallRating: data.rating,
-        title: data.title,
-        content: data.description,
-        subRatings: Object.fromEntries(
-          Object.entries(data.subRatings).map(([k, v]) => [k, v === 'N/A' ? 0 : parseInt(v)])
-        ),
-        verification,
-      };
-      mutation.mutate(payload);
     } catch (error) {
-      toast.error('Error preparing review data');
+      toast.dismiss();
+      toast.review.error('Error preparing review data');
     }
   };
 
@@ -210,23 +294,43 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
     );
   };
 
+  if (isCheckingReview) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking existing review...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
       {/* Mobile stepper button */}
-      <div className="sm:hidden block">
+      {!isEditMode && <div className="sm:hidden block">
         <button
           onClick={() => setShowStepper && setShowStepper(true)}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors mb-6"
         >
           <ChevronLeft className="h-5 w-5" />
-          <span>Back to Steps</span>
+          <span>Back </span>
         </button>
-      </div>
+      </div>}
 
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">
-          Write a review for {selectedSoftware ? selectedSoftware.name : 'this software'}
+        <h1 className="font-buffalo font-normal text-gray-900 mb-4" style={{ fontSize: '59px', lineHeight: '100%', letterSpacing: '0px' }}>
+          {isEditMode ? 'Edit your review for' : 'Write a review for'} {selectedSoftware ? selectedSoftware.name : 'this software'}
         </h1>
+        
+        {/* {isEditMode && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800 font-medium">
+              You're editing your existing review. Changes will be reviewed by our team before being published.
+            </p>
+          </div>
+        )} */}
+
         {/* Disclaimer */}
         <div className="text-sm text-gray-600 mb-8 space-y-1">
           <p>• Your review will only be published after it has been reviewed by our team and passed quality checks.</p>
@@ -245,7 +349,6 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
                 rating={watchedRating}
                 starClassName="w-10 h-10"
                 onRatingChange={handleRatingChange}
-                // size="xl"
               />
             </div>
             {errors.rating && (
@@ -304,10 +407,13 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           <div className="flex justify-end pt-4">
             <Button
               type="submit"
-              disabled={mutation.isPending}
+              disabled={createMutation.isPending || updateMutation.isPending}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold min-w-32"
             >
-              {mutation.isPending ? "Submitting..." : "Submit"}
+              {(createMutation.isPending || updateMutation.isPending) 
+                ? (isEditMode ? "Updating..." : "Submitting...") 
+                : (isEditMode ? "Update Review" : "Submit Review")
+              }
             </Button>
           </div>
         </form>

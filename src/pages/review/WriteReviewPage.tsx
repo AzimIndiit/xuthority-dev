@@ -1,18 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import toast from "react-hot-toast";
+import { useToast } from "@/hooks/useToast";
 import ReviewStepper from "@/features/review/ReviewStepper";
 import SelectSoftware from "@/features/review/SelectSoftware";
 import VerifyIdentity from "@/features/review/VerifyIdentity";
 import WriteReview from "@/features/review/WriteReview";
 import ReviewComplete from "@/features/review/ReviewComplete";
 import { useCurrentStep, useReviewStore } from "@/store/useReviewStore";
+import { useUserHasReviewed } from "@/hooks/useReview";
 
 const WriteReviewPage = () => {
   const [showStepper, setShowStepper] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = useCurrentStep();
-  const { setCurrentStep, setVerificationData } = useReviewStore();
+  const { setCurrentStep, setVerificationData ,selectedSoftware} = useReviewStore();
+  const toast = useToast();
+  const { hasReviewed, review, isLoading } = useUserHasReviewed(selectedSoftware?.id); 
+
+  // Handle existing review redirect to edit mode
+  useEffect(() => {
+    if (hasReviewed && review && selectedSoftware && !isLoading && currentStep !== 4) {
+      // User has already reviewed this product, skip to step 3 (WriteReview) for editing
+      setCurrentStep(3);
+    }
+  }, [hasReviewed, review, selectedSoftware, isLoading, setCurrentStep,currentStep]);
+
+  useEffect(() => {
+    if (currentStep === 1 && !selectedSoftware) {
+      setShowStepper(false);
+    }
+  }, [currentStep, selectedSoftware]);
 
   // Handle LinkedIn verification callback
   useEffect(() => {
@@ -21,7 +38,7 @@ const WriteReviewPage = () => {
     const linkedinError = searchParams.get('linkedin_error');
 
     if (linkedinError) {
-      toast.error(`LinkedIn verification failed: ${linkedinError}`);
+      toast.verification.error(`LinkedIn verification failed: ${linkedinError}`);
       // Clear the error parameter
       searchParams.delete('linkedin_error');
       setSearchParams(searchParams);
@@ -39,7 +56,7 @@ const WriteReviewPage = () => {
           linkedInData: parsedLinkedInData
         });
 
-        toast.success('LinkedIn verification completed successfully!');
+        toast.verification.success('LinkedIn verification completed successfully!');
         
         // Move to next step
         setCurrentStep(3);
@@ -51,7 +68,7 @@ const WriteReviewPage = () => {
         
       } catch (error) {
         console.error('Error parsing LinkedIn data:', error);
-        toast.error('Error processing LinkedIn verification data');
+        toast.verification.error('Error processing LinkedIn verification data');
         
         // Clear parameters
         searchParams.delete('linkedin_verified');
@@ -75,9 +92,14 @@ const WriteReviewPage = () => {
         return <SelectSoftware setShowStepper={setShowStepper} />;
     }
   };
-
+if(isLoading) {
+  return <div className="flex items-center justify-center h-screen">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+    <p className="text-gray-600">Checking existing review...</p>
+  </div>
+}
   return (
-    <div className="min-h-screen bg-white">
+    <div className=" bg-white">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-6">
           {/* Left Column: Stepper */}

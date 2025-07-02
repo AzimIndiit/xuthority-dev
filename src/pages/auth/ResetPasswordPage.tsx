@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Eye, EyeOff, Check, X, Loader2 } from "lucide-react";
 import { useResetPassword, useVerifyResetToken } from "@/hooks/useAuth";
-import toast from "react-hot-toast";
+import { useToast } from "@/hooks/useToast";
 
 const resetPasswordSchema = z.object({
   newPassword: z
@@ -74,6 +74,7 @@ const PasswordRequirementsChecker = ({ password }: { password: string }) => {
 export default function ResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const toast = useToast();
   const [passwordVisibility, setPasswordVisibility] = useState({
     password: false,
     confirmPassword: false,
@@ -98,7 +99,7 @@ export default function ResetPasswordPage() {
   // Verify token on page load
   useEffect(() => {
     if (!token) {
-      toast.error('Invalid or missing reset token');
+              toast.auth.error('Invalid or missing reset token');
       navigate('/');
       return;
     }
@@ -139,7 +140,7 @@ export default function ResetPasswordPage() {
 
   const onSubmit = async (data: ResetPasswordFormInputs) => {
     if (!token) {
-      toast.error('Invalid reset token');
+              toast.auth.error('Invalid reset token');
       return;
     }
 
@@ -150,7 +151,7 @@ export default function ResetPasswordPage() {
         confirmNewPassword: data.confirmNewPassword,
       });
       
-      toast.success('Password reset successfully!');
+      toast.auth.success('Password reset successfully!');
       navigate('/');
     } catch (error: any) {
       // Error is handled by the mutation hook

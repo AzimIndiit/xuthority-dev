@@ -12,9 +12,6 @@ const config = {
     //     'gray': '#8492a6',
     //     'gray-light': '#d3dce6',
     //   },
-      fontFamily: {
-        buffalo: ['Buffalo', 'sans-serif'],
-      },
     //   extend: {
     //     spacing: {
     //       '8xl': '96rem',

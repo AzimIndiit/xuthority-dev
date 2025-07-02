@@ -17,7 +17,7 @@ import { Eye, EyeOff, Check, X } from "lucide-react";
 import useUIStore from "@/store/useUIStore";
 import { useRegisterVendor, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
-import toast from "react-hot-toast";
+import { useToast } from "@/hooks/useToast";
 
 const vendorSignupSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }).max(50, { message: "First name must be less than 50 characters" }),
@@ -93,6 +93,7 @@ export function VendorSignupForm() {
   const { setAuthModalView, closeAuthModal } = useUIStore();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
+  const toast = useToast();
   
   // Use the new authentication hooks
   const registerMutation = useRegisterVendor();
@@ -134,7 +135,7 @@ export function VendorSignupForm() {
         acceptedTerms: data.terms,
         acceptedMarketing: data.updates || false,
       });
-      toast.success("User registration successful");
+      toast.auth.success("User registration successful");
       closeAuthModal();
     } catch (error) {
       // Error is handled by the mutation hook

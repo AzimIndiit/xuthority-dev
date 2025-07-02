@@ -7,7 +7,7 @@ import { useFollowers, useFollowing, useRemoveFollower, useToggleFollow } from '
 import { getUserInitials, getUserDisplayName } from '@/utils/userHelpers';
 import { formatNumber } from '@/utils/formatNumber';
 import useDebounce from '@/hooks/useDebounce';
-import { toast } from 'sonner';
+import { useToast } from '@/hooks/useToast';
 import { Input } from '../ui/input';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,6 +29,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
   className,
 }) => {
   const navigate = useNavigate();
+  const toast = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [followersPage, setFollowersPage] = useState(1);
   const [followingPage, setFollowingPage] = useState(1);

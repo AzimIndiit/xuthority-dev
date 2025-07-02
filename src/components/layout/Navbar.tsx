@@ -391,6 +391,7 @@ export default function Navbar() {
               setSelectedSoftware(null);
               setCurrentStep(1);
               navigate("/write-review");
+              setDrawerOpen(false);
             }}
             className="bg-blue-600 text-white font-semibold rounded-full px-4 sm:px-6 py-2 text-sm sm:text-base shadow hover:bg-blue-700 transition-colors w-full sm:w-1/2"
           >

@@ -1,6 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
-import { getUserReviewForProduct, Review } from '@/services/review';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { 
+  getUserReviewForProduct, 
+  Review, 
+  getProductReviews, 
+  getProductReviewStats, 
+  ProductReview, 
+  ProductReviewFilters,
+  voteHelpful,
+  removeHelpfulVote 
+} from '@/services/review';
 import useUserStore from '@/store/useUserStore';
+import { toast } from 'react-hot-toast';
 
 export function useUserReview(productId: string | undefined) {
   const { user, isLoggedIn } = useUserStore();
@@ -27,5 +37,70 @@ export function useUserHasReviewed(productId: string | undefined): {
     hasReviewed: !!review,
     review: review || null,
     isLoading,
+  };
+}
+
+// New hooks for product reviews
+export function useProductReviews(productId: string | undefined, filters?: ProductReviewFilters) {
+  return useQuery({
+    queryKey: ['productReviews', productId, filters],
+    queryFn: () => {
+      if (!productId) throw new Error('Product ID is required');
+      return getProductReviews(productId, filters);
+    },
+    enabled: !!productId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+}
+
+export function useProductReviewStats(productId: string | undefined) {
+  return useQuery({
+    queryKey: ['productReviewStats', productId],
+    queryFn: () => {
+      if (!productId) throw new Error('Product ID is required');
+      return getProductReviewStats(productId);
+    },
+    enabled: !!productId,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+}
+
+export function useHelpfulVote() {
+  const queryClient = useQueryClient();
+  const { user } = useUserStore();
+
+  const voteMutation = useMutation({
+    mutationFn: voteHelpful,
+    onSuccess: () => {
+      // Invalidate and refetch product reviews
+      queryClient.invalidateQueries({ queryKey: ['productReviews'] });
+      toast.success('Thank you for your feedback!');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error?.message || 'Failed to vote';
+      toast.error(errorMessage);
+    }
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: removeHelpfulVote,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productReviews'] });
+      toast.success('Vote removed');
+    },
+    onError: (error: any) => {
+      const errorMessage = error.response?.data?.error?.message || 'Failed to remove vote';
+      toast.error(errorMessage);
+    }
+  });
+
+  return {
+    voteHelpful: voteMutation.mutate,
+    removeVote: removeMutation.mutate,
+    isVoting: voteMutation.isPending,
+    isRemoving: removeMutation.isPending,
+    hasVoted: (review: ProductReview) => {
+      return review.helpfulVotes.voters.some(voter => voter.user === user?.id);
+    }
   };
 } 

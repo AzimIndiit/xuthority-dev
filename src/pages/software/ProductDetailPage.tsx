@@ -8,7 +8,6 @@ import ProductPricing from "@/components/product/ProductPricing";
 import ProductMedia from "@/components/product/ProductMedia";
 import ProductCompanyInfo from "@/components/product/ProductCompanyInfo";
 import ProductReviews from "@/components/product/ProductReviews";
-import { Review } from '@/types/review';
 import { Product } from "@/services/product";
 import { formatCurrency } from '@/utils/formatCurrency';
 
@@ -25,15 +24,7 @@ export default function ProductDetailPage() {
     return <div className="text-center py-12 text-red-500">Product not found.</div>;
   }
 
-  // Dummy review data for now (replace with real data if available)
-  const reviewData = {
-    productName: product.name,
-    rating: product.avgRating,
-    reviewCount: product.totalReviews,
-    ratingDistribution: [],
-    popularMentions: [],
-  };
-  const reviews: Review[] = [];
+
 
   // Get minimum price from pricing array and format as currency
   const minPrice = Array.isArray(product.pricing) && product.pricing.length > 0
@@ -98,12 +89,7 @@ export default function ProductDetailPage() {
             <ProductCompanyInfo companyDescription={product.userId} />
         </section>
         <section id="reviews">
-            <ProductReviews
-              {...reviewData}
-              reviews={reviews}
-              onSearch={() => {}}
-              onFilterChange={() => {}}
-            />
+            <ProductReviews product={product} />
         </section>
         {/* You can add more sections here for other tabs */}
       </main>

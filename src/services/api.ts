@@ -24,12 +24,27 @@ export interface ApiResponse<T = any> {
   message?: string;
   meta?: {
     pagination?: {
-      page: number;
-      limit: number;
-      total: number;
-      pages: number;
+      currentPage: number;
+      totalPages: number;
+      totalItems: number;
+      itemsPerPage: number;
+      hasNext: boolean;
+      hasPrev: boolean;
     };
     total?: number;
+    productInfo?: {
+      id: string;
+      name: string;
+      avgRating: number;
+      totalReviews: number;
+      ratingDistribution: {
+        5: number;
+        4: number;
+        3: number;
+        2: number;
+        1: number;
+      };
+    };
   };
   error?: ApiError;
 }

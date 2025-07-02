@@ -10,6 +10,7 @@ export interface Product {
   avgRating: number;
   totalReviews: number;
   users?: string;
+  ratingDistribution?:any[];
   industries?: string[];
   marketSegment?: string[];
   features?: string[];

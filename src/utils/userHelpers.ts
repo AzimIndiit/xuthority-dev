@@ -1,11 +1,11 @@
-import { UserInfo } from '@/store/useUserStore';
+import { User } from "@/services/auth";
 
 /**
  * Get user display name from user object
  * @param user - User object
  * @returns Display name (firstName + lastName) or email as fallback
  */
-export const getUserDisplayName = (user: UserInfo | null): string => {
+export const getUserDisplayName = (user: User | null): string => {
   if (!user) return '';
   return `${user.firstName} ${user.lastName}`.trim() || user.email;
 };
@@ -15,7 +15,7 @@ export const getUserDisplayName = (user: UserInfo | null): string => {
  * @param user - User object
  * @returns User initials (first letter of firstName + first letter of lastName)
  */
-export const getUserInitials = (user: UserInfo | null): string => {
+export const getUserInitials = (user: User | null): string => {
   if (!user) return '';
   const firstName = user.firstName || '';
   const lastName = user.lastName || '';
@@ -28,7 +28,7 @@ export const getUserInitials = (user: UserInfo | null): string => {
  * @param maxLength - Maximum length before truncation
  * @returns Truncated display name with ellipsis if needed
  */
-export const getTruncatedDisplayName = (user: UserInfo | null, maxLength: number = 20): string => {
+export const getTruncatedDisplayName = (user: User | null, maxLength: number = 20): string => {
   const displayName = getUserDisplayName(user);
   if (displayName.length > maxLength) {
     return `${displayName.substring(0, maxLength)}...`;

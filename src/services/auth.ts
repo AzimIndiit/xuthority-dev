@@ -8,7 +8,7 @@ export interface User {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'user' | 'vendor';
+  role?: 'user' | 'vendor';
   companyName?: string;
   companyEmail?: string;
   industry?: string;

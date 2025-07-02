@@ -259,6 +259,13 @@ const router = createBrowserRouter([
          
         ],
       },
+      // {
+      //   path: "/product-detail/:productSlug/reviews",
+      //   children: [
+      //     { index: true, Component: ProductReviews },
+         
+      //   ],
+      // },
     ],
   },
 ]);

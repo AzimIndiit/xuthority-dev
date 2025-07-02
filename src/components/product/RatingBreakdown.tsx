@@ -1,5 +1,6 @@
 import React from 'react';
 import StarRating from '@/components/ui/StarRating';
+import { cn } from '@/lib/utils';
 
 interface RatingDistribution {
   stars: number;
@@ -12,9 +13,15 @@ interface RatingBreakdownProps {
   reviewCount: number;
   ratingDistribution: RatingDistribution[];
   onFilterChange: (stars: number) => void;
+  filters: {
+    overallRating: number;
+    page: number;
+    limit: number;
+  };
 }
 
 const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
+  filters,
   rating,
   reviewCount,
   ratingDistribution,
@@ -36,14 +43,20 @@ const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
         {ratingDistribution.map((item) => (
           <div
             key={item.stars}
-            className="flex items-center group cursor-pointer p-1 rounded-lg hover:bg-gray-100"
-            onClick={() => onFilterChange(item.stars)}
+            className={cn("flex items-center group cursor-pointer p-1 rounded-lg hover:bg-gray-100", filters.overallRating === item.stars && "bg-gray-100")}
+            onClick={() =>{
+             if(filters.overallRating === item.stars){
+              onFilterChange(null);
+             }else{
+              onFilterChange(item.stars);
+             }
+            }}
           >
-            <span className="text-sm text-gray-600 w-16 sm:w-14 group-hover:underline">{item.stars} star{item.stars > 1 ? 's' : ''}</span>
+            <span className={cn("text-sm text-gray-600 w-16 sm:w-14 group-hover:underline", filters.overallRating === item.stars && "text-red-600")}>{item.stars} star{item.stars > 1 ? 's' : ''}</span>
             <div className="w-full bg-gray-200 rounded-full h-2 mx-2">
               <div className="bg-yellow-400 h-2 rounded-full" style={{ width: `${item.percentage}%` }}></div>
             </div>
-            <span className="text-sm text-gray-600 w-10 text-right group-hover:underline">{item.count}</span>
+            <span className={cn("text-sm text-gray-600 w-10 text-right group-hover:underline", filters.overallRating === item.stars && "text-red-600")}>{item.count}</span>
           </div>
         ))}
       </div>

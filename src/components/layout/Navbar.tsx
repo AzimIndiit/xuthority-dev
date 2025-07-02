@@ -23,7 +23,7 @@ import ConfirmationModal from "../ui/ConfirmationModal";
 const navLinks = [
   { label: "Software", href: "/software" },
   { label: "Solutions", href: "/solutions" },
-  { label: "Resources", href: "#" },
+  { label: "Resources", href: "/resources" },
   { label: "For Vendors", href: "#" },
   { label: "About Us", href: "#" },
   { label: "Reviews", href: "#" },

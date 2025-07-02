@@ -13,4 +13,10 @@ export const routePaths = {
   DISPUTES: "/disputes",
   DISPUTE_DETAIL: "/disputes/:disputeId",
   WRITE_REVIEW: "/write-review",
+  RESOURCES: "/resources",
+  RESOURCES_WEBINARS: "/resources/webinars",
+  WEBINAR_DETAIL: "/resources/webinars/:slug",
+  RESOURCES_EDGE: "/resources/edge",
+  RESOURCES_GUIDES: "/resources/guides",
+  RESOURCES_SUCCESS_HUB: "/resources/success-hub",
 };

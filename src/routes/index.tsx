@@ -29,6 +29,9 @@ const ConcertsCity = () => <div>Concerts City</div>;
 const ConcertsTrending = () => <div>Concerts Trending</div>;
 const RootLayout = lazy(() => import("@/components/layout/RootLayout"));
 const Home = lazy(() => import("@/pages/Home"));
+const ResourcesPage = lazy(() => import("@/pages/resource/ResourcesPage").then(module => ({ default: module.ResourcesPage })));
+const BlogDetailPage = lazy(() => import("@/pages/resource/BlogDetailPage").then(module => ({ default: module.BlogDetailPage })));
+const CategoryPage = lazy(() => import("@/pages/resource/CategoryPage").then(module => ({ default: module.CategoryPage })));
 
 // Lazy load software category routes
 const ProductDetailPage = lazy(
@@ -157,6 +160,28 @@ const router = createBrowserRouter([
           <WriteReviewPage />
         </UserOnlyRoute>,
         path: "/write-review",
+      },
+      {
+        path: "/resources",
+        children: [
+          {
+            index: true,
+            Component: (props: any) => (
+              <Suspense fallback={<Loader />}>
+                <ResourcesPage {...props} />
+              </Suspense>
+            ),
+          },
+          {
+            path: ":slug",
+            Component: (props: any) => (
+              <Suspense fallback={<Loader />}>
+                <BlogDetailPage {...props} />
+              </Suspense>
+            ),
+          },
+          
+        ],
       },
       {
         path: "/:category",

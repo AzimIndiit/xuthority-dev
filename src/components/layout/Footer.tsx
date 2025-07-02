@@ -1,6 +1,8 @@
+  import { useSoftwareOptions } from "@/hooks/useSoftwareOptions";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
+  const {options:softwareOptions,isLoading:softwareLoading}=useSoftwareOptions(1,5)
   return (
     <footer className="bg-[#111] text-white border-t border-neutral-800">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-10 md:gap-0">
@@ -72,10 +74,15 @@ export default function Footer() {
         <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-8 md:pl-16">
           <div>
             <h4 className="font-semibold mb-3">Quick Links</h4>
-            <ul className="space-y-2 text-gray-200">
-              <li>
-                <Link to="/" className="hover:text-white transition-colors">
-                  Home
+            <ul className="space-y-2 text-gray-200"> 
+                <li>
+                <Link to="/software" className="hover:text-white transition-colors">
+                  Software
+                </Link>
+              </li>
+                <li>
+                <Link to="/solutions" className="hover:text-white transition-colors">
+                  Solutions
                 </Link>
               </li>
               <li>
@@ -83,55 +90,34 @@ export default function Footer() {
                   Resources
                 </Link>
               </li>
+              
               <li>
-                <Link to="/write-review" className="hover:text-white transition-colors">
-                  Write Review
+                <Link to="/for-vendor" className="hover:text-white transition-colors">
+                  For Vendor
                 </Link>
               </li>
               <li>
-                <Link to="/profile" className="hover:text-white transition-colors">
-                  Profile
-                </Link>
-              </li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
+                <Link to="/about-us" className="hover:text-white transition-colors">
                   About Us
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">Categories</h4>
+            <h4 className="font-semibold mb-3">Top Categories</h4>
             <ul className="space-y-2 text-gray-200">
-              <li>
-                <Link to="/project-management" className="hover:text-white transition-colors">
-                  Project Management
-                </Link>
-              </li>
-              <li>
-                <Link to="/video-conferencing" className="hover:text-white transition-colors">
-                  Video Conferencing
-                </Link>
-              </li>
-              <li>
-                <Link to="/e-commerce-platforms" className="hover:text-white transition-colors">
-                  E-Commerce Platforms
-                </Link>
-              </li>
-              <li>
-                <Link to="/marketing-automation" className="hover:text-white transition-colors">
-                  Marketing Automation
-                </Link>
-              </li>
-              <li>
-                <Link to="/accounting" className="hover:text-white transition-colors">
-                  Accounting Software
-                </Link>
-              </li>
+              {softwareOptions.map((option,index)=>(
+                <li key={index}>
+                  <Link to={`/software/${option.slug}`} className="hover:text-white transition-colors">
+                    {option.label}
+                  </Link>
+                </li>
+              ))}
+              
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold mb-3">Legal</h4>
+            <h4 className="font-semibold mb-3">Other</h4>
             <ul className="space-y-2 text-gray-200">
               <li>
                 <a href="/terms" className="hover:text-white transition-colors">
@@ -148,16 +134,7 @@ export default function Footer() {
                   Refund Policy
                 </a>
               </li>
-              <li>
-                <a href="/contact" className="hover:text-white transition-colors">
-                  Contact Us
-                </a>
-              </li>
-              <li>
-                <a href="/help" className="hover:text-white transition-colors">
-                  Help Center
-                </a>
-              </li>
+            
             </ul>
           </div>
         </div>

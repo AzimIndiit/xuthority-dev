@@ -33,6 +33,11 @@ const ResourcesPage = lazy(() => import("@/pages/resource/ResourcesPage").then(m
 const BlogDetailPage = lazy(() => import("@/pages/resource/BlogDetailPage").then(module => ({ default: module.BlogDetailPage })));
 const CategoryPage = lazy(() => import("@/pages/resource/CategoryPage").then(module => ({ default: module.CategoryPage })));
 
+// Lazy load legal pages
+const TermsConditionsPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.TermsConditionsPage })));
+const PrivacyPolicyPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.PrivacyPolicyPage })));
+const RefundPolicyPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.RefundPolicyPage })));
+
 // Lazy load software category routes
 const ProductDetailPage = lazy(
   () => import("@/pages/software/ProductDetailPage")
@@ -182,6 +187,31 @@ const router = createBrowserRouter([
           },
           
         ],
+      },
+      // Legal pages
+      {
+        path: "/terms",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <TermsConditionsPage {...props} />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/privacy",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <PrivacyPolicyPage {...props} />
+          </Suspense>
+        ),
+      },
+      {
+        path: "/refund",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <RefundPolicyPage {...props} />
+          </Suspense>
+        ),
       },
       {
         path: "/:category",

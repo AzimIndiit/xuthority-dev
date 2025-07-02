@@ -20,9 +20,9 @@ const breadcrumbNameMap: { [key: string]: string } = {
 const Breadcrumb = () => {
   const location = useLocation();
   const pathnames = location?.pathname?.split("/").filter((x) => x);
-
+console.log(pathnames[0]);
   // Don't render breadcrumbs on the homepage.
-  if (pathnames.length === 0) {
+  if (pathnames.length === 0 || ['for-vendors','about-us'].includes(pathnames[0])) {
     return null;
   }
 

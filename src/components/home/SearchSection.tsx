@@ -35,7 +35,6 @@ export default function SearchSection() {
   // You can further enhance with click outside logic if needed
   if (debounced && !showDropdown) setShowDropdown(true);
   if (!debounced && showDropdown) setShowDropdown(false);
-console.log('results',results?.softwares?.length === 0 && results?.solutions?.length === 0 && results?.products?.length === 0)
   function renderSection(title: string, items: any[] | undefined, type: string) {
     if (!items?.length) return null;
     return (
@@ -60,7 +59,7 @@ console.log('results',results?.softwares?.length === 0 && results?.solutions?.le
       </div>
     );
   }
-console.log('results', results)
+
   return (
     <section className=" flex flex-col items-center justify-center min-h-[90dvh] w-full bg-gradient-to-br from-yellow-100 via-yellow-50 to-yellow-200  px-4 sm:px-6 lg:px-8 py-12" style={{backgroundImage: 'url(/svg/home_bg.svg)',backgroundSize: 'cover',backgroundPosition: 'center' ,backgroundRepeat: 'no-repeat'}}>
       <div className="w-full lg:max-w-screen-xl mx-auto">

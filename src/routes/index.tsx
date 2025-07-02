@@ -14,7 +14,6 @@ import ProductsPage from '../pages/user/ProductsPage';
 import AddProductPage from '../pages/user/AddProductPage';
 import UserOnlyRoute from './UserOnlyRoute';
 
-const About = () => <div>About Page</div>;
 const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
 const AuthLayout = ({ children }: { children?: React.ReactNode }) => (
   <div>
@@ -38,6 +37,9 @@ const TermsConditionsPage = lazy(() => import("@/pages/legal").then(module => ({
 const PrivacyPolicyPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.PrivacyPolicyPage })));
 const RefundPolicyPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.RefundPolicyPage })));
 
+// Lazy load vendor pages
+const ForVendorsPage = lazy(() => import("@/pages/vendor").then(module => ({ default: module.ForVendorsPage })));
+const AboutPage = lazy(() => import("@/pages/about").then(module => ({ default: module.AboutPage })));
 // Lazy load software category routes
 const ProductDetailPage = lazy(
   () => import("@/pages/software/ProductDetailPage")
@@ -80,7 +82,6 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
-      { path: "about", Component: About },
       {
         path: "auth",
         Component: AuthLayout,
@@ -187,6 +188,24 @@ const router = createBrowserRouter([
           },
           
         ],
+      },
+      // For Vendors page
+      {
+        path: "/for-vendors",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <ForVendorsPage {...props} />
+          </Suspense>
+        ),
+      },
+      // About page
+      {
+        path: "/about-us",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <AboutPage {...props} />
+          </Suspense>
+        ),
       },
       // Legal pages
       {

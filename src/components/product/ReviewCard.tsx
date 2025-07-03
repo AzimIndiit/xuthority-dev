@@ -1,5 +1,5 @@
-import React from 'react';
-import { ThumbsUp, MessageSquare } from 'lucide-react';
+import React, { useState } from 'react';
+import { ThumbsUp, MessageSquare, Reply, FileText } from 'lucide-react';
 import StarRating from '@/components/ui/StarRating';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Review } from '@/types/review';
@@ -11,19 +11,22 @@ import useUIStore from '@/store/useUIStore';
 import { cn } from '@/lib/utils';
 import { getUserDisplayName } from '@/utils/userHelpers';
 import { useNavigate, useParams } from 'react-router-dom';
+import DisputeModal from './DisputeModal';
 
 interface ReviewCardProps {
   review: Review;
   backendReview?: ProductReview; // Optional backend review data for enhanced features
-  hideComments?: boolean;
+  showComments?: boolean;
+  showDispute?: boolean;
 }
 
-const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, hideComments }) => {
-  const { isLoggedIn } = useUserStore();
+const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComments, showDispute }) => {
+  const { isLoggedIn, user } = useUserStore();
   const { openAuthModal } = useUIStore();
   const { productSlug } = useParams();
   const { voteHelpful, removeVote, isVoting, isRemoving, hasVoted } = useHelpfulVote();
   const navigate = useNavigate();
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const isUserVoted = backendReview ? hasVoted(backendReview) : false;
   const helpfulCount = backendReview?.helpfulVotes.count || 0;
 
@@ -53,7 +56,22 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, hideComm
         }
       });
   };
-console.log(review,'review');
+
+  const handleDisputeClick = () => {
+    if (!isLoggedIn) {
+      openAuthModal();
+      return;
+    }
+    
+    if (user?.role !== 'vendor') {
+      // Only vendors can dispute reviews
+      return;
+    }
+    
+    setIsDisputeModalOpen(true);
+  };
+  console.log(backendReview,'backendReview');
+ 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* Header: Title, Actions */}
@@ -65,7 +83,7 @@ console.log(review,'review');
             <span className="font-normal text-black">"</span>
           </h3>
         </div>
- { !hideComments &&       <div className="flex items-center gap-4 text-xs font-medium mt-2 sm:mt-0">
+ { showComments &&      <div className="flex items-center gap-4 text-xs font-medium mb-2 sm:mt-0">
           <button
             onClick={handleHelpfulClick}
             disabled={isVoting || isRemoving}
@@ -95,6 +113,31 @@ console.log(review,'review');
             </span>
           </button>
         </div>}
+        {showDispute && (
+          <div className="flex items-center gap-4 text-base font-medium mb-2 sm:mt-0">
+            <button
+              onClick={handleCommentClick}
+              className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-red-600 hover:underline cursor-pointer"
+              style={{ minWidth: 0 }}
+            >
+              <Reply  size={14} className="mr-0.5 "  />
+              <span className="font-semibold text-xs " >
+                View Reply
+                {backendReview?.totalReplies ? ` (${backendReview.totalReplies})` : ''}
+              </span>
+            </button>
+           {review.product?.userId === user?.id && <button
+              onClick={handleDisputeClick}
+              className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-blue-600 hover:underline cursor-pointer"
+              style={{ minWidth: 0 }}
+            >
+              <FileText size={14} className="mr-0.5" />
+              <span className="font-semibold text-xs " >
+                Dispute
+              </span>
+            </button>}
+          </div>
+        )}
       </div>
       {/* Rating and Date */}
       <div className="flex items-center px-4 mt-1 mb-1">
@@ -151,6 +194,15 @@ console.log(review,'review');
           )}
         </div>
       </div>
+      
+      {/* Dispute Modal */}
+      {backendReview && (
+        <DisputeModal
+          isOpen={isDisputeModalOpen}
+          onOpenChange={setIsDisputeModalOpen}
+          reviewId={backendReview._id}
+        />
+      )}
     </div>
   );
 };

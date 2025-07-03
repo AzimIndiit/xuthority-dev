@@ -157,7 +157,7 @@ api.interceptors.response.use(
                         'An unexpected error occurred';
     
     // Show error toast for non-401 errors
-    if (error.response?.status !== 401) {
+    if (error.response?.status !== 401 && error.response?.status !== 404) {
       toast.dismiss()
       toast.error(errorMessage);
     }

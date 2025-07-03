@@ -1,15 +1,26 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DisputedReview, Dispute } from '@/types/dispute';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, Loader2, Check, X } from 'lucide-react';
 import StarRating from '../ui/StarRating';
 import { Textarea } from '../ui/textarea';
 import { Input } from '../ui/input';
+import useUserStore from '@/store/useUserStore';
+import { getUserDisplayName } from '@/utils/userHelpers';
+import { useNavigate } from 'react-router-dom';
+import { useReviewStore } from '@/store/useReviewStore';
+import { Product } from '@/services/product';
+import { useDeleteReview } from '@/hooks/useReview';
+import { useAddExplanation, useUpdateExplanation } from '@/hooks/useDispute';
+import ConfirmationModal from '../ui/ConfirmationModal';
+import { formatDate } from '@/utils/formatDate';
 
 interface DisputeCardProps {
   review: DisputedReview;
   dispute: Dispute;
+  product: Product;
+  refetchDisputes: () => void;
 }
 
 const statusStyles = {
@@ -18,10 +29,89 @@ const statusStyles = {
   Dismissed: 'bg-gray-100 text-gray-800',
 };
 
-const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute }) => {
+const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, refetchDisputes }) => {
+  const { user } = useUserStore();
+  const navigate = useNavigate();
+  const { setSelectedSoftware } = useReviewStore();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [explanation, setExplanation] = useState(dispute.explanations || '');
+  const [editExplanation, setEditExplanation] = useState(dispute.explanations ? false : true);
+  
+  const deleteReviewMutation = useDeleteReview();
+  const addExplanationMutation = useAddExplanation();
+  const updateExplanationMutation = useUpdateExplanation();
+
+  // Update explanation state when dispute changes
+  useEffect(() => {
+    setExplanation(dispute.explanations || '');
+  }, [dispute.explanations]);
+
+  const handleDeleteReview = () => {
+    deleteReviewMutation.mutate(review.id);
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleSubmitExplanation = () => {
+    if (!explanation.trim()) return;
+    
+    addExplanationMutation.mutate({
+      disputeId: dispute.id,
+      data: { explanation: explanation.trim() }
+    }, {
+      onSuccess: () => {
+        setExplanation('');
+        refetchDisputes();
+      }
+    });
+  };
+
+  const handleUpdateExplanation = () => {
+    if (!explanation.trim() || !dispute.explanationsId) return;
+    
+    updateExplanationMutation.mutate({
+      disputeId: dispute.id,
+      explanationId: dispute.explanationsId,
+      data: { explanation: explanation.trim() }
+    }, {
+      onSuccess: () => {
+        refetchDisputes();
+      }
+    });
+  };
+
+  const isAuthor = (authorId: string) => {
+    return user?.id === authorId;
+  };
+
   return (
     <div className="bg-white p-4  rounded-lg border border-gray-200 shadow-sm">
       {/* Review Section */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+        <div className="flex items-center gap-3">
+          <div className="relative w-10 h-10">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={review.avatar} alt={getUserDisplayName(review as any)} />
+              <AvatarFallback>{getUserDisplayName(review as any)}</AvatarFallback>
+            </Avatar>
+    
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 text-[13px] leading-tight">{getUserDisplayName(review as any)}</p>
+            <p className="text-xs text-gray-600 leading-tight">
+              {review.title.split(' ').slice(0, 2).join(' ')}
+              {review.companyName && (
+                <>
+                  , <span className="font-normal">{review.companyName}</span>
+                </>
+              )}
+              {review.companySize && (
+                <> ({review.companySize} emp.)</>
+              )}
+            </p>
+          </div>
+        </div>
+      
+      </div>
       <div className="flex flex-col sm:flex-row justify-between sm:items-start gap-4">
         <div className="flex-1">
           <h2 className="text-lg sm:text-xl font-bold text-gray-900">"{review.title}"</h2>
@@ -31,18 +121,35 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute }) => {
           </div>
           <p className="text-gray-700 mt-4 text-xs sm:text-sm">{review.content}</p>
         </div>
-        <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
-          <Button className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-4 py-2 !text-xs font-semibold flex items-center h-10 sm:h-12">
-            <Edit className="w-3 h-3 sm:mr-1 sm:w-4 sm:h-4" />
-          <span className="hidden sm:block"> Edit Review</span>
+     { review.isOwnReview &&   <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
+          <Button onClick={() => {
+             setSelectedSoftware({
+              id: product._id,
+              name: product.name,
+              logoUrl: product.logoUrl,
+            
+             });
+            navigate(`/write-review`);
+          }} className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-4 py-2 !text-xs font-semibold flex items-center h-10">
+            <Edit className="w-2 h-2" />
+          <span className="hidden sm:block text-xs"> Edit Review</span>
           </Button>
-          <Button variant="destructive" className="rounded-full px-4 py-2 !text-xs font-semibold flex items-center h-10 sm:h-12">
-            <Trash2 className="w-3 h-3 sm:mr-1 sm:w-4 sm:h-4" />
-          <span className="hidden sm:block"> Delete Review</span>
-          </Button>
+          {/* <Button 
+            variant="destructive" 
+            className="rounded-full px-4 py-2 !text-xs font-semibold flex items-center h-10"
+            onClick={() => setIsDeleteModalOpen(true)}
+            disabled={deleteReviewMutation.isPending}
+          >
+            {deleteReviewMutation.isPending ? (
+              <Loader2 className="w-2 h-2 animate-spin" />
+            ) : (
+              <Trash2 className="w-2 h-2" />
+            )}
+            <span className="hidden sm:block text-xs"> Delete Review</span>
+          </Button> */}
 
          
-        </div>
+        </div>}
       </div>
 
       {/* <hr className="my-8 border-gray-200" /> */}
@@ -50,17 +157,8 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute }) => {
       {/* Dispute Section */}
       <div className='mt-4'>
         <h3 className="text-lg sm:text-xl font-bold text-gray-900">Dispute</h3>
-        <div className="flex items-center gap-4 mt-4">
-          <Avatar className="h-12 w-12 bg-gray-100">
-            <AvatarImage src={dispute.disputer.avatarUrl} alt={dispute.disputer.name} />
-            <AvatarFallback>{dispute.disputer.name.charAt(0)}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="font-semibold text-gray-900">{dispute.disputer.name}</p>
-            <p className="text-sm text-gray-500">{dispute.date}</p>
-          </div>
-        </div>
-        <div className="mt-6">
+  
+        <div className="mt-2">
           <div className="flex items-center gap-2">
             <h4 className="text-base sm:text-lg font-semibold text-gray-900">{dispute.reason}</h4>
             <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusStyles[dispute.status]}`}>
@@ -68,29 +166,68 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute }) => {
             </span>
           </div>
           <div className="text-gray-700 mt-2 space-y-2 text-xs sm:text-sm">
-            <p>{dispute.explanation}</p>
-            <ul className="list-disc list-inside pl-4 ">
-              {dispute.claims.map((claim, index) => (
-                <li key={index}>{claim}</li>
-              ))}
-            </ul>
+            <p>{dispute.description}</p>
+            
           </div>
         </div>
       </div>
-      
-      {/* Add Explanation Section */}
-      {dispute.status === 'Active' && <div className="mt-8">
-        <h3 className="text-xl font-bold text-gray-900">Add Explanation</h3>
+
+      {/* Explanation Section */}
+      {dispute.explanations && (
+        <div className='mt-4'>
+          <h3 className="text-lg sm:text-xl font-bold text-gray-900">Explanation</h3>
+          <div className="mt-2 flex justify-between items-center text-gray-700 text-sm bg-gray-50 p-3 rounded-lg border border-gray-20">
+            <p className="0">
+              {dispute.explanations}
+            </p>
+            <button className='text-blue-600 text-sm cursor-pointer' onClick={() => {
+              setEditExplanation(prev => !prev)
+              setExplanation(dispute.explanations)
+            }}>Edit</button>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Explanation Section */}
+      {  editExplanation && dispute.status === 'Active' && review.isOwnReview && <div className="mt-8">
+        <h3 className="text-xl font-bold text-gray-900">
+          {dispute.explanations ? 'Edit' : 'Add'} Explanation
+        </h3>
         <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
           <Input
             placeholder="Type here..."
             className="w-full sm:flex-1 rounded-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 h-12"
+            value={explanation}
+            onChange={(e) => setExplanation(e.target.value)}
+            disabled={addExplanationMutation.isPending || updateExplanationMutation.isPending}
           />
-          <Button className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-6 py-3 font-semibold self-end sm:self-auto">
-            Submit
+          <Button 
+            className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-6 py-3 font-semibold self-end sm:self-auto"
+            onClick={dispute.explanations ? handleUpdateExplanation : handleSubmitExplanation}
+            disabled={addExplanationMutation.isPending || updateExplanationMutation.isPending || !explanation.trim()}
+          >
+            {addExplanationMutation.isPending || updateExplanationMutation.isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Submitting...
+              </>
+            ) : (
+              dispute.explanations ? 'Update' : 'Submit'
+            )}
           </Button>
         </div>
       </div>}
+      
+      {/* Delete Review Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={handleDeleteReview}
+        title="Delete Review"
+        description="Are you sure you want to delete this review? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

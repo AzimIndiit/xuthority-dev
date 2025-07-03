@@ -243,3 +243,7 @@ export async function voteHelpful(reviewId: string) {
 export async function removeHelpfulVote(reviewId: string) {
   return ApiService.delete(`/product-reviews/${reviewId}/helpful`);
 }
+
+export async function deleteReview(reviewId: string) {
+  return ApiService.delete(`/product-reviews/${reviewId}`);
+}

@@ -9,7 +9,8 @@ import {
   Review,
   ProductReviewFilters,
   voteHelpful,
-  removeHelpfulVote
+  removeHelpfulVote,
+  deleteReview
 } from '@/services/review';
 import useUserStore from '@/store/useUserStore';
 import { toast } from 'react-hot-toast';
@@ -26,6 +27,7 @@ export function useUserReview(productId: string | undefined) {
       return getUserReviewForProduct(productId);
     },
     enabled: !!(productId && user?.id && isLoggedIn), 
+   
   });
 }
 
@@ -36,7 +38,6 @@ export function useUserHasReviewed(productId: string | undefined): {
 } {
 
   const { data: review, isLoading } = useUserReview(productId);
-  console.log(productId,'productId',review,isLoading);
   return {
     hasReviewed: !!review,
     review: review || null,
@@ -118,5 +119,23 @@ export const useProductReview = (reviewId: string) => {
       return response;
     },
     enabled: !!reviewId,
+  });
+};
+
+// Hook to delete a review
+export const useDeleteReview = () => {
+  const queryClient = useQueryClient();
+  const { success, error } = useToast();
+
+  return useMutation({
+    mutationFn: deleteReview,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['productReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['userReview'] });
+      success('Review deleted successfully');
+    },
+    onError: (err: any) => {
+      error(err.response?.data?.error?.message || 'Failed to delete review');
+    }
   });
 }; 

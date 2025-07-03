@@ -1,9 +1,18 @@
+import useUserStore from "@/store/useUserStore";
+
 export interface Review {
   id: string;
   title: string;
   rating: number;
   date: string;
   content: string;
+  isOwnReview?: boolean;
+  product?: {
+    _id: string;
+    name: string;
+    slug: string;
+    userId?: string;
+  };
   reviewer: {
     firstName: string;
     lastName: string;
@@ -25,10 +34,11 @@ export interface Review {
 // New backend-compatible interfaces
 export interface BackendReview {
   _id: string;
-  product: {
+  product?: {
     _id: string;
     name: string;
     slug: string;
+    userId?: string;
   };
   reviewer: {
     _id: string;
@@ -46,6 +56,7 @@ export interface BackendReview {
   overallRating: number;
   title: string;
   content: string;
+  isOwnReview?: boolean;
   subRatings: {
     easeOfUse?: number;
     customerSupport?: number;
@@ -86,7 +97,6 @@ export interface RatingDistribution {
 
 // Helper function to transform backend review to frontend review
 export function transformBackendReview(backendReview: BackendReview): Review {
-  console.log(backendReview,'backendReview');
   // Handle null or undefined input
   if (!backendReview) {
     throw new Error('BackendReview is required for transformation');
@@ -102,6 +112,7 @@ export function transformBackendReview(backendReview: BackendReview): Review {
    
     date: new Date(backendReview.publishedAt || backendReview.submittedAt || Date.now()).toLocaleDateString(),
     content: backendReview.content || '',
+ 
     reviewer: {
       firstName: backendReview.reviewer.firstName || '',
       lastName: backendReview.reviewer.lastName || '',
@@ -111,6 +122,12 @@ export function transformBackendReview(backendReview: BackendReview): Review {
       companyName: backendReview.reviewer.companyName || '',
       companySize: backendReview.reviewer.companySize || '',
       industry: backendReview.reviewer.industry || '',
+    },
+    product: {
+      _id: backendReview.product._id || '',
+      name: backendReview.product.name || '',
+      slug: backendReview.product.slug || '',
+      userId: backendReview.product.userId || '',
     },
     verification: {
       isVerified: backendReview.verification?.isVerified || false,

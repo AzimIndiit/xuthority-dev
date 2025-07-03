@@ -44,7 +44,7 @@ export default function SoftwareCard({id, name, logo, rating, reviewCount, logoB
                       </span>
                     </div>
         </div>
-      {user?.role === "user" &&  <div className="mt-auto ">
+      { (!isLoggedIn ||  user?.role !== 'vendor') &&  <div className="mt-auto ">
           <Button 
             onClick={() => {
               if(!isLoggedIn) {

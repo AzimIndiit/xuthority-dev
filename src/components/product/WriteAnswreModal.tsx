@@ -103,6 +103,7 @@ const WriteAnswreModal: React.FC<WriteAnswreModalProps> = ({
               className="mt-2 min-h-[120px] rounded-lg"
               required
             />
+            
           </div>
           <DialogFooter>
             <Button 

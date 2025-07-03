@@ -144,7 +144,7 @@ const deleteMutation = useDeleteProduct();
               </span>
             </div>
           </div>
-        {user?.role!=='vendor' ?  <Button
+        {(!isLoggedIn ||  user?.role !== 'vendor') ?  <Button
             className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-none px-4 py-2 text-xs sm:text-sm shadow"
             onClick={onWriteReview}
           >

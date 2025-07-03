@@ -4,6 +4,7 @@ import { ProductReview } from '@/services/review';
 import ReviewCard from './ReviewCard';
 import { Button } from '@/components/ui/button';
 import LottieLoader from '../LottieLoader';
+import useUserStore from '@/store/useUserStore';
 
 interface ReviewListProps {
   reviews: Review[];
@@ -29,6 +30,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
   pagination,
   onLoadMore 
 }) => {
+  const { user, isLoggedIn } = useUserStore();
   if (isLoading && reviews.length === 0) {
     return (
       <div className="flex justify-center items-center py-20">
@@ -51,6 +53,8 @@ const ReviewList: React.FC<ReviewListProps> = ({
         <ReviewCard 
           key={review.id} 
           review={review} 
+          showComments={user?.role === 'user' || !isLoggedIn}
+          showDispute={user?.role === 'vendor'}
           backendReview={backendReviews[index]}
         />
       ))}

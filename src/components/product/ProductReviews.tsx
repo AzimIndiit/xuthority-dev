@@ -21,7 +21,7 @@ interface ProductReviewsProps {
 const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
   const { openAuthModal } = useUIStore();
   const { setSelectedSoftware } = useReviewStore();
-  const { isLoggedIn } = useUserStore();
+  const { isLoggedIn,user } = useUserStore();
   const navigate = useNavigate();
 
   // State for filters
@@ -81,7 +81,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
 
   const onWriteReview = () => {
     if (!isLoggedIn) {
-      openAuthModal();
+      return openAuthModal();
     }
     setSelectedSoftware({id: product._id, name: product.name,logoUrl: product.logoUrl});
     navigate('/write-review');
@@ -125,9 +125,9 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
               <p className="ml-2 text-lg text-gray-600">({reviewCount}) {rating} out of 5</p>
             </div>
           </div>
-          <Button onClick={onWriteReview} className="bg-red-600 text-white hover:bg-red-700 mt-4 md:mt-0 px-8 py-4 text-lg rounded-none">
+       { (!isLoggedIn ||  user?.role !== 'vendor') &&   <Button onClick={onWriteReview} className="bg-red-600 text-white hover:bg-red-700 mt-4 md:mt-0 px-8 py-4 text-lg rounded-none">
             Write A Review
-          </Button>
+          </Button>}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">

@@ -9,6 +9,7 @@ import SubCategoryPage from "@/pages/software/SubCategoryPage";
 import CommunityPage from "@/pages/software/CommunityPage";
 import DisputesPage from '@/pages/software/DisputesPage';
 import WriteReviewPage from '@/pages/review/WriteReviewPage';
+import ReviewCommentsPage from '@/pages/review/ReviewCommentsPage';
 import AuthCallback from '@/pages/auth/AuthCallback';
 import ProductsPage from '../pages/user/ProductsPage';
 import AddProductPage from '../pages/user/AddProductPage';
@@ -258,6 +259,14 @@ const router = createBrowserRouter([
           { index: true, Component: ProductDetailPage },
          
         ],
+      },
+      {
+        path: "/product-detail/:productSlug/reviews",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <ReviewCommentsPage {...props} />
+          </Suspense>
+        ),
       },
       // {
       //   path: "/product-detail/:productSlug/reviews",

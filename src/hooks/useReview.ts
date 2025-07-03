@@ -1,16 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { 
-  getUserReviewForProduct, 
-  Review, 
   getProductReviews, 
   getProductReviewStats, 
-  ProductReview, 
+  createReview, 
+  updateReview, 
+  getUserReviewForProduct,
+  ProductReview,
+  Review,
   ProductReviewFilters,
   voteHelpful,
-  removeHelpfulVote 
+  removeHelpfulVote
 } from '@/services/review';
 import useUserStore from '@/store/useUserStore';
 import { toast } from 'react-hot-toast';
+import { ApiService } from '@/services/api';
+import { useToast } from './useToast';
 
 export function useUserReview(productId: string | undefined) {
   const { user, isLoggedIn } = useUserStore();
@@ -74,7 +78,7 @@ export function useHelpfulVote() {
     onSuccess: () => {
       // Invalidate and refetch product reviews
       queryClient.invalidateQueries({ queryKey: ['productReviews'] });
-      toast.success('Thank you for your feedback!');
+      // toast.success('Thank you for your feedback!');
     },
     onError: (error: any) => {
       const errorMessage = error.response?.data?.error?.message || 'Failed to vote';
@@ -86,7 +90,7 @@ export function useHelpfulVote() {
     mutationFn: removeHelpfulVote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productReviews'] });
-      toast.success('Vote removed');
+      // toast.success('Vote removed');
     },
     onError: (error: any) => {
       const errorMessage = error.response?.data?.error?.message || 'Failed to remove vote';
@@ -103,4 +107,16 @@ export function useHelpfulVote() {
       return review.helpfulVotes.voters.some(voter => voter.user === user?.id);
     }
   };
-} 
+}
+
+// Hook to get a single product review by ID
+export const useProductReview = (reviewId: string) => {
+  return useQuery({
+    queryKey: ['productReview', reviewId],
+    queryFn: async () => {
+      const response = await ApiService.get<ProductReview>(`/product-reviews/${reviewId}`);
+      return response;
+    },
+    enabled: !!reviewId,
+  });
+}; 

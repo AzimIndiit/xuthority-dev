@@ -86,6 +86,7 @@ export interface RatingDistribution {
 
 // Helper function to transform backend review to frontend review
 export function transformBackendReview(backendReview: BackendReview): Review {
+  console.log(backendReview,'backendReview');
   // Handle null or undefined input
   if (!backendReview) {
     throw new Error('BackendReview is required for transformation');
@@ -98,6 +99,7 @@ export function transformBackendReview(backendReview: BackendReview): Review {
     id: backendReview._id || 'unknown',
     title: backendReview.title || 'Untitled Review',
     rating: backendReview.overallRating || 1,
+   
     date: new Date(backendReview.publishedAt || backendReview.submittedAt || Date.now()).toLocaleDateString(),
     content: backendReview.content || '',
     reviewer: {

@@ -66,6 +66,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     return [];
   }, [reviewsResponse, statsResponse]);
 
+  console.log(reviews,'reviews');
   const popularMentions = useMemo(() => {
     return statsResponse?.data?.popularMentions || ['All Reviews'];
   }, [statsResponse]);
@@ -150,6 +151,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
           <ReviewList 
             reviews={reviews} 
             backendReviews={reviewsResponse?.data}
+            productSlug={product.slug}
             isLoading={reviewsLoading}
             pagination={reviewsResponse?.meta?.pagination}
             onLoadMore={() => {

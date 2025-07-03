@@ -8,6 +8,7 @@ import LottieLoader from '../LottieLoader';
 interface ReviewListProps {
   reviews: Review[];
   backendReviews?: ProductReview[];
+  productSlug?: string;
   isLoading?: boolean;
   pagination?: {
     currentPage: number;
@@ -22,52 +23,57 @@ interface ReviewListProps {
 
 const ReviewList: React.FC<ReviewListProps> = ({ 
   reviews, 
-  backendReviews = [], 
-  isLoading = false, 
+  backendReviews = [],
+  productSlug,
+  isLoading = false,
   pagination,
   onLoadMore 
 }) => {
-  if (reviews.length === 0 && !isLoading) {
+  if (isLoading && reviews.length === 0) {
     return (
-      <div className="bg-[#F7F7F7]">
-        <div className="w-full text-center py-12">
-          <p className="text-gray-500 text-lg">No reviews yet. Be the first to review this product!</p>
-        </div>
+      <div className="flex justify-center items-center py-20">
+        <LottieLoader size="medium" />
+      </div>
+    );
+  }
+
+  if (reviews.length === 0) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-lg text-gray-500">No reviews yet. Be the first to write a review!</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-[#F7F7F7]">
-      <div className="w-full">
-        <div className="space-y-6">
-          {reviews.map((review, index) => (
-            <ReviewCard 
-              key={review.id} 
-              review={review} 
-              backendReview={backendReviews[index]}
-            />
-          ))}
+    <div className="space-y-4">
+      {reviews.map((review, index) => (
+        <ReviewCard 
+          key={review.id} 
+          review={review} 
+          backendReview={backendReviews[index]}
+        />
+      ))}
+      
+      {pagination && pagination.hasNext && (
+        <div className="flex justify-center mt-8">
+          <Button
+            onClick={onLoadMore}
+            variant="outline"
+            size="lg"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <LottieLoader size="small" />
+                <span className="ml-2">Loading...</span>
+              </>
+            ) : (
+              'Load More Reviews'
+            )}
+          </Button>
         </div>
-        
-        {isLoading && (
-          <div className="flex justify-center mt-8">
-            <LottieLoader size="medium" />
-          </div>
-        )}
-        
-        {pagination && pagination.hasNext && !isLoading && (
-          <div className="text-center mt-10">
-            <Button 
-              onClick={onLoadMore}
-              variant="outline" 
-              className="border-blue-600 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-full px-8 py-3"
-            >
-              Load More Reviews ({pagination.totalItems - (pagination.currentPage * pagination.itemsPerPage)} remaining)
-            </Button>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

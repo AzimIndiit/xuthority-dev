@@ -10,17 +10,20 @@ import useUserStore from '@/store/useUserStore';
 import useUIStore from '@/store/useUIStore';
 import { cn } from '@/lib/utils';
 import { getUserDisplayName } from '@/utils/userHelpers';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface ReviewCardProps {
   review: Review;
   backendReview?: ProductReview; // Optional backend review data for enhanced features
+  hideComments?: boolean;
 }
 
-const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview }) => {
+const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, hideComments }) => {
   const { isLoggedIn } = useUserStore();
   const { openAuthModal } = useUIStore();
+  const { productSlug } = useParams();
   const { voteHelpful, removeVote, isVoting, isRemoving, hasVoted } = useHelpfulVote();
-
+  const navigate = useNavigate();
   const isUserVoted = backendReview ? hasVoted(backendReview) : false;
   const helpfulCount = backendReview?.helpfulVotes.count || 0;
 
@@ -38,8 +41,19 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview }) => {
       voteHelpful(backendReview._id);
     }
   };
-  console.log(review);
-
+  const handleCommentClick = () => {
+      if (!isLoggedIn) {
+        openAuthModal();
+        return;
+      }
+      navigate(`/product-detail/${productSlug}/reviews`, {
+        state: {
+          reviewId: review.id,
+          review: review
+        }
+      });
+  };
+console.log(review,'review');
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* Header: Title, Actions */}
@@ -51,12 +65,12 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview }) => {
             <span className="font-normal text-black">"</span>
           </h3>
         </div>
-        <div className="flex items-center gap-4 text-xs font-medium mt-2 sm:mt-0">
+ { !hideComments &&       <div className="flex items-center gap-4 text-xs font-medium mt-2 sm:mt-0">
           <button
             onClick={handleHelpfulClick}
             disabled={isVoting || isRemoving}
             className={cn(
-              "flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none hover:underline transition-colors",
+              "flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none hover:underline transition-colors cursor-pointer",
               isUserVoted ? "text-red-600" : "text-red-500",
               (isVoting || isRemoving) && "opacity-50 cursor-not-allowed"
             )}
@@ -74,15 +88,17 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview }) => {
               </>
             )}
           </button>
-          <button className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-blue-600 hover:underline">
+          <button onClick={handleCommentClick} className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-blue-600 hover:underline cursor-pointer">
             <MessageSquare size={14} className="mr-0.5" />
-            <span className="font-semibold">Add Comment</span>
+            <span className="font-semibold">
+            Add Comments {backendReview?.totalReplies ? ` (${backendReview.totalReplies})` : ''}
+            </span>
           </button>
-        </div>
+        </div>}
       </div>
       {/* Rating and Date */}
       <div className="flex items-center px-4 mt-1 mb-1">
-        <StarRating rating={review?.rating || 1} className="!text-yellow-400" />
+        <StarRating rating={review?.rating || 1} />
         <span className="text-gray-600 text-xs ml-2">{review?.date || new Date().toLocaleDateString()}</span>
       </div>
       {/* Review Content */}

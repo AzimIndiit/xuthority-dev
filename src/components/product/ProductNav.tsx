@@ -5,6 +5,7 @@ import { useParams } from "react-router-dom";
 
 const ProductNav = () => {
   const { category, subCategory, productSlug } = useParams();
+  console.log('category', category,subCategory)
   const tabs = [
     { id: "product-overview", label: "Product Overview" },
     { id: "pricing", label: "Pricing" },
@@ -80,14 +81,14 @@ const ProductNav = () => {
 
           <div className="hidden flex-shrink-0 items-center gap-6 sm:flex">
             <a
-              href={`/${category}/${subCategory}/${productSlug}/community`}
+              href={`/product-detail/${productSlug}/community`}
               className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline"
             >
               <Users className="h-4 w-4" />
               Community
             </a>
             <a
-              href={`/${category}/${subCategory}/${productSlug}/disputes`}
+              href={`/product-detail/${productSlug}/disputes`}
               className="flex items-center gap-1.5 text-sm font-medium text-red-600 hover:underline"
             >
               <MessageSquareWarning className="h-4 w-4" />
@@ -98,14 +99,14 @@ const ProductNav = () => {
 
         <div className="flex w-full border-y sm:hidden mt-3">
           <a
-            href={`/${category}/${subCategory}/${productSlug}/community`}
+            href={`/product-detail/${productSlug}/community`}
             className="flex flex-1 items-center justify-center gap-2 border-r py-3 text-sm font-medium text-blue-600"
           >
             <Users className="h-5 w-5" />
             <span>Community</span>
           </a>
           <a
-            href={`/${category}/${subCategory}/${productSlug}/disputes`}
+            href={`/product-detail/${productSlug}/disputes`}
             className="flex flex-1 items-center justify-center gap-2 py-3 text-sm font-medium text-red-600"
           >
             <MessageSquareWarning className="h-5 w-5" />

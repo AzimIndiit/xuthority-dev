@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,6 +10,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useCreateQuestion } from '@/hooks/useCommunity';
+import { useParams } from 'react-router-dom';
+import useUIStore from '@/store/useUIStore';
+import useUserStore from '@/store/useUserStore';
 
 interface AskQuestionModalProps {
   isOpen: boolean;
@@ -17,30 +21,75 @@ interface AskQuestionModalProps {
 }
 
 const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChange }) => {
+  const [question, setQuestion] = useState('');
+  const { productSlug } = useParams();
+  const createQuestionMutation = useCreateQuestion();
+  const { isLoggedIn } = useUserStore();
+  const { openAuthModal } = useUIStore();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!isLoggedIn) {
+      openAuthModal();
+      return;
+    }
+    
+    if (!question.trim()) return;
+
+    try {
+      await createQuestionMutation.mutateAsync({
+        title: question.trim(),
+        // product: productId // TODO: Get product ID from slug if needed
+      });
+      
+      // Reset form and close modal on success
+      setQuestion('');
+      onOpenChange(false);
+    } catch (error) {
+      // Error is handled by the mutation hook
+    }
+  };
+
+  const handleClose = () => {
+    setQuestion('');
+    onOpenChange(false);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-lg p-8 rounded-xl">
-        <DialogHeader className="text-center">
-          <DialogTitle className="text-3xl font-bold">Ask Question</DialogTitle>
-          <DialogDescription className="text-base text-gray-500 pt-2">
-            Have a question? Ask the community and get insights from experts, vendors, and experienced users.
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-4">
-          <Label htmlFor="question" className="text-base font-semibold text-gray-900">
-            Question
-          </Label>
-          <Textarea
-            placeholder="Type Your Question..."
-            id="question"
-            className="mt-2 min-h-[120px] rounded-lg"
-          />
-        </div>
-        <DialogFooter>
-          <Button type="submit" size="lg" className="w-full bg-blue-600 hover:bg-blue-700 rounded-full">
-            Submit
-          </Button>
-        </DialogFooter>
+        <form onSubmit={handleSubmit}>
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-3xl font-bold">Ask Question</DialogTitle>
+            <DialogDescription className="text-base text-gray-500 pt-2">
+              Have a question? Ask the community and get insights from experts, vendors, and experienced users.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="question" className="text-base font-semibold text-gray-900">
+              Question
+            </Label>
+            <Textarea
+              placeholder="Type Your Question..."
+              id="question"
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              className="mt-2 min-h-[120px] rounded-lg"
+              required
+            />
+          </div>
+          <DialogFooter>
+            <Button 
+              type="submit" 
+              size="lg" 
+              className="w-full bg-blue-600 hover:bg-blue-700 rounded-full h-12"
+              disabled={!question.trim() || createQuestionMutation.isPending}
+            >
+              {createQuestionMutation.isPending ? 'Submitting...' : 'Submit'}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

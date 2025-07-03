@@ -15,6 +15,7 @@ export interface Question {
   date: string;
   isOwnQuestion?: boolean;
   answers: Answer[];
+  totalAnswers: number; 
 }
 
 export interface MyAnswer {
@@ -22,4 +23,6 @@ export interface MyAnswer {
   question: string;
   questionDate: string;
   answerContent: string;
+  answerId?: string;
+  questionId?: string;
 } 

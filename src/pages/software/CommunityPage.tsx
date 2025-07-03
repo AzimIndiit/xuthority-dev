@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronDown, Plus, ListFilter, PlusCircle } from "lucide-react";
@@ -13,134 +13,77 @@ import {
 import MyAnswerCard from '@/components/product/MyAnswerCard';
 import AskQuestionModal from "@/components/product/AskQuestionModal";
 import WriteAnswreModal from "@/components/product/WriteAnswreModal";
+import { useQuestions, useAnswers, useUserAnswers } from "@/hooks/useCommunity";
+import { useParams } from "react-router-dom";
+import { formatDate } from "@/utils/formatDate";
+import { getUserDisplayName } from "@/utils/userHelpers";
+import useUserStore from "@/store/useUserStore";
+import LottieLoader from "@/components/LottieLoader";
 
 const CommunityPage = () => {
+  const { productSlug } = useParams();
+  const { user } = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const questions: Question[] = [
-    {
-      id: "1",
-      question: "Is Monday.com suitable for small businesses?",
-      date: "Jan 27, 2025",
-      isOwnQuestion: false,
-      answers: [
-        {
-          id: "1-1",
-          author: {
-            name: "monday",
-            avatarUrl: "https://i.pravatar.cc/40?u=monday",
-            isVendor: true,
-          },
-          date: "Jan 27, 2025",
-          content:
-            "Absolutely! Monday.com is designed to be flexible and scalable, making it a great fit for small businesses. It offers customizable workflows, automation, and integrations that help teams stay organized and efficient. Plus, our affordable pricing plans ensure small businesses get value without overspending.",
-        },
-        {
-          id: "1-2",
-          author: {
-            name: "Admin",
-            avatarUrl: "https://i.pravatar.cc/40?u=admin",
-            isVendor: false,
-          },
-          date: "Jan 27, 2025",
-          content:
-            "Yes, Monday.com works well for small businesses, but setup and customization are crucial. As an admin, I find that configuring the right boards and automations takes time, but once set up, it streamlines operations. However, pricing may be a consideration for businesses with tight budgets.",
-        },
-        {
-          id: "1-3",
-          author: {
-            name: "Calista Mayasari",
-            avatarUrl: "https://i.pravatar.cc/40?u=calista",
-            isVendor: false,
-          },
-          date: "Jan 28, 2025",
-          content:
-            "Monday.com is useful, but it depends on your needs. For simple task tracking, it works well, but the interface can feel overwhelming at first. If you're a small team that needs basic project management, it's great—just be prepared for a learning curve.",
-        },
-      ],
-    },
-    {
-      id: "2",
-      question:
-        "Can I integrate Monday.com with other tools like Slack and Google Drive?",
-      date: "Jan 27, 2025",
-      isOwnQuestion: false,
-      answers: [
-        {
-          id: "2-1",
-          author: {
-            name: "monday",
-            avatarUrl: "https://i.pravatar.cc/40?u=monday",
-            isVendor: true,
-          },
-          date: "Jan 27, 2025",
-          content:
-            "Yes, Monday.com integrates with popular tools such as Slack, Google Drive, Microsoft Teams, and more to streamline workflows.",
-        },
-      ],
-    },
-    {
-      id: "3",
-      question: "Does Monday.com offer automation for repetitive tasks?",
-      date: "Jan 26, 2025",
-      isOwnQuestion: true,
-      answers: [
-        {
-          id: "3-1",
-          author: {
-            name: "monday",
-            avatarUrl: "https://i.pravatar.cc/40?u=monday",
-            isVendor: true,
-          },
-          date: "Jan 27, 2025",
-          content:
-            "Yes, Monday.com provides automation to reduce manual work, such as task assignments, status updates, and notifications.",
-        },
-        {
-          id: "3-2",
-          author: {
-            name: "Zahra Mohamed",
-            avatarUrl: "https://i.pravatar.cc/40?u=zahra",
-            isVendor: false,
-          },
-          date: "Jan 27, 2025",
-          content:
-            "Yes, Monday.com automates many routine tasks like sending reminders and updating task statuses. I find it useful, but sometimes the automation rules need fine-tuning to work exactly as expected.",
-        },
-        {
-          id: "3-3",
-          author: {
-            name: "Jesús Romero",
-            avatarUrl: "https://i.pravatar.cc/40?u=jesus",
-            isVendor: false,
-          },
-          date: "Jan 28, 2025",
-          content:
-            "Definitely! I've used Monday.com to automate repetitive steps like task handovers and deadline tracking. It's a great way to boost efficiency, but if you rely on advanced automation, you might need a premium plan.",
-        },
-      ],
-    },
-  ];
+  const [sortBy, setSortBy] = useState<'createdAt' | 'totalAnswers'>('createdAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  const myAnswers: MyAnswer[] = [
-    {
-      id: 'ans1',
-      question: 'What are the limitations of Monday.com?',
-      questionDate: 'Jan 27, 2025',
-      answerContent: 'Some users find the pricing higher compared to alternatives, and the platform can feel overwhelming with too many customization options.',
-    },
-    {
-      id: 'ans2',
-      question: 'Can I use Monday.com for personal task management?',
-      questionDate: 'Jan 27, 2025',
-      answerContent: 'Yes, Monday.com can be used for personal productivity, but it is primarily designed for team collaboration.',
-    },
-    {
-      id: 'ans3',
-      question: 'Is Monday.com suitable for small businesses?',
-      questionDate: 'Jan 27, 2025',
-      answerContent: 'Absolutely! Monday.com is designed to be flexible and scalable, making it a great fit for small businesses. It offers customizable workflows, automation, and integrations that help teams stay organized and efficient.',
-    },
-  ];
+  // Fetch questions from API
+  const { data: questionsData, isLoading: questionsLoading } = useQuestions({
+    page: 1,
+    limit: 10,
+    sortBy,
+    sortOrder,
+    status: 'approved'
+  });
+
+  // Fetch user's answers
+  const { data: userAnswersData, isLoading: userAnswersLoading } = useUserAnswers(user?.id || '');
+
+  // Transform API data to match the existing UI structure
+  const questions: Question[] = useMemo(() => {
+    if (!questionsData?.questions) return [];
+
+    return questionsData.questions.map((q: any) => ({
+      id: q._id,
+      question: q.title,
+      date: formatDate(q.createdAt),
+      isOwnQuestion: user?.id === q.author._id,
+      totalAnswers: q.totalAnswers,
+      answers: [] // Answers will be loaded separately when expanded
+    }));
+  }, [questionsData, user]);
+
+  // Transform user's answers for the "My Answers" tab
+  const myAnswers: MyAnswer[] = useMemo(() => {
+    if (!userAnswersData) return [];
+
+    return userAnswersData.map((answer: any) => ({
+      id: answer.id,
+      question: answer.question,
+      questionDate: formatDate(answer.questionDate),
+      answerContent: answer.answerContent,
+      answerId: answer.answerId,
+      questionId: answer.questionId
+    }));
+  }, [userAnswersData]);
+
+  const handleSortChange = (value: string) => {
+    if (value === 'mostRecent') {
+      setSortBy('createdAt');
+      setSortOrder('desc');
+    } else if (value === 'newest') {
+      setSortBy('createdAt');
+      setSortOrder('asc');
+    }
+  };
+
+  if (questionsLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <LottieLoader size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white min-h-screen">
@@ -159,9 +102,12 @@ const CommunityPage = () => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuItem>Most Recent</DropdownMenuItem>
-                <DropdownMenuItem>Most Helpful</DropdownMenuItem>
-                <DropdownMenuItem>Newest</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange('mostRecent')}>
+                  Most Recent
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleSortChange('newest')}>
+                  Newest
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
@@ -172,13 +118,13 @@ const CommunityPage = () => {
             <TabsList className="bg-gray-200 rounded-xl inline-flex cursor-pointer w-full sm:w-auto  h-10 sm:h-12">
               <TabsTrigger
                 value="community-qa"
-                className="px-3 sm:px-6 py-2 text-[10px] sm:text-sm font-semibold rounded-lg data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md flex-1 sm:flex-none"
+                className="px-3 sm:px-6 py-2 text-[10px] sm:text-sm font-semibold rounded-lg data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md flex-1 sm:flex-none cursor-pointer"
               >
                 Community Q&A
               </TabsTrigger>
               <TabsTrigger
                 value="my-answers"
-                className="px-3 sm:px-6 py-2 text-[10px] sm:text-sm font-semibold rounded-lg data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md flex-1 sm:flex-none"
+                className="px-3 sm:px-6 py-2 text-[10px] sm:text-sm font-semibold rounded-lg data-[state=active]:bg-red-600 data-[state=active]:text-white data-[state=active]:shadow-md flex-1 sm:flex-none cursor-pointer"
               >
                 My Answers
               </TabsTrigger>
@@ -192,16 +138,28 @@ const CommunityPage = () => {
           </div>
           <TabsContent value="community-qa">
             <div className="space-y-6 mt-6">
-              {questions.map((question) => (
-                <QuestionCard key={question.id} question={question} />
-              ))}
+             {
+                questions.map((question) => (
+                        <QuestionCard key={question.id} question={question} />
+                      ))}
+            
             </div>
           </TabsContent>
           <TabsContent value="my-answers">
-            <div className="space-y-6">
-              {myAnswers.map((answer) => (
-                <MyAnswerCard key={answer.id} myAnswer={answer} />
-              ))}
+            <div className="space-y-6 mt-6">
+              {userAnswersLoading ? (
+                <div className="flex justify-center py-12">
+                  <LottieLoader size="medium" />
+                </div>
+              ) : myAnswers.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  You haven't answered any questions yet.
+                </div>
+              ) : (
+                myAnswers.map((answer) => (
+                  <MyAnswerCard key={answer.id} myAnswer={answer} />
+                ))
+              )}
             </div>
           </TabsContent>
         </Tabs>

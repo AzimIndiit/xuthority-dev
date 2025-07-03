@@ -243,11 +243,7 @@ const router = createBrowserRouter([
               { index: true, Component: SubCategoryPage },
               {
                 path: ":productSlug",
-                children: [
-                  { index: true, Component: ProductDetailPage },
-                  { path: "community", Component: CommunityPage },
-                  { path: "disputes", Component: DisputesPage },
-                ],
+                
               },
             ],
           },
@@ -257,7 +253,14 @@ const router = createBrowserRouter([
         path: "/product-detail/:productSlug",
         children: [
           { index: true, Component: ProductDetailPage },
-         
+          {
+            path: "community",
+            Component: CommunityPage,
+          },
+          {
+            path: "disputes",
+            Component: DisputesPage,
+          }
         ],
       },
       {

@@ -152,7 +152,9 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
       <div className="bg-pink-50 px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-pink-100">
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10">
-            <Avatar className="h-10 w-10">
+            <Avatar className="h-10 w-10 cursor-pointer" onClick={() => {  if(review.reviewer.id !== user?.id){ navigate(`/public-profile/${review.reviewer.slug}`)}else{
+              navigate(`/profile`)
+            }}}>
               <AvatarImage src={review.reviewer.avatar} alt={getUserDisplayName(review.reviewer as any)} />
               <AvatarFallback>{getUserDisplayName(review.reviewer as any)}</AvatarFallback>
             </Avatar>

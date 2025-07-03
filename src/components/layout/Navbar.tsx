@@ -3,7 +3,7 @@ import { Button } from "../ui/button";
 import useUserStore from "@/store/useUserStore";
 import { useNavigate } from "react-router-dom";
 import useUIStore from "@/store/useUIStore";
-import { useAuth, useLogout } from "@/hooks/useAuth";
+import { useAuth, useLogout, useUserProfileStats } from "@/hooks/useAuth";
 import { getUserDisplayName, getUserInitials, getTruncatedDisplayName } from "@/utils/userHelpers";
 import {
   DropdownMenu,
@@ -19,6 +19,7 @@ import { useReviewStore } from "@/store/useReviewStore";
 import { formatNumber } from "@/utils/formatNumber";
 import { queryClient } from "@/lib/queryClient";
 import ConfirmationModal from "../ui/ConfirmationModal";
+import { useFollowStatus } from "@/hooks/useFollow";
 
 const navLinks = [
   { label: "Software", href: "/software" },
@@ -43,6 +44,11 @@ export default function Navbar() {
   // Use the new authentication hooks
   const { user, isLoggedIn } = useAuth();
   const logoutMutation = useLogout();
+  const { 
+    data: userStats, 
+    isLoading: userStatsLoading 
+  } = useUserProfileStats(user?._id || '');
+
   
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const navigate = useNavigate();
@@ -281,7 +287,7 @@ export default function Navbar() {
                   className="text-center hover:bg-gray-50 rounded-lg p-1 transition-colors duration-200"
                 >
                   <div className="font-bold text-gray-900 text-base leading-tight">
-                    {formatNumber(user?.followers)}
+                    {formatNumber(userStats?.followers)}
                   </div>
                   <div className="text-xs text-gray-500">Followers</div>
                 </button>
@@ -293,7 +299,7 @@ export default function Navbar() {
                   className="text-center hover:bg-gray-50 rounded-lg p-1 transition-colors duration-200"
                 >
                   <div className="font-bold text-gray-900 text-base leading-tight">
-                    {formatNumber(user?.following)}
+                    {formatNumber(userStats?.following)}
                   </div>
                   <div className="text-xs text-gray-500">Following</div>
                 </button>

@@ -46,16 +46,109 @@ export const useProfile = () => {
 // Hook for public user profile query
 export const usePublicProfile = (userId: string) => {
   return useQuery({
-    queryKey: queryKeys.publicProfile(userId),
+    queryKey: ['publicProfile', userId],
     queryFn: async () => {
       const response = await AuthService.getPublicProfile(userId);
-      if (!response.success) {
-        throw new Error(response.error?.message || 'Failed to fetch profile');
+      if (response.success && response.data) {
+        return response.data.user;
       }
-      return response.data;
+      throw new Error(response.error?.message || 'Failed to fetch public profile');
     },
     enabled: !!userId,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Hook for public profile query by slug
+export const usePublicProfileBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: ['publicProfileBySlug', slug],
+    queryFn: async () => {
+      const response = await AuthService.getPublicProfileBySlug(slug);
+      if (response.success && response.data) {
+        return response.data.user;
+      }
+      throw new Error(response.error?.message || 'Failed to fetch public profile');
+    },
+    enabled: !!slug,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Hook for user reviews query
+export const useUserReviews = (userId: string, options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}) => {
+  return useQuery({
+    queryKey: ['userReviews', userId, options],
+    queryFn: async () => {
+      const response = await AuthService.getUserReviews(userId, options);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to fetch user reviews');
+    },
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+// Hook for user reviews query by slug
+export const useUserReviewsBySlug = (slug: string, options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}) => {
+  return useQuery({
+    queryKey: ['userReviewsBySlug', slug, options],
+    queryFn: async () => {
+      const response = await AuthService.getUserReviewsBySlug(slug, options);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to fetch user reviews');
+    },
+    enabled: !!slug,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+  });
+};
+
+// Hook for user profile statistics query
+export const useUserProfileStats = (userId: string) => {
+  return useQuery({
+    queryKey: ['userProfileStats', userId],
+    queryFn: async () => {
+      const response = await AuthService.getUserProfileStats(userId);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to fetch user profile statistics');
+    },
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+};
+
+// Hook for user profile statistics query by slug
+export const useUserProfileStatsBySlug = (slug: string) => {
+  return useQuery({
+    queryKey: ['userProfileStatsBySlug', slug],
+    queryFn: async () => {
+      const response = await AuthService.getUserProfileStatsBySlug(slug);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to fetch user profile statistics');
+    },
+    enabled: !!slug,
+    refetchOnWindowFocus: true,
+    refetchOnMount: true,
+    
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 

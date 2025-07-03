@@ -63,7 +63,7 @@ export interface ProductReview {
     _id: string;
     name: string;
     slug: string;
-  };
+    };
   reviewer: {
     _id: string;
     name: string;
@@ -76,6 +76,7 @@ export interface ProductReview {
     companyName: string;
     companySize: string;
     industry: string;
+    slug: string; 
   };
   overallRating: number;
   title: string;

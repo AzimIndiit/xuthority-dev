@@ -4,6 +4,7 @@ import { ChevronRightIcon } from 'lucide-react';
 import { formatNumber } from '@/utils/formatNumber';
 import { getTruncatedDisplayName, getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 import { User } from '@/services/auth';
+import { useUserProfileStats } from '@/hooks/useAuth';
 
 interface SidebarItem {
   id: string;
@@ -28,6 +29,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   onFollowersClick,
   onFollowingClick,
 }) => {
+  const { data: userStats, isLoading: userStatsLoading } = useUserProfileStats(user?._id || '');
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 ">
       {/* Profile Header */}
@@ -43,7 +45,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
             disabled={!onFollowersClick}
           >
             <div className="text-xl font-black text-gray-800 ">
-              {formatNumber(user?.followers || 0)}
+              {formatNumber(userStats?.followers || 0)}
             </div>
             <div className="text-sm text-gray-500 ">Followers</div>
           </button>
@@ -53,7 +55,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
             disabled={!onFollowingClick}
           >
             <div className="text-xl font-black text-gray-800 ">
-              {formatNumber(user?.following || 0)}
+              {formatNumber(userStats?.following || 0)}
             </div>
             <div className="text-sm text-gray-500 ">Following</div>
           </button>

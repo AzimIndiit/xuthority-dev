@@ -14,6 +14,7 @@ export interface Review {
     userId?: string;
   };
   reviewer: {
+    id: string;
     firstName: string;
     lastName: string;
     avatar: string;
@@ -22,6 +23,7 @@ export interface Review {
     companyName: string;
     companySize: string;
     industry: string;
+    slug: string;
   };
   verification: {
     isVerified: boolean;
@@ -52,6 +54,7 @@ export interface BackendReview {
     companyName: string;
     companySize: string;
     industry: string;
+    slug: string;
   };
   overallRating: number;
   title: string;
@@ -114,6 +117,7 @@ export function transformBackendReview(backendReview: BackendReview): Review {
     content: backendReview.content || '',
  
     reviewer: {
+      id: backendReview.reviewer._id || '',
       firstName: backendReview.reviewer.firstName || '',
       lastName: backendReview.reviewer.lastName || '',
       avatar: backendReview.reviewer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=f3f4f6&color=374151`,
@@ -122,6 +126,7 @@ export function transformBackendReview(backendReview: BackendReview): Review {
       companyName: backendReview.reviewer.companyName || '',
       companySize: backendReview.reviewer.companySize || '',
       industry: backendReview.reviewer.industry || '',
+      slug: backendReview.reviewer.slug || '',
     },
     product: {
       _id: backendReview.product._id || '',

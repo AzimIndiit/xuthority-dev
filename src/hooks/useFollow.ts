@@ -6,6 +6,7 @@ import FollowService, {
   ToggleFollowResponse,
   FollowUser,
 } from '@/services/follow';
+import useUserStore from '@/store/useUserStore';
 
 // Query keys for follow-related queries
 export const followQueryKeys = {
@@ -28,6 +29,9 @@ export const useFollowers = (
     queryKey: followQueryKeys.followers(userId, page, limit, search),
     queryFn: () => FollowService.getFollowers(userId, page, limit, search),
     enabled: !!userId,
+    select: (data:any) => {
+      return data.data
+    },
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
@@ -43,6 +47,9 @@ export const useFollowing = (
     queryKey: followQueryKeys.following(userId, page, limit, search),
     queryFn: () => FollowService.getFollowing(userId, page, limit, search),
     enabled: !!userId,
+    select: (data:any) => {
+      return data.data
+    },
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
@@ -63,6 +70,12 @@ export const useFollowStatus = (userId: string) => {
     queryKey: followQueryKeys.status(userId),
     queryFn: () => FollowService.getFollowStatus(userId),
     enabled: !!userId,
+    select: (data:any) => {
+      return {
+        isFollowing: data.data.isFollowing,
+        userId: data.data.userId
+      };
+    },
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
@@ -70,16 +83,21 @@ export const useFollowStatus = (userId: string) => {
 // Hook to toggle follow/unfollow
 export const useToggleFollow = () => {
   const queryClient = useQueryClient();
+  const { user: currentUser } = useUserStore();
 
   return useMutation<ToggleFollowResponse, Error, string>({
     mutationFn: (userId: string) => FollowService.toggleFollow(userId),
-    onSuccess: (data, userId) => {
+    onSuccess: (data: any, userId) => {
       // Update follow status cache
+      const newData = data.data as any
       queryClient.setQueryData(
         followQueryKeys.status(userId),
-        { isFollowing: data.isFollowing, userId }
+        { isFollowing: newData.isFollowing, userId }
       );
-
+      queryClient.invalidateQueries({ 
+        queryKey:  followQueryKeys.status(userId),
+        exact: true 
+      });
       // Invalidate related caches
       queryClient.invalidateQueries({ 
         queryKey: ['follow', 'followers'], 
@@ -94,11 +112,33 @@ export const useToggleFollow = () => {
         exact: false 
       });
 
-      // Show success message
-      const message = data.action === 'followed' 
-        ? `You are now following ${data.targetUser.firstName} ${data.targetUser.lastName}`
-        : `You unfollowed ${data.targetUser.firstName} ${data.targetUser.lastName}`;
+      // Invalidate user profile stats queries (for both users involved)
+      // Target user's stats (their follower count changed)
+      queryClient.invalidateQueries({ 
+        queryKey: ['userProfileStats', userId], 
+        exact: true 
+      });
+
       
+      // Current user's stats (their following count changed)
+      if (currentUser?._id) {
+        queryClient.invalidateQueries({ 
+          queryKey: ['userProfileStats', currentUser._id], 
+          exact: true 
+        });
+      }
+      
+      // Invalidate profile stats by slug if available
+      queryClient.invalidateQueries({ 
+        queryKey: ['userProfileStatsBySlug'], 
+        exact: false 
+      });
+
+      // Show success message
+      const message = newData.action === 'followed' 
+        ? `You are now following ${newData?.targetUser?.firstName} ${newData?.targetUser?.lastName}`
+        : `You unfollowed ${newData?.targetUser?.firstName} ${newData?.targetUser?.lastName}`;
+    
       toast.success(message);
     },
     onError: (error) => {
@@ -111,10 +151,17 @@ export const useToggleFollow = () => {
 // Hook to remove follower
 export const useRemoveFollower = () => {
   const queryClient = useQueryClient();
+  const { user: currentUser } = useUserStore();
 
   return useMutation<any, Error, string>({
     mutationFn: (userId: string) => FollowService.removeFollower(userId),
     onSuccess: (data, userId) => {
+      // Invalidate follow status cache
+      queryClient.invalidateQueries({ 
+        queryKey: followQueryKeys.status(userId),
+        exact: true 
+      });
+      
       // Invalidate followers cache to refresh the list
       queryClient.invalidateQueries({ 
         queryKey: ['follow', 'followers'], 
@@ -122,6 +169,27 @@ export const useRemoveFollower = () => {
       });
       queryClient.invalidateQueries({ 
         queryKey: ['follow', 'stats'], 
+        exact: false 
+      });
+
+      // Invalidate user profile stats queries (for both users involved)
+      // Target user's stats (their following count changed)
+      queryClient.invalidateQueries({ 
+        queryKey: ['userProfileStats', userId], 
+        exact: true 
+      });
+      
+      // Current user's stats (their follower count changed)
+      if (currentUser?._id) {
+        queryClient.invalidateQueries({ 
+          queryKey: ['userProfileStats', currentUser._id], 
+          exact: true 
+        });
+      }
+      
+      // Invalidate profile stats by slug if available
+      queryClient.invalidateQueries({ 
+        queryKey: ['userProfileStatsBySlug'], 
         exact: false 
       });
 

@@ -16,6 +16,7 @@ import useUserStore from '@/store/useUserStore';
 import { toast } from 'react-hot-toast';
 import { ApiService } from '@/services/api';
 import { useToast } from './useToast';
+import { queryClient } from '@/lib/queryClient';
 
 export function useUserReview(productId: string | undefined) {
   const { user, isLoggedIn } = useUserStore();
@@ -71,7 +72,6 @@ export function useProductReviewStats(productId: string | undefined) {
 }
 
 export function useHelpfulVote() {
-  const queryClient = useQueryClient();
   const { user } = useUserStore();
 
   const voteMutation = useMutation({
@@ -124,7 +124,7 @@ export const useProductReview = (reviewId: string) => {
 
 // Hook to delete a review
 export const useDeleteReview = () => {
-  const queryClient = useQueryClient();
+ 
   const { success, error } = useToast();
 
   return useMutation({

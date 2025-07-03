@@ -47,7 +47,9 @@ const ProductDetailPage = lazy(
 );
 
 // Lazy load user and vendor routes
-const UserProfile = lazy(() => import("@/pages/user/Profile"));
+const UserProfile = lazy(() => import("../pages/user/Profile"));
+const PublicProfile = lazy(() => import('../pages/user/PublicProfile'));
+const PublicProfileBySlug = lazy(() => import('../pages/user/PublicProfileBySlug'));
 
 
 const Loader = () => (
@@ -159,6 +161,37 @@ const router = createBrowserRouter([
                 ),
               },
             ],
+          },
+        ],
+      },
+      // Public profile route (accessible to all authenticated users)
+      {
+        path: "/user/:userId",
+        element: <ProtectedRoute />,
+        children: [
+          {
+            index: true,
+            Component: (props: any) => (
+              <Suspense fallback={<Loader />}>
+                <PublicProfile {...props} />
+              </Suspense>
+            ),
+          },
+        ],
+      },
+      
+      // Public profile by slug route (accessible to all authenticated users)
+      {
+        path: "/public-profile/:slug",
+        element: <ProtectedRoute />,
+        children: [
+          {
+            index: true,
+            Component: (props: any) => (
+              <Suspense fallback={<Loader />}>
+                <PublicProfileBySlug {...props} />
+              </Suspense>
+            ),
           },
         ],
       },

@@ -89,7 +89,9 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
         <div className="flex items-center gap-3">
           <div className="relative w-10 h-10">
-            <Avatar className="h-10 w-10">
+            <Avatar className="h-10 w-10 cursor-pointer" onClick={() => {  if(review.id !== user?.id){ navigate(`/public-profile/${review.slug}`)}else{
+              navigate(`/profile`)
+            }}}>
               <AvatarImage src={review.avatar} alt={getUserDisplayName(review as any)} />
               <AvatarFallback>{getUserDisplayName(review as any)}</AvatarFallback>
             </Avatar>

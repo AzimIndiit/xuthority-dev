@@ -14,6 +14,7 @@ const breadcrumbNameMap: { [key: string]: string } = {
   'profile': 'Profile',
   'followers': 'Followers',
   'following': 'Following',
+  'public-profile': 'Public Profile',
   // Example: 'user-profile': 'User Profile'
 };
 
@@ -49,11 +50,14 @@ console.log(pathnames[0]);
               // For profile tabs, make the link go to the profile base page
               const linkTo = value === 'followers' || value === 'following' ? '/profile' : value === 'product-detail' ? '/' : to;
 
+              // Check if this item should be non-clickable
+              const shouldBeNonClickable = isLast || value === 'public-profile';
+
               return (
                 <React.Fragment key={to}>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
-                    {isLast ? (
+                    {shouldBeNonClickable ? (
                       <BreadcrumbPage className="font-semibold text-blue-600 capitalize">
                         {name}
                       </BreadcrumbPage>

@@ -124,7 +124,8 @@ const ReviewCommentsPage: React.FC = () => {
             firstName: user?.firstName,
             lastName: user?.lastName,
             avatar: user?.avatar,
-            email: user?.email
+            email: user?.email,
+            slug: user?.slug
           }
         };
         
@@ -268,7 +269,7 @@ console.log(allReplies,'allReplies');
         </div>
 
         {/* Review Card */}
-        <ReviewCard review={review} backendReview={reviewResponse?.data as any} hideComments={true} />
+        <ReviewCard review={review} backendReview={reviewResponse?.data as any} showComments={false} showDispute={false} />
 
         {/* Comments Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-4">
@@ -315,7 +316,9 @@ console.log(allReplies,'allReplies');
                 <div className="space-y-6">
                   {allReplies.map((reply: any) => (
                     <div key={reply._id} className="flex items-start gap-3 animate-fadeIn">
-                      <Avatar className="w-10 h-10">
+                      <Avatar className="w-10 h-10 cursor-pointer" onClick={() => {  if(reply.author.id !== user?.id){ navigate(`/public-profile/${reply.author.slug}`)}else{
+                        navigate(`/profile`)
+                      }}}>
                         <AvatarImage 
                           src={reply.author.avatar || reply.author.profilePicture} 
                           alt={getUserDisplayName(reply.author)} 

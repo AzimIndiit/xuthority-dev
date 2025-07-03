@@ -7,6 +7,7 @@ export interface User {
   displayName?: string;
   firstName: string;
   lastName: string;
+  slug?: string;
   email: string;
   role?: 'user' | 'vendor';
   companyName?: string;
@@ -202,6 +203,44 @@ export class AuthService {
     return await ApiService.get<{ user: User }>(`/users/public-profile/${userId}`);
   }
 
+  // Get user reviews
+  static async getUserReviews(userId: string, options?: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<ApiResponse<{
+    reviews: any[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalItems: number;
+      itemsPerPage: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+    total: number;
+  }>> {
+    const params = new URLSearchParams();
+    if (options?.page) params.append('page', options.page.toString());
+    if (options?.limit) params.append('limit', options.limit.toString());
+    if (options?.sortBy) params.append('sortBy', options.sortBy);
+    if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
+    
+    const queryString = params.toString();
+    return await ApiService.get(`/users/${userId}/reviews${queryString ? `?${queryString}` : ''}`);
+  }
+
+  // Get user profile statistics
+  static async getUserProfileStats(userId: string): Promise<ApiResponse<{
+    reviewsWritten: number;
+    disputes: number;
+    followers: number;
+    following: number;
+  }>> {
+    return await ApiService.get(`/users/${userId}/profile-stats`);
+  }
+
   // Social login URLs
   static getGoogleLoginUrl(role: 'user' | 'vendor' = 'user'): string {
     const baseUrl = `${(import.meta as any).env.VITE_API_BASE_URL || 'http://localhost:8081/api/v1'}/auth/google`;
@@ -221,6 +260,49 @@ export class AuthService {
   // Get current token
   static getToken(): string | null {
     return tokenStorage.getToken();
+  }
+
+  // Get public profile by slug
+  static async getPublicProfileBySlug(slug: string): Promise<ApiResponse<{ user: User }>> {
+    return await ApiService.get<{ user: User }>(`/users/public-profile/slug/${slug}`);
+  }
+
+  // Get user reviews by slug
+  static async getUserReviewsBySlug(slug: string, options?: {
+    page?: number;
+    limit?: number;
+    sortBy?: string;
+    sortOrder?: 'asc' | 'desc';
+  }): Promise<ApiResponse<{
+    reviews: any[];
+    pagination: {
+      currentPage: number;
+      totalPages: number;
+      totalItems: number;
+      itemsPerPage: number;
+      hasNext: boolean;
+      hasPrev: boolean;
+    };
+    total: number;
+  }>> {
+    const params = new URLSearchParams();
+    if (options?.page) params.append('page', options.page.toString());
+    if (options?.limit) params.append('limit', options.limit.toString());
+    if (options?.sortBy) params.append('sortBy', options.sortBy);
+    if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
+    
+    const queryString = params.toString();
+    return await ApiService.get(`/users/slug/${slug}/reviews${queryString ? `?${queryString}` : ''}`);
+  }
+
+  // Get user profile statistics by slug
+  static async getUserProfileStatsBySlug(slug: string): Promise<ApiResponse<{
+    reviewsWritten: number;
+    disputes: number;
+    followers: number;
+    following: number;
+  }>> {
+    return await ApiService.get(`/users/slug/${slug}/profile-stats`);
   }
 }
 

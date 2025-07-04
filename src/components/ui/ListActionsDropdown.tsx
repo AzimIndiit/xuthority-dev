@@ -26,20 +26,20 @@ const ListActionsDropdown: React.FC<ListActionsDropdownProps> = ({
         <Button
           variant="ghost"
           size="icon"
-          className="text-gray-600 hover:text-gray-800 h-8 w-8"
+          className="text-gray-600 hover:text-gray-800 h-8"
           disabled={disabled}
         >
           <MoreHorizontal className="w-5 h-5" />
           <span className="sr-only">List actions</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-48">
+      <DropdownMenuContent align="end" className="">
         <DropdownMenuItem 
           onClick={onEdit}
           className="cursor-pointer"
         >
           <Edit className="w-4 h-4 mr-2" />
-          Edit List
+          Edit
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
@@ -47,7 +47,7 @@ const ListActionsDropdown: React.FC<ListActionsDropdownProps> = ({
           className="cursor-pointer text-red-600 focus:text-red-600"
         >
           <Trash2 className="w-4 h-4 mr-2" />
-          Delete List
+          Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

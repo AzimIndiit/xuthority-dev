@@ -24,7 +24,7 @@ const listModalSchema = z.object({
     .min(2, 'List name must be at least 2 characters')
     .max(100, 'List name must be less than 100 characters')
     .trim(),
-  productId: z.string().optional(),
+  productIds: z.array(z.string()).min(1, 'At least one product is required')
 });
 
 type ListModalFormData = z.infer<typeof listModalSchema>;
@@ -37,12 +37,7 @@ interface CreateListModalProps {
   // Edit mode props
   mode?: 'create' | 'edit';
   existingListName?: string;
-  existingProducts?: Array<{
-    productId: string;
-    name: string;
-    logoUrl?: string;
-    brandColors?: string;
-  }>;
+  existingProductIds?: string[];
 }
 
 const CreateListModal: React.FC<CreateListModalProps> = ({
@@ -52,114 +47,84 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   className,
   mode = 'create',
   existingListName = '',
-  existingProducts = []
+  existingProductIds = []
 }) => {
-  const [selectedProducts, setSelectedProducts] = React.useState<Array<{
-    productId: string;
-    name: string;
-    logoUrl?: string;
-    brandColors?: string;
-  }>>([]);
+  // Form setup with validation - initialize based on mode
+  const getInitialFormValues = React.useCallback(() => ({
+    listName: mode === 'edit' ? existingListName : '',
+    productIds: mode === 'edit' ? (existingProductIds || []) : [],
+  }), [mode, existingListName, existingProductIds]);
 
-  // Form setup with validation
+  const initialValues = getInitialFormValues();
+  
   const methods = useForm<ListModalFormData>({
     resolver: zodResolver(listModalSchema),
     mode: 'onChange',
-    defaultValues: {
-      listName: '',
-      productId: '',
-    },
+    defaultValues: initialValues,
+    values: initialValues, // This ensures form updates when props change
   });
 
   const { 
     handleSubmit, 
     reset, 
-    setValue,
     watch,
-    formState: { isValid, isDirty } 
+    formState: { isValid } 
   } = methods;
 
-  const selectedProductId = watch('productId');
-
+  const selectedProductIds = watch('productIds') || [];
+console.log('existingProductIds', existingProductIds)
   // API hooks
   const createListMutation = useCreateFavoriteList();
   const renameListMutation = useRenameFavoriteList();
   const addToFavoritesMutation = useAddToFavorites();
   const removeFromFavoritesMutation = useRemoveFromFavorites();
   const { data: productsData, isLoading: productsLoading } = useProducts(1, 50);
+  const productsDataArray = productsData?.data && Array.isArray(productsData.data) ? productsData.data : []
 
-  // Process products data for FormSelect (exclude already selected products)
+  // Process products data for FormSelect
   const productOptions = React.useMemo(() => {
-    if (!productsData?.data?.data) return [];
+    if (!productsDataArray || productsDataArray.length === 0) return [];
     
-    const selectedProductIds = selectedProducts.map(p => p.productId);
-    
-    return productsData.data.data
-      .filter(product => !selectedProductIds.includes(product._id))
-      .map((product) => ({
-        value: product._id,
-        label: product.name,
-      }));
-  }, [productsData, selectedProducts]);
+    return productsDataArray.map((product) => ({
+      value: product._id,
+      label: product.name,
+    }));
+  }, [productsDataArray]);
+  
+  // Debug logging
+  console.log('Modal Debug:', {
+    mode,
+    existingListName,
+    existingProductIds,
+    initialValues,
+    selectedProductIds,
+    productOptionsLength: productOptions.length
+  });
 
-  // Reset form and selected products when modal opens/closes or mode changes
-  React.useEffect(() => {
-    if (isOpen) {
-      if (mode === 'edit' && existingListName) {
-        reset({ listName: existingListName, productId: '' });
-        setSelectedProducts(existingProducts);
-      } else {
-        reset({ listName: '', productId: '' });
-        setSelectedProducts([]);
-      }
-    } else {
-      // Reset when modal closes
-      reset({ listName: '', productId: '' });
-      setSelectedProducts([]);
-    }
-  }, [isOpen, mode, existingListName, reset]);
-
-  // Update selected products when existingProducts changes (only for edit mode)
-  React.useEffect(() => {
-    if (isOpen && mode === 'edit' && existingProducts.length > 0) {
-      setSelectedProducts(existingProducts);
-    }
-  }, [isOpen, mode, existingProducts.length]);
-
-  // Add product to selected list
-  const handleAddProduct = () => {
-    if (!selectedProductId) return;
-
-    const product = productsData?.data?.data?.find(p => p._id === selectedProductId);
-    if (!product) return;
-
-    const newProduct = {
-      productId: product._id,
-      name: product.name,
-      logoUrl: product.logoUrl,
-      brandColors: product.brandColors
-    };
-
-    setSelectedProducts(prev => [...prev, newProduct]);
-    setValue('productId', ''); // Clear selection
+  // Initialize form when modal opens
+  const initializeModal = () => {
+    const initialValues = getInitialFormValues();
+    reset(initialValues);
   };
 
-  // Remove product from selected list
-  const handleRemoveProduct = (productId: string) => {
-    setSelectedProducts(prev => prev.filter(p => p.productId !== productId));
+  // Reset form when modal closes
+  const resetModal = () => {
+    reset({ listName: '', productIds: [] });
   };
+
+  // No need for separate add/remove functions since we're using FormSelect with multiple
 
   // Form submission handler
   const onSubmit = async (data: ListModalFormData) => {
     try {
       if (mode === 'create') {
-        // Create new list
+        // Create new list first
         await createListMutation.mutateAsync(data.listName);
         
         // Add selected products to the new list
-        for (const product of selectedProducts) {
+        for (const productId of data.productIds) {
           await addToFavoritesMutation.mutateAsync({
-            productId: product.productId,
+            productId: productId,
             listName: data.listName
           });
         }
@@ -174,31 +139,30 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
         }
 
         // Handle product changes
-        const existingProductIds = existingProducts.map(p => p.productId);
-        const newProductIds = selectedProducts.map(p => p.productId);
+        const currentProductIds = existingProductIds || [];
+        const newProductIds = data.productIds || [];
 
         // Add new products
-        const productsToAdd = selectedProducts.filter(p => !existingProductIds.includes(p.productId));
-        for (const product of productsToAdd) {
+        const productsToAdd = newProductIds.filter(productId => !currentProductIds.includes(productId));
+        for (const productId of productsToAdd) {
           await addToFavoritesMutation.mutateAsync({
-            productId: product.productId,
+            productId: productId,
             listName: data.listName
           });
         }
 
         // Remove products that were removed
-        const productsToRemove = existingProducts.filter(p => !newProductIds.includes(p.productId));
-        for (const product of productsToRemove) {
+        const productsToRemove = currentProductIds.filter(productId => !newProductIds.includes(productId));
+        for (const productId of productsToRemove) {
           await removeFromFavoritesMutation.mutateAsync({
-            productId: product.productId,
+            productId: productId,
             listName: data.listName
           });
         }
       }
       
       // Reset form and close modal
-      reset();
-      setSelectedProducts([]);
+      resetModal();
       onOpenChange(false);
       onSuccess?.();
       
@@ -215,9 +179,18 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
 
   // Handle modal close
   const handleClose = () => {
-    reset();
-    setSelectedProducts([]);
+    resetModal();
     onOpenChange(false);
+  };
+
+  // Handle modal open/close changes
+  const handleOpenChange = (open: boolean) => {
+    if (open) {
+      initializeModal();
+    } else {
+      resetModal();
+    }
+    onOpenChange(open);
   };
 
   // Loading state
@@ -225,9 +198,12 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
                           renameListMutation.isPending || 
                           addToFavoritesMutation.isPending || 
                           removeFromFavoritesMutation.isPending;
-
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={handleOpenChange}
+      key={`dialog-${mode}-${existingListName}-${Array.isArray(existingProductIds) ? existingProductIds.join(',') : ''}-${productOptions.length}`} // Force re-initialization when mode or data changes
+    >
       <DialogContent className={cn("sm:max-w-[600px] p-0", className)}>
         {/* Close Button */}
         <button
@@ -244,16 +220,16 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
             <h2 className="text-2xl font-bold text-gray-900 mb-3">
               {mode === 'edit' ? 'Edit List' : 'Create New List'}
             </h2>
-            <p className="text-gray-500 text-sm leading-relaxed">
+            <p className="text-gray-500 text-sm leading-relaxed max-w-sm mx-auto">
               {mode === 'edit' 
-                ? 'Update your list name and manage the products<br />in your favorite software collection.'
-                : 'Create a new list to save and organize the best software<br />products tailored to your needs.'
+                ? 'Update your list name and manage the products in your favorite software collection.'
+                : 'Create a new list to save and organize the best software products tailored to your needs.'
               }
             </p>
           </div>
 
           {/* Form */}
-          <FormProvider {...methods}>
+          <FormProvider {...methods} key={`form-${mode}-${existingListName}-${Array.isArray(existingProductIds) ? existingProductIds.join(',') : ''}-${productOptions.length}`}>
             <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
               {/* List Name Field */}
               <FormInput
@@ -269,80 +245,26 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
                 <div className="flex gap-3">
                   <div className="flex-1">
                     <FormSelect
-                      name="productId"
-                      label="Add Product"
-                      placeholder="Select Product"
+                      name="productIds"
+                      label="Select Products"
+                      placeholder={productsLoading ? "Loading products..." : "Select Products"}
                       options={productOptions}
                       searchable
                       disabled={productsLoading || isFormSubmitting}
+                      multiple
+                      key={`select-${productOptions.length}`} // Force re-render when options change
                     />
                   </div>
-                  <div className="pt-8">
-                    <Button
-                      type="button"
-                      onClick={handleAddProduct}
-                      disabled={!selectedProductId || isFormSubmitting}
-                      className="h-12 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full"
-                    >
-                      Add
-                    </Button>
-                  </div>
+                
                 </div>
 
-                {/* Selected Products */}
-                {selectedProducts.length > 0 && (
-                  <div className="space-y-3">
-                    <label className="block text-sm font-medium text-gray-900">
-                      Selected Products ({selectedProducts.length})
-                    </label>
-                    <div className="max-h-40 overflow-y-auto space-y-2 border rounded-lg p-3 bg-gray-50">
-                      {selectedProducts.map((product) => (
-                        <div
-                          key={product.productId}
-                          className="flex items-center justify-between bg-white rounded-lg p-3 border"
-                        >
-                          <div className="flex items-center gap-3">
-                            {product.logoUrl ? (
-                              <div 
-                                className="w-8 h-8 rounded-md flex items-center justify-center border"
-                                style={{ backgroundColor: product.brandColors || '#f3f4f6' }}
-                              >
-                                <img 
-                                  src={product.logoUrl} 
-                                  alt={product.name} 
-                                  className="w-6 h-6 object-contain" 
-                                />
-                              </div>
-                            ) : (
-                              <div className="w-8 h-8 bg-blue-100 rounded-md flex items-center justify-center">
-                                <span className="text-blue-600 font-semibold text-sm">
-                                  {product.name.charAt(0).toUpperCase()}
-                                </span>
-                              </div>
-                            )}
-                            <span className="font-medium text-gray-900">{product.name}</span>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveProduct(product.productId)}
-                            disabled={isFormSubmitting}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          
               </div>
 
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={!isValid || (!isDirty && selectedProducts.length === existingProducts.length) || isFormSubmitting}
+                disabled={!isValid || selectedProductIds.length === 0 || isFormSubmitting || productsLoading}
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8 disabled:opacity-50"
               >
                 {isFormSubmitting 

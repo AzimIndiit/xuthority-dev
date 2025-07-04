@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useFavoriteLists, useFavoriteListProducts } from '@/hooks/useFavorites';
+import { useFavoriteLists, useFavoriteListProducts, useDeleteFavoriteList } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,9 +9,9 @@ import { useNavigate } from 'react-router-dom';
 import LottieLoader from '@/components/LottieLoader';
 import { 
   CreateListModal, 
-  DeleteConfirmModal, 
-  ListActionsDropdown 
+  ListActionsDropdown,
 } from '@/components/ui';
+import ConfirmationModal from '../ui/ConfirmationModal';
 
 interface MyFavoritesProps {
   className?: string;
@@ -25,8 +25,11 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedList, setSelectedList] = useState<{
     name: string;
-    productCount: number;
+    productIds: string[];
   } | null>(null);
+  
+  // Delete list mutation
+  const deleteListMutation = useDeleteFavoriteList();
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -40,13 +43,6 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     page: currentPage,
     limit: ITEMS_PER_PAGE,
   });
-
-  // Fetch products for the selected list when editing
-  const { data: editListProducts, isLoading: editListProductsLoading } = useFavoriteListProducts(
-    showEditDialog && selectedList?.name ? selectedList.name : '',
-    { page: 1, limit: 100 } // Get all products for editing
-  );
-
   // Accumulate lists for pagination
   React.useEffect(() => {
     if (favoritesData?.lists) {
@@ -84,9 +80,6 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     }
   }, [allLists, sortBy]);
 
-  const handleListClick = (listName: string) => {
-    navigate(`/profile/favorites/${encodeURIComponent(listName)}`);
-  };
 
   const handleCreateSuccess = () => {
     handleRefetch();
@@ -97,16 +90,24 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   };
 
   const handleDeleteSuccess = () => {
-    handleRefetch();
+    if (selectedList) {
+      deleteListMutation.mutate(selectedList.name, {
+        onSuccess: () => {
+          setShowDeleteDialog(false);
+          setSelectedList(null);
+          handleRefetch();
+        }
+      });
+    }
   };
 
-  const handleEditClick = (listName: string, productCount: number) => {
-    setSelectedList({ name: listName, productCount });
+  const handleEditClick = (listName: string, productIds: string[]) => {
+    setSelectedList({ name: listName, productIds });
     setShowEditDialog(true);
   };
 
-  const handleDeleteClick = (listName: string, productCount: number) => {
-    setSelectedList({ name: listName, productCount });
+  const handleDeleteClick = (listName: string, productIds: string[]) => {
+    setSelectedList({ name: listName, productIds });
     setShowDeleteDialog(true);
   };
 
@@ -117,40 +118,8 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   // Check if there are more lists to load
   const hasMoreLists = favoritesData?.pagination?.currentPage < favoritesData?.pagination?.totalPages;
 
-  // Prepare existing products for edit modal
-  const existingProducts = React.useMemo(() => {
-    if (!editListProducts?.products) return [];
-    
-    return editListProducts.products.map(product => ({
-      productId: product.productId,
-      name: product.name,
-      logoUrl: product.logoUrl,
-      brandColors: product.brandColors
-    }));
-  }, [editListProducts]);
 
-  const getProductIcon = (logoUrl?: string, name?: string) => {
-    if (logoUrl) {
-      return (
-        <img 
-          src={logoUrl} 
-          alt={name} 
-          className="w-full h-full object-cover rounded-lg"
-          onError={(e) => {
-            e.currentTarget.src = '';
-            e.currentTarget.style.display = 'none';
-          }}
-        />
-      );
-    }
-    
-    // Fallback to first letter of product name
-    return (
-      <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-        {name?.charAt(0).toUpperCase() || '?'}
-      </div>
-    );
-  };
+
 
   if (isLoading && !hasLoadedInitial) {
     return (
@@ -172,27 +141,17 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     <div className={cn("max-w-7xl mx-auto", className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">My Favorites</h1>
+        <h1 className=" sm:text-2xl text-xl font-bold text-gray-900">My Favorites</h1>
         
         <div className="flex items-center gap-4">
-          {/* Sort Dropdown */}
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="mostRecent">Most Recent</SelectItem>
-              <SelectItem value="alphabetical">Alphabetical</SelectItem>
-              <SelectItem value="mostProducts">Most Products</SelectItem>
-            </SelectContent>
-          </Select>
+   
 
           {/* Create New List Button */}
           <Button 
-            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full !text-sm h-10"
             onClick={() => setShowCreateDialog(true)}
           >
-            <Plus className="w-4 h-4 mr-2" />
+            <Plus className="w-2 h-2" />
             Create New List
           </Button>
         </div>
@@ -219,16 +178,16 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
             {sortedLists.map((list) => (
               <Card
                 key={list.listName}
-                className="bg-white border border-gray-200 rounded-2xl shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200 p-0 gap-0"
-                onClick={() => handleListClick(list.listName)}
+                className="bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200 p-0 gap-0"
+          
               >
                 {/* Header with background */}
-                <div className="bg-blue-100 rounded-t-2xl p-4 flex items-center justify-between">
+                <div className="bg-blue-100 rounded-t-lg p-4 flex items-center justify-between">
                   <h2 className="text-lg font-semibold text-gray-900 m-0">{list.listName}</h2>
                   <div onClick={(e) => e.stopPropagation()}>
                     <ListActionsDropdown
-                      onEdit={() => handleEditClick(list.listName, list.totalProducts)}
-                      onDelete={() => handleDeleteClick(list.listName, list.totalProducts)}
+                      onEdit={() => handleEditClick(list.listName, list.products.map(product => product.productId))}
+                      onDelete={() => handleDeleteClick(list.listName, list.products.map(product => product.productId))}
                     />
                   </div>
                 </div>
@@ -264,7 +223,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
                         className="text-blue-600 hover:text-blue-700 font-medium text-base underline underline-offset-2"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleListClick(list.listName);
+                        //   handleListClick(list);
                         }}
                       >
                         View All
@@ -307,15 +266,17 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
             onSuccess={handleEditSuccess}
             mode="edit"
             existingListName={selectedList.name}
-            existingProducts={existingProducts}
+            existingProductIds={selectedList.productIds}
           />
 
-          <DeleteConfirmModal
+          <ConfirmationModal
             isOpen={showDeleteDialog}
-            onOpenChange={setShowDeleteDialog}
-            listName={selectedList.name}
-            productCount={selectedList.productCount}
-            onSuccess={handleDeleteSuccess}
+            onOpenChange={(open) => !deleteListMutation.isPending && setShowDeleteDialog(open)}
+            onConfirm={handleDeleteSuccess}
+            title="Delete List"
+            description="Are you sure you want to delete this list? This action cannot be undone."
+            confirmText={deleteListMutation.isPending ? "Deleting..." : "Delete"}
+            cancelText="Cancel"
           />
         </>
       )}

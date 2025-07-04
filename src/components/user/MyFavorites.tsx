@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
-import { useFavoriteLists, useCreateFavoriteList, useAddToFavorites } from '@/hooks/useFavorites';
-import { useProducts } from '@/hooks/useProducts';
+import { useFavoriteLists } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MoreHorizontal, Plus, Star, X } from 'lucide-react';
+import { MoreHorizontal, Plus, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import LottieLoader from '@/components/LottieLoader';
+import CreateListModal from '@/components/ui/CreateListModal';
 
 interface MyFavoritesProps {
   className?: string;
@@ -19,44 +17,18 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('mostRecent');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
-  const [newListName, setNewListName] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState('');
 
   // Fetch user's favorite lists
-  const { data: favoritesData, isLoading, error } = useFavoriteLists();
-  const createListMutation = useCreateFavoriteList();
-  const addToFavoritesMutation = useAddToFavorites();
-
-  // Fetch products for the dropdown
-  const { data: productsData, isLoading: productsLoading } = useProducts(1, 50); // Get first 50 products
-  const products = Array.isArray(productsData?.data) ? productsData.data : [];
-
-  const handleCreateList = async () => {
-    if (!newListName.trim()) return;
-    
-    try {
-      // First create the list
-      await createListMutation.mutateAsync(newListName.trim());
-      
-      // Then add the selected product to the list if one is selected
-      if (selectedProduct) {
-        await addToFavoritesMutation.mutateAsync({
-          productId: selectedProduct,
-          listName: newListName.trim()
-        });
-      }
-      
-      setNewListName('');
-      setSelectedProduct('');
-      setShowCreateDialog(false);
-    } catch (error) {
-      // Error handled by mutation hooks
-    }
-  };
+  const { data: favoritesData, isLoading, error, refetch } = useFavoriteLists();
 
   const handleListClick = (listName: string) => {
     // Navigate to the list detail page
     navigate(`/profile/favorites/${encodeURIComponent(listName)}`);
+  };
+
+  const handleCreateSuccess = () => {
+    // Refetch the favorites lists to show the new list
+    refetch();
   };
 
   const getProductIcon = (logoUrl?: string, name?: string) => {
@@ -120,94 +92,13 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
           </Select>
 
           {/* Create New List Button */}
-          <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-            <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6">
-                <Plus className="w-4 h-4 mr-2" />
-                Create New List
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px] p-0">
-              {/* Close Button */}
-              <button
-                onClick={() => setShowCreateDialog(false)}
-                className="absolute right-4 top-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
-              >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Close</span>
-              </button>
-
-              <div className="p-8">
-                {/* Header */}
-                <div className="text-center mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-3">Create New List</h2>
-                  <p className="text-gray-500 text-sm leading-relaxed">
-                    Create a new list to save and organize the best software<br />
-                    products tailored to your needs.
-                  </p>
-                </div>
-
-                {/* Form */}
-                <div className="space-y-6">
-                  {/* List Name */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-3">
-                      List Name
-                    </label>
-                    <Input
-                      placeholder="Enter List Name"
-                      value={newListName}
-                      onChange={(e) => setNewListName(e.target.value)}
-                      onKeyPress={(e) => {
-                        if (e.key === 'Enter') {
-                          handleCreateList();
-                        }
-                      }}
-                      className="w-full h-12 px-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-
-                  {/* Add Product */}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-900 mb-3">
-                      Add Product
-                    </label>
-                    <Select value={selectedProduct} onValueChange={setSelectedProduct}>
-                      <SelectTrigger className="w-full h-12 px-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                        <SelectValue placeholder="Select Product" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {productsLoading ? (
-                          <SelectItem value="" disabled>
-                            Loading products...
-                          </SelectItem>
-                        ) : products.length === 0 ? (
-                          <SelectItem value="" disabled>
-                            No products available
-                          </SelectItem>
-                        ) : (
-                          products.map((product) => (
-                            <SelectItem key={product._id || product.id} value={product._id || product.id}>
-                              {product.name}
-                            </SelectItem>
-                          ))
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Continue Button */}
-                  <Button
-                    onClick={handleCreateList}
-                    disabled={!newListName.trim() || createListMutation.isPending || addToFavoritesMutation.isPending}
-                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8"
-                  >
-                    {(createListMutation.isPending || addToFavoritesMutation.isPending) ? 'Creating...' : 'Continue'}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <Button 
+            className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-6"
+            onClick={() => setShowCreateDialog(true)}
+          >
+            <Plus className="w-4 h-4 mr-2" />
+            Create New List
+          </Button>
         </div>
       </div>
 
@@ -293,6 +184,13 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
           ))}
         </div>
       )}
+
+      {/* Create List Modal */}
+      <CreateListModal
+        isOpen={showCreateDialog}
+        onOpenChange={setShowCreateDialog}
+        onSuccess={handleCreateSuccess}
+      />
     </div>
   );
 };

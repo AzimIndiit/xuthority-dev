@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { MoreHorizontal, Plus, Star } from 'lucide-react';
+import { MoreHorizontal, Plus, Star, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import LottieLoader from '@/components/LottieLoader';
@@ -19,6 +19,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   const [sortBy, setSortBy] = useState('mostRecent');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [newListName, setNewListName] = useState('');
+  const [selectedProduct, setSelectedProduct] = useState('');
 
   // Fetch user's favorite lists
   const { data: favoritesData, isLoading, error } = useFavoriteLists();
@@ -30,6 +31,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     try {
       await createListMutation.mutateAsync(newListName.trim());
       setNewListName('');
+      setSelectedProduct('');
       setShowCreateDialog(false);
     } catch (error) {
       // Error handled by mutation hook
@@ -109,33 +111,72 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
                 Create New List
               </Button>
             </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Favorite List</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <Input
-                  placeholder="Enter list name..."
-                  value={newListName}
-                  onChange={(e) => setNewListName(e.target.value)}
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      handleCreateList();
-                    }
-                  }}
-                />
-                <div className="flex justify-end gap-3">
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowCreateDialog(false)}
-                  >
-                    Cancel
-                  </Button>
+            <DialogContent className="sm:max-w-[500px] p-0">
+              {/* Close Button */}
+              <button
+                onClick={() => setShowCreateDialog(false)}
+                className="absolute right-4 top-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground"
+              >
+                <X className="h-4 w-4" />
+                <span className="sr-only">Close</span>
+              </button>
+
+              <div className="p-8">
+                {/* Header */}
+                <div className="text-center mb-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-3">Create New List</h2>
+                  <p className="text-gray-500 text-sm leading-relaxed">
+                    Create a new list to save and organize the best software<br />
+                    products tailored to your needs.
+                  </p>
+                </div>
+
+                {/* Form */}
+                <div className="space-y-6">
+                  {/* List Name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-3">
+                      List Name
+                    </label>
+                    <Input
+                      placeholder="Enter List Name"
+                      value={newListName}
+                      onChange={(e) => setNewListName(e.target.value)}
+                      onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                          handleCreateList();
+                        }
+                      }}
+                      className="w-full h-12 px-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Add Product */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-900 mb-3">
+                      Add Product
+                    </label>
+                    <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+                      <SelectTrigger className="w-full h-12 px-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <SelectValue placeholder="Select Product" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="smartsheet">Smartsheet</SelectItem>
+                        <SelectItem value="notion">Notion</SelectItem>
+                        <SelectItem value="slack">Slack</SelectItem>
+                        <SelectItem value="airtable">Airtable</SelectItem>
+                        <SelectItem value="clickup">ClickUp</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Continue Button */}
                   <Button
                     onClick={handleCreateList}
                     disabled={!newListName.trim() || createListMutation.isPending}
+                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8"
                   >
-                    {createListMutation.isPending ? 'Creating...' : 'Create List'}
+                    {createListMutation.isPending ? 'Creating...' : 'Continue'}
                   </Button>
                 </div>
               </div>

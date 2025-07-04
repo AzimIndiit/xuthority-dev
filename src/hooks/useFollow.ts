@@ -7,6 +7,7 @@ import FollowService, {
   FollowUser,
 } from '@/services/follow';
 import useUserStore from '@/store/useUserStore';
+import { queryClient } from '@/lib/queryClient';
 
 // Query keys for follow-related queries
 export const followQueryKeys = {
@@ -32,7 +33,7 @@ export const useFollowers = (
     select: (data:any) => {
       return data.data
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    // staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 
@@ -50,7 +51,7 @@ export const useFollowing = (
     select: (data:any) => {
       return data.data
     },
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    // staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };
 
@@ -82,7 +83,6 @@ export const useFollowStatus = (userId: string) => {
 
 // Hook to toggle follow/unfollow
 export const useToggleFollow = () => {
-  const queryClient = useQueryClient();
   const { user: currentUser } = useUserStore();
 
   return useMutation<ToggleFollowResponse, Error, string>({
@@ -150,7 +150,6 @@ export const useToggleFollow = () => {
 
 // Hook to remove follower
 export const useRemoveFollower = () => {
-  const queryClient = useQueryClient();
   const { user: currentUser } = useUserStore();
 
   return useMutation<any, Error, string>({

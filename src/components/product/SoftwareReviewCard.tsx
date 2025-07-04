@@ -1,26 +1,33 @@
 import React, { useState } from 'react';
-import { Star, ThumbsUp, MessageSquare, FileText, Reply } from 'lucide-react';
+import { Star, ThumbsUp, MessageSquare, FileText, Reply, Edit, Loader2, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SoftwareReviewCardProps } from '@/types/software-review';
 import StarRating from '../ui/StarRating';
 import { useNavigate } from 'react-router-dom';
 import useUserStore from '@/store/useUserStore';
 import useUIStore from '@/store/useUIStore';
-import { useHelpfulVote } from '@/hooks/useReview';
+import { useDeleteReview, useHelpfulVote } from '@/hooks/useReview';
 import DisputeModal from './DisputeModal';
+import { Button } from '../ui/button';
+import ConfirmationModal from '../ui/ConfirmationModal';
+import { useReviewStore } from '@/store/useReviewStore';
 
 const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
   software,
   review,
   className,
   showComments = false,
-  showDispute = false   
+  showDispute = false,
+  showAction = false
 }) => {
     const { isLoggedIn, user } = useUserStore();
     const { openAuthModal } = useUIStore();
+    const { setSelectedSoftware } = useReviewStore();
   const navigate = useNavigate();
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { voteHelpful, removeVote, isVoting, isRemoving, hasVoted } = useHelpfulVote();
+  const deleteReviewMutation = useDeleteReview();
   const isUserVoted = review ? hasVoted(review as any) : false;
   const helpfulCount = review?.helpfulVotes?.count || 0;
   const formatDate = (dateString: string) => {
@@ -75,6 +82,11 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
     }
     
     setIsDisputeModalOpen(true);
+  };
+
+  const handleDeleteReview = () => {
+    deleteReviewMutation.mutate(review.id);
+    setIsDeleteModalOpen(false);
   };
 
   return (
@@ -176,6 +188,38 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
             </button>}
           </div>
         )}
+
+        {
+  showAction &&    <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
+          <Button onClick={() => {
+             setSelectedSoftware({
+              id: software.id,
+              name: software.name,
+              logoUrl: software.logoUrl,
+            
+             });
+            navigate(`/write-review`);
+          }} className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-4 py-2 !text-xs font-semibold flex items-center h-10">
+            <Edit className="w-2 h-2" />
+          <span className="hidden sm:block text-xs"> Edit Review</span>
+          </Button>
+          <Button 
+            variant="destructive" 
+            className="rounded-full px-4 py-2 !text-xs font-semibold flex items-center h-10"
+            onClick={() => setIsDeleteModalOpen(true)}
+            disabled={deleteReviewMutation.isPending}
+          >
+            {deleteReviewMutation.isPending ? (
+              <Loader2 className="w-2 h-2 animate-spin" />
+            ) : (
+              <Trash2 className="w-2 h-2" />
+            )}
+            <span className="hidden sm:block text-xs"> Delete Review</span>
+          </Button>
+
+         
+        </div>
+        }
         </div>
 
         {/* Review Content */}
@@ -210,6 +254,17 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
           reviewId={review.id}
         />
       )}
+
+       {/* Delete Review Confirmation Modal */}
+       <ConfirmationModal
+        isOpen={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={handleDeleteReview}
+        title="Delete Review"
+        description="Are you sure you want to delete this review? This action cannot be undone."
+        confirmText="Delete"
+        cancelText="Cancel"
+      />
     </div>
   );
 };

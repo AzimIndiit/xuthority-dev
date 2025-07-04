@@ -33,10 +33,11 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [followersPage, setFollowersPage] = useState(1);
   const [followingPage, setFollowingPage] = useState(1);
-  const [allFollowers, setAllFollowers] = useState<any[]>([]);
-  const [allFollowing, setAllFollowing] = useState<any[]>([]);
 
+
+  // Debounced search term logic
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
+  const effectiveSearchTerm = debouncedSearchTerm && debouncedSearchTerm.length >= 2 ? debouncedSearchTerm : '';
 
   // Fetch followers
   const {
@@ -44,7 +45,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
     isLoading: followersLoading,
     error: followersError,
     refetch: refetchFollowers,
-  } = useFollowers(userId, followersPage, 10, debouncedSearchTerm);
+  } = useFollowers(userId, followersPage, 10, effectiveSearchTerm);
 
   // Fetch following
   const {
@@ -52,48 +53,15 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
     isLoading: followingLoading,
     error: followingError,
     refetch: refetchFollowing,
-  } = useFollowing(userId, followingPage, 10, debouncedSearchTerm);
+  } = useFollowing(userId, followingPage, 10, effectiveSearchTerm);
 
   const removeFollowerMutation = useRemoveFollower();
   const toggleFollowMutation = useToggleFollow();
 
-  // Update followers list when data changes
-  useEffect(() => {
-    if (followersData?.data) {
-      const newFollowers = Array.isArray(followersData.data) ? followersData.data : [];
-      if (followersPage === 1 || debouncedSearchTerm) {
-        setAllFollowers(newFollowers);
-      } else {
-        setAllFollowers(prev => {
-          const currentData = Array.isArray(prev) ? prev : [];
-          return [...currentData, ...newFollowers];
-        });
-      }
-    }
-  }, [followersData, followersPage, debouncedSearchTerm]);
 
-  // Update following list when data changes
-  useEffect(() => {
-    if (followingData?.data) {
-      const newFollowing = Array.isArray(followingData.data) ? followingData.data : [];
-      if (followingPage === 1 || debouncedSearchTerm) {
-        setAllFollowing(newFollowing);
-      } else {
-        setAllFollowing(prev => {
-          const currentData = Array.isArray(prev) ? prev : [];
-          return [...currentData, ...newFollowing];
-        });
-      }
-    }
-  }, [followingData, followingPage, debouncedSearchTerm]);
 
-  // Reset pages when search term changes
-  useEffect(() => {
-    setFollowersPage(1);
-    setFollowingPage(1);
-    setAllFollowers([]);
-    setAllFollowing([]);
-  }, [debouncedSearchTerm]);
+const followingDataArray = Array.isArray(followingData) ? followingData : followingData?.data;
+const followersDataArray = Array.isArray(followersData) ? followersData : followersData?.data;
 
   const handleRemoveFollower = async (followerId: string) => {
     if (!currentUserId || currentUserId !== userId) {
@@ -103,12 +71,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
     try {
       await removeFollowerMutation.mutateAsync(followerId);
       toast.success('Follower removed successfully');
-      
-      // Remove from local state
-      setAllFollowers(prev => {
-        const currentData = Array.isArray(prev) ? prev : [];
-        return currentData.filter(follower => follower._id !== followerId);
-      });
+
       
       // Refetch to ensure consistency
       refetchFollowers();
@@ -123,13 +86,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
 
     try {
       await toggleFollowMutation.mutateAsync(userId);
-      
-      // Remove from local state immediately
-      setAllFollowing(prev => {
-        const currentData = Array.isArray(prev) ? prev : [];
-        return currentData.filter(following => following._id !== userId);
-      });
-      
+
       // Refetch to ensure consistency
       refetchFollowing();
     } catch (error) {
@@ -155,7 +112,8 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
     const newTab = value as 'followers' | 'following';
     onTabChange?.(newTab);
   };
-
+  console.log(followersData,"followersData");
+  console.log(followingData,"followingData");
   return (
     <div className="">
        
@@ -204,7 +162,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
                 Try Again
               </Button>
             </div>
-          ) : !Array.isArray(allFollowers) || allFollowers.length === 0 ? (
+          ):!Array.isArray(followersDataArray) || followersDataArray.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600">
                 {debouncedSearchTerm ? 'No followers found matching your search' : 'No followers yet'}
@@ -212,7 +170,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {allFollowers.map((follower) => (
+              {followersDataArray.map((follower) => (
                 <div
                   key={follower._id}
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"
@@ -273,7 +231,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
                 Try Again
               </Button>
             </div>
-          ) : !Array.isArray(allFollowing) || allFollowing.length === 0 ? (
+          ) : !Array.isArray(followingDataArray) || followingDataArray.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-600">
                 {debouncedSearchTerm ? 'No following found matching your search' : 'Not following anyone yet'}
@@ -281,7 +239,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
             </div>
           ) : (
             <div className="space-y-4">
-              {allFollowing.map((following) => (
+              {followingDataArray.map((following) => (
                 <div
                   key={following._id}
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"

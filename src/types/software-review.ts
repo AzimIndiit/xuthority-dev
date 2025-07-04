@@ -51,6 +51,7 @@ export interface SoftwareReviewCardProps {
   compact?: boolean;
   showComments?: boolean;
   showDispute?: boolean;
+  showAction?: boolean;
 }
 
 export interface ReviewFilters {

@@ -24,6 +24,7 @@ import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import ProductsPage from './ProductsPage';
 import AddProductPage from './AddProductPage';
 import EditProductPage from './EditProductPage';
+import MyReviews from '@/components/user/MyReviews';
 
 const ProfilePage: React.FC = () => {
   const { tab, subTab } = useParams<{ tab?: string, subTab?: string }>();
@@ -283,6 +284,10 @@ console.log('user', user)
         );
       case 'products':
         return <ProductsPage />;  
+      case 'my-reviews':
+        return <MyReviews />;
+      case 'my-favourites':
+        return <MyFavourites />;
 
       // Placeholder for other tabs
       default:

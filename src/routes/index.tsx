@@ -51,6 +51,9 @@ const UserProfile = lazy(() => import("../pages/user/Profile"));
 // const PublicProfile = lazy(() => import('../pages/user/PublicProfile'));
 const PublicProfileBySlug = lazy(() => import('../pages/public-profile/PublicProfileBySlug'));
 
+// Lazy load notifications page
+const NotificationsPage = lazy(() => import("@/pages/notifications").then(module => ({ default: module.NotificationsPage })));
+
 
 const Loader = () => (
   <div className="w-full flex justify-center items-center min-h-[100dvh] text-lg font-semibold">
@@ -160,6 +163,7 @@ const router = createBrowserRouter([
                   </Suspense>
                 ),
               },
+              
             ],
           },
         ],

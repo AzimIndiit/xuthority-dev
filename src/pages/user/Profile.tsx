@@ -26,6 +26,8 @@ import AddProductPage from './AddProductPage';
 import EditProductPage from './EditProductPage';
 import MyReviews from '@/components/user/MyReviews';
 import MyFavorites from '@/components/user/MyFavorites';
+import { NotificationsPage } from '../notifications';
+import { NotificationsList } from '@/components/notifications';
 
 const ProfilePage: React.FC = () => {
   const { tab, subTab } = useParams<{ tab?: string, subTab?: string }>();
@@ -289,6 +291,9 @@ console.log('user', user)
         return <MyReviews />;
       case 'my-favourites':
         return <MyFavorites />;
+
+      case 'notifications':
+        return <NotificationsList />;
 
       // Placeholder for other tabs
       default:

@@ -5,6 +5,7 @@ export const routePaths = {
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/auth/reset-password",
   PROFILE: "/profile",
+  NOTIFICATIONS: "/notifications",
   CATEGORIES: "/categories",
   SOFTWARE_CATEGORY: "/:category",
   SUB_CATEGORY: "/:category/:subCategory",

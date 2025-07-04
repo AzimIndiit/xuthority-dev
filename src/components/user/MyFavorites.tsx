@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useFavoriteLists } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MoreHorizontal, Plus, Star } from 'lucide-react';
+import { Plus, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import LottieLoader from '@/components/LottieLoader';
-import CreateListModal from '@/components/ui/CreateListModal';
+import { 
+  CreateListModal, 
+  EditListModal, 
+  DeleteConfirmModal, 
+  ListActionsDropdown 
+} from '@/components/ui';
 
 interface MyFavoritesProps {
   className?: string;
@@ -17,19 +22,95 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   const navigate = useNavigate();
   const [sortBy, setSortBy] = useState('mostRecent');
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedList, setSelectedList] = useState<{
+    name: string;
+    productCount: number;
+  } | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allLists, setAllLists] = useState<any[]>([]);
+  const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
 
-  // Fetch user's favorite lists
-  const { data: favoritesData, isLoading, error, refetch } = useFavoriteLists();
+  const ITEMS_PER_PAGE = 10;
+
+  // Fetch user's favorite lists with pagination
+  const { data: favoritesData, isLoading, error, refetch, isFetching } = useFavoriteLists({
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+  });
+
+  // Accumulate lists for pagination
+  React.useEffect(() => {
+    if (favoritesData?.lists) {
+      if (currentPage === 1) {
+        // First page - replace all lists
+        setAllLists(favoritesData.lists);
+        setHasLoadedInitial(true);
+      } else {
+        // Subsequent pages - append new lists
+        setAllLists(prev => [...prev, ...favoritesData.lists]);
+      }
+    }
+  }, [favoritesData, currentPage]);
+
+  // Reset pagination when refetching
+  const handleRefetch = () => {
+    setCurrentPage(1);
+    setAllLists([]);
+    setHasLoadedInitial(false);
+    refetch();
+  };
+
+  // Sort lists based on selected criteria
+  const sortedLists = useMemo(() => {
+    const listsToSort = [...allLists];
+    
+    switch (sortBy) {
+      case 'alphabetical':
+        return listsToSort.sort((a, b) => a.listName.localeCompare(b.listName));
+      case 'mostProducts':
+        return listsToSort.sort((a, b) => b.totalProducts - a.totalProducts);
+      case 'mostRecent':
+      default:
+        return listsToSort.sort((a, b) => new Date(b.lastUpdated).getTime() - new Date(a.lastUpdated).getTime());
+    }
+  }, [allLists, sortBy]);
 
   const handleListClick = (listName: string) => {
-    // Navigate to the list detail page
     navigate(`/profile/favorites/${encodeURIComponent(listName)}`);
   };
 
   const handleCreateSuccess = () => {
-    // Refetch the favorites lists to show the new list
-    refetch();
+    handleRefetch();
   };
+
+  const handleEditSuccess = () => {
+    handleRefetch();
+  };
+
+  const handleDeleteSuccess = () => {
+    handleRefetch();
+  };
+
+  const handleEditClick = (listName: string, productCount: number) => {
+    setSelectedList({ name: listName, productCount });
+    setShowEditDialog(true);
+  };
+
+  const handleDeleteClick = (listName: string, productCount: number) => {
+    setSelectedList({ name: listName, productCount });
+    setShowDeleteDialog(true);
+  };
+
+  const handleLoadMore = () => {
+    setCurrentPage(prev => prev + 1);
+  };
+
+  // Check if there are more lists to load
+  const hasMoreLists = favoritesData?.pagination?.currentPage < favoritesData?.pagination?.totalPages;
 
   const getProductIcon = (logoUrl?: string, name?: string) => {
     if (logoUrl) {
@@ -54,7 +135,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     );
   };
 
-  if (isLoading) {
+  if (isLoading && !hasLoadedInitial) {
     return (
       <div className={cn("flex items-center justify-center py-20", className)}>
         <LottieLoader size="large" />
@@ -69,8 +150,6 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
       </div>
     );
   }
-
-  const lists = favoritesData?.lists || [];
 
   return (
     <div className={cn("max-w-7xl mx-auto", className)}>
@@ -103,7 +182,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
       </div>
 
       {/* Favorite Lists */}
-      {lists.length === 0 ? (
+      {sortedLists.length === 0 && hasLoadedInitial ? (
         <div className="text-center py-20">
           <div className="w-32 h-32 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
             <Star className="w-16 h-16 text-gray-400" />
@@ -118,79 +197,108 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {lists.map((list) => (
-            <Card 
-              key={list.listName} 
-              className="bg-gradient-to-br from-blue-50 to-purple-50 border-0 cursor-pointer hover:shadow-lg transition-shadow duration-200"
-              onClick={() => handleListClick(list.listName)}
-            >
-              <CardContent className="p-6">
-                {/* List Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-semibold text-gray-900">{list.listName}</h2>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="text-gray-500 hover:text-gray-700"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      // Handle menu actions (rename, delete, etc.)
-                    }}
-                  >
-                    <MoreHorizontal className="w-5 h-5" />
-                  </Button>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {sortedLists.map((list) => (
+              <Card
+                key={list.listName}
+                className="bg-white border border-gray-200 rounded-2xl shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200 p-0 gap-0"
+                onClick={() => handleListClick(list.listName)}
+              >
+                {/* Header with background */}
+                <div className="bg-blue-100 rounded-t-2xl p-4 flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-900 m-0">{list.listName}</h2>
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <ListActionsDropdown
+                      onEdit={() => handleEditClick(list.listName, list.totalProducts)}
+                      onDelete={() => handleDeleteClick(list.listName, list.totalProducts)}
+                    />
+                  </div>
                 </div>
-
-                {/* Product Grid */}
-                {list.products.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500">No products in this list yet</p>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-3 gap-4 mb-6">
-                    {list.products.slice(0, 3).map((product) => (
-                      <div key={product.productId} className="space-y-2">
-                        {/* Product Icon */}
-                        <div className="w-16 h-16 mx-auto">
-                          {getProductIcon(product.logoUrl, product.name)}
+                <CardContent className="p-4">
+                  {/* Product Grid */}
+                  {list.products.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">No products in this list yet</p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-4 ">
+                      {list.products.slice(0, 3).map((product) => (
+                        <div key={product.productId} className="flex flex-col items-center">
+                          {/* Product Icon with soft background */}
+                          <div className=" cursor-pointer" >
+                            <div className={`w-14 h-14 rounded-md  flex items-center justify-center  border border-white`} style={{ backgroundColor: product.brandColors }}>
+                              <img src={product.logoUrl} alt={product.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-md" />
+                            </div>
+                          </div>
+                          {/* Product Name */}
+                          <span className="text-sm font-medium text-gray-900 text-center leading-tight mt-2 line-clamp-2">
+                            {product.name}
+                          </span>
                         </div>
-                        
-                        {/* Product Name */}
-                        <p className="text-center text-sm font-medium text-gray-700 truncate">
-                          {product.name}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
 
-                {/* View All Link */}
-                {list.products.length > 0 && (
-                  <div className="text-center">
-                    <button 
-                      className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleListClick(list.listName);
-                      }}
-                    >
-                      View All ({list.totalProducts})
-                    </button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+                  {/* View All Link */}
+                  {list.products.length > 3 && (
+                    <div className="text-center mt-2 mb-1">
+                      <button
+                        className="text-blue-600 hover:text-blue-700 font-medium text-base underline underline-offset-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleListClick(list.listName);
+                        }}
+                      >
+                        View All
+                      </button>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          {/* Load More Button */}
+          {hasMoreLists && (
+            <div className="text-center mt-8">
+              <Button
+                onClick={handleLoadMore}
+                disabled={isFetching}
+                className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-3"
+              >
+                {isFetching ? 'Loading...' : 'Load More Lists'}
+              </Button>
+            </div>
+          )}
+        </>
       )}
 
-      {/* Create List Modal */}
+      {/* Modals */}
       <CreateListModal
         isOpen={showCreateDialog}
         onOpenChange={setShowCreateDialog}
         onSuccess={handleCreateSuccess}
       />
+
+      {selectedList && (
+        <>
+          <EditListModal
+            isOpen={showEditDialog}
+            onOpenChange={setShowEditDialog}
+            currentListName={selectedList.name}
+            onSuccess={handleEditSuccess}
+          />
+
+          <DeleteConfirmModal
+            isOpen={showDeleteDialog}
+            onOpenChange={setShowDeleteDialog}
+            listName={selectedList.name}
+            productCount={selectedList.productCount}
+            onSuccess={handleDeleteSuccess}
+          />
+        </>
+      )}
     </div>
   );
 };

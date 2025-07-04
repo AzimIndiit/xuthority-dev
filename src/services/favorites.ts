@@ -10,6 +10,7 @@ export interface FavoriteProduct {
   totalReviews: number;
   addedAt: string;
   notes?: string;
+  brandColors?: string;
 }
 
 export interface FavoriteList {

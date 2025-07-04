@@ -2,84 +2,63 @@ import React from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-import { useProducts } from '@/hooks/useProducts';
-import { useCreateFavoriteList, useAddToFavorites } from '@/hooks/useFavorites';
+import { useRenameFavoriteList } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { FormInput } from '@/components/ui/FormInput';
-import { FormSelect } from '@/components/ui/FormSelect';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Form validation schema
-const createListSchema = z.object({
-  listName: z.string().nonempty()
-    .min(2, 'List name is required')
+const editListSchema = z.object({
+  listName: z.string()
+    .min(2, 'List name must be at least 2 characters')
     .max(100, 'List name must be less than 100 characters')
     .trim(),
-  productId: z.string().optional(),
 });
 
-type CreateListFormData = z.infer<typeof createListSchema>;
+type EditListFormData = z.infer<typeof editListSchema>;
 
-interface CreateListModalProps {
+interface EditListModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
+  currentListName: string;
   onSuccess?: () => void;
   className?: string;
 }
 
-const defaultValues: CreateListFormData = {
-  listName: '',
-  productId: '',
-};
-
-const CreateListModal: React.FC<CreateListModalProps> = ({
+const EditListModal: React.FC<EditListModalProps> = ({
   isOpen,
   onOpenChange,
+  currentListName,
   onSuccess,
   className
 }) => {
   // Form setup with validation
-  const methods = useForm<CreateListFormData>({
-    resolver: zodResolver(createListSchema),
+  const methods = useForm<EditListFormData>({
+    resolver: zodResolver(editListSchema),
     mode: 'onChange',
-    defaultValues,
+    defaultValues: {
+      listName: currentListName,
+    },
   });
 
   const { 
     handleSubmit, 
     reset, 
-    formState: { isSubmitting, isValid } 
+    formState: { isValid, isDirty } 
   } = methods;
 
   // API hooks
-  const createListMutation = useCreateFavoriteList();
-  const addToFavoritesMutation = useAddToFavorites();
-  const { data: productsData, isLoading: productsLoading } = useProducts(1, 50);
-  const productsDataArray : any = Array.isArray(productsData) ? productsData.data : [];
-  // Process products data for FormSelect
-  const productOptions = React.useMemo(() => {
-    if (!productsDataArray) return [];
-    return productsDataArray.map((product) => ({
-      value: product._id || product.id,
-      label: product.name,
-    }));
-  }, [productsDataArray]);
+  const renameMutation = useRenameFavoriteList();
 
   // Form submission handler
-  const onSubmit = async (data: CreateListFormData) => {
+  const onSubmit = async (data: EditListFormData) => {
     try {
-      // First create the list
-      await createListMutation.mutateAsync(data.listName);
-      
-      // Then add the selected product to the list if one is selected
-      if (data.productId) {
-        await addToFavoritesMutation.mutateAsync({
-          productId: data.productId,
-          listName: data.listName
-        });
-      }
+      await renameMutation.mutateAsync({
+        listName: currentListName,
+        newListName: data.listName
+      });
       
       // Reset form and close modal
       reset();
@@ -88,7 +67,7 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
       
     } catch (error) {
       // Errors are handled by mutation hooks with toast notifications
-      console.error('Error creating list:', error);
+      console.error('Error renaming list:', error);
     }
   };
 
@@ -99,12 +78,19 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
 
   // Handle modal close
   const handleClose = () => {
-    reset();
+    reset({ listName: currentListName });
     onOpenChange(false);
   };
 
+  // Reset form when modal opens with new list name
+  React.useEffect(() => {
+    if (isOpen && currentListName) {
+      reset({ listName: currentListName });
+    }
+  }, [isOpen, currentListName, reset]);
+
   // Loading state
-  const isFormSubmitting = createListMutation.isPending || addToFavoritesMutation.isPending;
+  const isFormSubmitting = renameMutation.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -121,10 +107,10 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
         <div className="p-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-3">Create New List</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Edit List</h2>
             <p className="text-gray-500 text-sm leading-relaxed">
-              Create a new list to save and organize the best software<br />
-              products tailored to your needs.
+              Update the name of your favorite list to better<br />
+              organize your saved software products.
             </p>
           </div>
 
@@ -140,23 +126,13 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
                 disabled={isFormSubmitting}
               />
 
-              {/* Add Product Field */}
-              <FormSelect
-                name="productId"
-                label="Add Product"
-                placeholder="Select Product"
-                options={productOptions}
-                searchable
-                disabled={productsLoading || isFormSubmitting}
-              />
-
               {/* Submit Button */}
               <Button
                 type="submit"
-                disabled={!isValid || isFormSubmitting}
+                disabled={!isValid || !isDirty || isFormSubmitting}
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8 disabled:opacity-50"
               >
-                {isFormSubmitting ? 'Creating...' : 'Continue'}
+                {isFormSubmitting ? 'Updating...' : 'Update List'}
               </Button>
             </form>
           </FormProvider>
@@ -166,4 +142,4 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   );
 };
 
-export default CreateListModal; 
+export default EditListModal; 

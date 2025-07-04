@@ -193,11 +193,11 @@ export const useRemoveFollower = () => {
         exact: false 
       });
 
-      toast.success('Follower removed successfully');
+      // Success toast is handled in the component
     },
     onError: (error) => {
       console.error('Remove follower error:', error);
-      toast.error(error.message || 'Failed to remove follower');
+      // Error toast is handled in the component
     },
   });
 }; 

@@ -13,10 +13,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import UserReviews from './UserReviews';
 import UserProducts from './UserProducts';
+import useUserStore from '@/store/useUserStore';
+import useUIStore from '@/store/useUIStore';
 
 const PublicProfileBySlugPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-
+  const { isLoggedIn } = useUserStore();
+  const { openAuthModal } = useUIStore();
   const toast = useToast();
 
   // Fetch user data by slug
@@ -61,6 +64,10 @@ const PublicProfileBySlugPage: React.FC = () => {
   }
 
   const handleFollowToggle = async () => {
+    if (!isLoggedIn) {
+      openAuthModal();
+      return;
+    }
     if (!publicProfile?._id) return;
     
     try {

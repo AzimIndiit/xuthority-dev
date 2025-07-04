@@ -81,6 +81,7 @@ const FollowersPage: React.FC = () => {
         {/* Followers/Following Component */}
         <FollowersFollowing
           userId={userId}
+          currentUserId={currentUser?._id}
           activeTab={activeTab}
           onTabChange={handleTabChange}
           showRemoveButton={isCurrentUser && activeTab === 'followers'}

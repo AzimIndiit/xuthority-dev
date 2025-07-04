@@ -96,7 +96,9 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
   }, [debouncedSearchTerm]);
 
   const handleRemoveFollower = async (followerId: string) => {
-    if (!currentUserId || currentUserId !== userId) return;
+    if (!currentUserId || currentUserId !== userId) {
+      return;
+    }
 
     try {
       await removeFollowerMutation.mutateAsync(followerId);
@@ -137,7 +139,7 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
   };
 
   const handleLoadMoreFollowers = () => {
-    setFollowersPage(prev => prev + 1);
+    setFollowersPage(prev => prev + 1); 
   };
 
   const handleLoadMoreFollowing = () => {
@@ -215,25 +217,25 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
                   key={follower._id}
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"
                 >
-                  <div className="flex items-center space-x-4 w-full">
-                    <Avatar className="w-12 h-12" onClick={() => navigate(`/public-profile/${follower.slug}`)}>
-                      <AvatarImage  className='object-cover'     src={follower.avatar || ''} alt={follower.name} />
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="w-12 h-12 cursor-pointer" onClick={() => navigate(`/public-profile/${follower.slug}`)}>
+                      <AvatarImage className='object-cover' src={follower.avatar || ''} alt={follower.name} />
                       <AvatarFallback className="text-sm">
                         {getUserInitials(follower)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className='flex items-center gap-2 justify-between w-full'>
+                    <div>
                       <h3 className="font-semibold text-gray-900 text-lg">
                         {getUserDisplayName(follower)}
                       </h3>
-                      <Button disabled={removeFollowerMutation.isPending} onClick={() => handleRemoveFollower(follower._id)} className="h-8 bg-red-600 hover:bg-red-700 text-white hover:text-white  py-2  font-semibold transition-colors duration-200 !w-fit" variant="outline">{removeFollowerMutation.isPending ? 'Removing...' : 'Remove'}</Button>
                     </div>
                   </div>
+                  
                   {canRemoveFollowers && (
                     <Button
                       onClick={() => handleRemoveFollower(follower._id)}
                       disabled={removeFollowerMutation.isPending}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold transition-colors duration-200"
+                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition-colors duration-200"
                     >
                       {removeFollowerMutation.isPending ? 'Removing...' : 'Remove'}
                     </Button>
@@ -284,20 +286,20 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
                   key={following._id}
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"
                 >
-                  <div className="flex items-center space-x-4 w-full">
-                    <Avatar className="w-12 h-12" onClick={() => navigate(`/public-profile/${following.slug}`)}>
+                  <div className="flex items-center space-x-4">
+                    <Avatar className="w-12 h-12 cursor-pointer" onClick={() => navigate(`/public-profile/${following.slug}`)}>
                       <AvatarImage className='object-cover' src={following.avatar || ''} alt={following.name} />
                       <AvatarFallback className="text-sm">
                         {getUserInitials(following)}
                       </AvatarFallback>
                     </Avatar>
-                    <div className='flex items-center gap-2 justify-between w-full '>
+                    <div>
                       <h3 className="font-semibold text-gray-900 text-lg">
                         {getUserDisplayName(following)}
                       </h3>
-                      <Button disabled={toggleFollowMutation.isPending} onClick={() => handleUnfollow(following._id)} className="h-8 bg-blue-600 hover:bg-blue-700 text-white hover:text-white  py-2  font-semibold transition-colors duration-200 !w-fit" variant="outline">{toggleFollowMutation.isPending ? 'Unfollowing...' : 'Unfollow'}</Button>
                     </div>
                   </div>
+                  
                   {canUnfollowUsers && (
                     <Button
                       onClick={() => handleUnfollow(following._id)}

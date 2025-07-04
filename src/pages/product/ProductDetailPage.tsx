@@ -55,7 +55,7 @@ export default function ProductDetailPage() {
 
   return (
     <div className="bg-white min-h-[100vh]">
-      <ProductDetailHeader product={headerProduct} />
+      <ProductDetailHeader product={headerProduct}  productOwner={product.userId}/>
       <ProductNav />
       <main className="w-full">
         <section id="product-overview" className="bg-[#F7F7F7]">

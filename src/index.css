@@ -184,3 +184,54 @@
   }
 }
 
+/* Custom styles for vendor modal - no animations */
+.vendor-modal-no-animation {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  scale: 1 !important;
+}
+
+.vendor-modal-no-animation[data-state="open"] {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  scale: 1 !important;
+}
+
+.vendor-modal-no-animation[data-state="closed"] {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  scale: 1 !important;
+}
+
+/* Override Radix UI animations for vendor modal */
+.vendor-modal-no-animation * {
+  animation-duration: 0s !important;
+  animation-delay: 0s !important;
+  animation-iteration-count: 1 !important;
+  animation-fill-mode: none !important;
+  transition-duration: 0s !important;
+  transition-delay: 0s !important;
+  transform: none !important;
+  opacity: 1 !important;
+  scale: 1 !important;
+}
+
+/* Specifically disable zoom animations */
+.vendor-modal-no-animation {
+  --radix-dialog-content-transform: none !important;
+}
+
+.vendor-modal-no-animation[data-state="open"] {
+  --radix-dialog-content-transform: none !important;
+}
+
+.vendor-modal-no-animation[data-state="closed"] {
+  --radix-dialog-content-transform: none !important;
+}
+

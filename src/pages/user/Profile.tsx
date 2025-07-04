@@ -253,6 +253,7 @@ console.log('user', user)
         return (
           <FollowersFollowing
             userId={user._id}
+            currentUserId={user._id}
             activeTab="followers"
             onTabChange={(tab) => {
               setFollowTab(tab);
@@ -268,6 +269,7 @@ console.log('user', user)
         return (
           <FollowersFollowing
             userId={user._id}
+            currentUserId={user._id}
             activeTab="following"
             onTabChange={(tab) => {
               setFollowTab(tab);

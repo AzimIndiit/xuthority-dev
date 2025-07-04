@@ -18,6 +18,7 @@ import useUIStore from "@/store/useUIStore";
 import { useRegisterVendor, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
 import { useToast } from "@/hooks/useToast";
+import { scrollToTop } from "@/utils/scrollToTop";
 
 const vendorSignupSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }).max(50, { message: "First name must be less than 50 characters" }),
@@ -94,7 +95,7 @@ export function VendorSignupForm() {
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
   const toast = useToast();
-  
+ 
   // Use the new authentication hooks
   const registerMutation = useRegisterVendor();
   const { googleLogin, linkedInLogin } = useSocialLogin();
@@ -152,7 +153,7 @@ export function VendorSignupForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form id="vendor-signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor="firstName">First Name</Label>

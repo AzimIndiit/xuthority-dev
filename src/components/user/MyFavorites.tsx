@@ -43,16 +43,9 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
 
   // Fetch products for the selected list when editing
   const { data: editListProducts, isLoading: editListProductsLoading } = useFavoriteListProducts(
-    selectedList?.name || '',
+    showEditDialog && selectedList?.name ? selectedList.name : '',
     { page: 1, limit: 100 } // Get all products for editing
   );
-
-  // Only fetch when edit dialog is open and list name exists
-  React.useEffect(() => {
-    if (showEditDialog && selectedList?.name && !editListProductsLoading) {
-      // Products will be fetched automatically by the hook when listName is provided
-    }
-  }, [showEditDialog, selectedList?.name, editListProductsLoading]);
 
   // Accumulate lists for pagination
   React.useEffect(() => {

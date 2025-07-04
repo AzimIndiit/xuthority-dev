@@ -59,14 +59,14 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
     name: string;
     logoUrl?: string;
     brandColors?: string;
-  }>>(existingProducts);
+  }>>([]);
 
   // Form setup with validation
   const methods = useForm<ListModalFormData>({
     resolver: zodResolver(listModalSchema),
     mode: 'onChange',
     defaultValues: {
-      listName: mode === 'edit' ? existingListName : '',
+      listName: '',
       productId: '',
     },
   });
@@ -102,18 +102,29 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
       }));
   }, [productsData, selectedProducts]);
 
-  // Reset form and selected products when modal opens/closes
+  // Reset form and selected products when modal opens/closes or mode changes
   React.useEffect(() => {
     if (isOpen) {
-      if (mode === 'edit') {
+      if (mode === 'edit' && existingListName) {
         reset({ listName: existingListName, productId: '' });
         setSelectedProducts(existingProducts);
       } else {
         reset({ listName: '', productId: '' });
         setSelectedProducts([]);
       }
+    } else {
+      // Reset when modal closes
+      reset({ listName: '', productId: '' });
+      setSelectedProducts([]);
     }
-  }, [isOpen, mode, existingListName, existingProducts, reset]);
+  }, [isOpen, mode, existingListName, reset]);
+
+  // Update selected products when existingProducts changes (only for edit mode)
+  React.useEffect(() => {
+    if (isOpen && mode === 'edit' && existingProducts.length > 0) {
+      setSelectedProducts(existingProducts);
+    }
+  }, [isOpen, mode, existingProducts.length]);
 
   // Add product to selected list
   const handleAddProduct = () => {

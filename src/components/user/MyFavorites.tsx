@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useFavoriteLists } from '@/hooks/useFavorites';
+import { useFavoriteLists, useFavoriteListProducts } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,7 +9,6 @@ import { useNavigate } from 'react-router-dom';
 import LottieLoader from '@/components/LottieLoader';
 import { 
   CreateListModal, 
-  EditListModal, 
   DeleteConfirmModal, 
   ListActionsDropdown 
 } from '@/components/ui';
@@ -41,6 +40,19 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     page: currentPage,
     limit: ITEMS_PER_PAGE,
   });
+
+  // Fetch products for the selected list when editing
+  const { data: editListProducts, isLoading: editListProductsLoading } = useFavoriteListProducts(
+    selectedList?.name || '',
+    { page: 1, limit: 100 } // Get all products for editing
+  );
+
+  // Only fetch when edit dialog is open and list name exists
+  React.useEffect(() => {
+    if (showEditDialog && selectedList?.name && !editListProductsLoading) {
+      // Products will be fetched automatically by the hook when listName is provided
+    }
+  }, [showEditDialog, selectedList?.name, editListProductsLoading]);
 
   // Accumulate lists for pagination
   React.useEffect(() => {
@@ -111,6 +123,18 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
 
   // Check if there are more lists to load
   const hasMoreLists = favoritesData?.pagination?.currentPage < favoritesData?.pagination?.totalPages;
+
+  // Prepare existing products for edit modal
+  const existingProducts = React.useMemo(() => {
+    if (!editListProducts?.products) return [];
+    
+    return editListProducts.products.map(product => ({
+      productId: product.productId,
+      name: product.name,
+      logoUrl: product.logoUrl,
+      brandColors: product.brandColors
+    }));
+  }, [editListProducts]);
 
   const getProductIcon = (logoUrl?: string, name?: string) => {
     if (logoUrl) {
@@ -279,15 +303,18 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
         isOpen={showCreateDialog}
         onOpenChange={setShowCreateDialog}
         onSuccess={handleCreateSuccess}
+        mode="create"
       />
 
       {selectedList && (
         <>
-          <EditListModal
+          <CreateListModal
             isOpen={showEditDialog}
             onOpenChange={setShowEditDialog}
-            currentListName={selectedList.name}
             onSuccess={handleEditSuccess}
+            mode="edit"
+            existingListName={selectedList.name}
+            existingProducts={existingProducts}
           />
 
           <DeleteConfirmModal

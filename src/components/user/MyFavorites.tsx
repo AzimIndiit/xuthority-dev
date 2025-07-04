@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useFavoriteLists, useCreateFavoriteList } from '@/hooks/useFavorites';
+import { useFavoriteLists, useCreateFavoriteList, useAddToFavorites } from '@/hooks/useFavorites';
+import { useProducts } from '@/hooks/useProducts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -24,17 +25,32 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   // Fetch user's favorite lists
   const { data: favoritesData, isLoading, error } = useFavoriteLists();
   const createListMutation = useCreateFavoriteList();
+  const addToFavoritesMutation = useAddToFavorites();
+
+  // Fetch products for the dropdown
+  const { data: productsData, isLoading: productsLoading } = useProducts(1, 50); // Get first 50 products
+  const products = Array.isArray(productsData?.data) ? productsData.data : [];
 
   const handleCreateList = async () => {
     if (!newListName.trim()) return;
     
     try {
+      // First create the list
       await createListMutation.mutateAsync(newListName.trim());
+      
+      // Then add the selected product to the list if one is selected
+      if (selectedProduct) {
+        await addToFavoritesMutation.mutateAsync({
+          productId: selectedProduct,
+          listName: newListName.trim()
+        });
+      }
+      
       setNewListName('');
       setSelectedProduct('');
       setShowCreateDialog(false);
     } catch (error) {
-      // Error handled by mutation hook
+      // Error handled by mutation hooks
     }
   };
 
@@ -161,11 +177,21 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
                         <SelectValue placeholder="Select Product" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="smartsheet">Smartsheet</SelectItem>
-                        <SelectItem value="notion">Notion</SelectItem>
-                        <SelectItem value="slack">Slack</SelectItem>
-                        <SelectItem value="airtable">Airtable</SelectItem>
-                        <SelectItem value="clickup">ClickUp</SelectItem>
+                        {productsLoading ? (
+                          <SelectItem value="" disabled>
+                            Loading products...
+                          </SelectItem>
+                        ) : products.length === 0 ? (
+                          <SelectItem value="" disabled>
+                            No products available
+                          </SelectItem>
+                        ) : (
+                          products.map((product) => (
+                            <SelectItem key={product._id || product.id} value={product._id || product.id}>
+                              {product.name}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -173,10 +199,10 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
                   {/* Continue Button */}
                   <Button
                     onClick={handleCreateList}
-                    disabled={!newListName.trim() || createListMutation.isPending}
+                    disabled={!newListName.trim() || createListMutation.isPending || addToFavoritesMutation.isPending}
                     className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8"
                   >
-                    {createListMutation.isPending ? 'Creating...' : 'Continue'}
+                    {(createListMutation.isPending || addToFavoritesMutation.isPending) ? 'Creating...' : 'Continue'}
                   </Button>
                 </div>
               </div>

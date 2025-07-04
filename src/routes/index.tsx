@@ -6,8 +6,8 @@ import LottieLoader from "@/components/LottieLoader";
 import ScrollToTop from "@/components/ScrollToTop";
 import SoftwareCategoryPage from "@/pages/software/SoftwareCategoryPage";
 import SubCategoryPage from "@/pages/software/SubCategoryPage";
-import CommunityPage from "@/pages/software/CommunityPage";
-import DisputesPage from '@/pages/software/DisputesPage';
+import CommunityPage from "@/pages/product/CommunityPage";
+import DisputesPage from '@/pages/product/DisputesPage';
 import WriteReviewPage from '@/pages/review/WriteReviewPage';
 import ReviewCommentsPage from '@/pages/review/ReviewCommentsPage';
 import AuthCallback from '@/pages/auth/AuthCallback';
@@ -43,13 +43,13 @@ const ForVendorsPage = lazy(() => import("@/pages/vendor").then(module => ({ def
 const AboutPage = lazy(() => import("@/pages/about").then(module => ({ default: module.AboutPage })));
 // Lazy load software category routes
 const ProductDetailPage = lazy(
-  () => import("@/pages/software/ProductDetailPage")
+  () => import("@/pages/product/ProductDetailPage")
 );
 
 // Lazy load user and vendor routes
 const UserProfile = lazy(() => import("../pages/user/Profile"));
-const PublicProfile = lazy(() => import('../pages/user/PublicProfile'));
-const PublicProfileBySlug = lazy(() => import('../pages/user/PublicProfileBySlug'));
+// const PublicProfile = lazy(() => import('../pages/user/PublicProfile'));
+const PublicProfileBySlug = lazy(() => import('../pages/public-profile/PublicProfileBySlug'));
 
 
 const Loader = () => (
@@ -164,26 +164,9 @@ const router = createBrowserRouter([
           },
         ],
       },
-      // Public profile route (accessible to all authenticated users)
-      {
-        path: "/user/:userId",
-        element: <ProtectedRoute />,
-        children: [
-          {
-            index: true,
-            Component: (props: any) => (
-              <Suspense fallback={<Loader />}>
-                <PublicProfile {...props} />
-              </Suspense>
-            ),
-          },
-        ],
-      },
-      
       // Public profile by slug route (accessible to all authenticated users)
       {
         path: "/public-profile/:slug",
-        element: <ProtectedRoute />,
         children: [
           {
             index: true,

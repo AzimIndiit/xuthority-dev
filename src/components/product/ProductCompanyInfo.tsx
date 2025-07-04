@@ -53,6 +53,7 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
     linkedin: companyDescription.socialLinks.linkedin,
     linkedinEmployees: companyDescription.linkedinEmployees,
     ownership:getUserDisplayName(companyDescription),
+    slug: companyDescription.slug,
   };
 
   return (
@@ -88,10 +89,10 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 md:gap-x-12">
             <div className="max-w-md">
               <DetailItem icon={User} label="Seller">
-                (<a href="#" className="text-blue-600 hover:underline">{companyData.seller}</a>)
+                (<a href={`/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
               </DetailItem>
               <DetailItem icon={Globe} label="Company Website">
-                (<a href="#" className="text-blue-600 hover:underline">{companyData.website}</a>)
+                (<a href={companyData.website} className="text-blue-600 hover:underline">{companyData.website}</a>)
               </DetailItem>
               <DetailItem icon={Calendar} label="Year Founded">({companyData.founded})</DetailItem>
               <DetailItem icon={MapPin} label="HQ Location">({companyData.hq})</DetailItem>

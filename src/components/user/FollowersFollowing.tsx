@@ -216,8 +216,8 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"
                 >
                   <div className="flex items-center space-x-4 w-full">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={follower.avatar || ''} alt={follower.name} />
+                    <Avatar className="w-12 h-12" onClick={() => navigate(`/public-profile/${follower.slug}`)}>
+                      <AvatarImage  className='object-cover'     src={follower.avatar || ''} alt={follower.name} />
                       <AvatarFallback className="text-sm">
                         {getUserInitials(follower)}
                       </AvatarFallback>
@@ -285,8 +285,8 @@ const FollowersFollowing: React.FC<FollowersFollowingProps> = ({
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"
                 >
                   <div className="flex items-center space-x-4 w-full">
-                    <Avatar className="w-12 h-12">
-                      <AvatarImage src={following.avatar || ''} alt={following.name} />
+                    <Avatar className="w-12 h-12" onClick={() => navigate(`/public-profile/${following.slug}`)}>
+                      <AvatarImage className='object-cover' src={following.avatar || ''} alt={following.name} />
                       <AvatarFallback className="text-sm">
                         {getUserInitials(following)}
                       </AvatarFallback>

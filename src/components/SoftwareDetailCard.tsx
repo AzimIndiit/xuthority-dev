@@ -114,7 +114,7 @@ const deleteMutation = useDeleteProduct();
       <Card className="relative bg-white rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
         {/* Logo space is handled above */}
         {/* Logo and Compare */}
-       {user?.role!=='vendor' && <div className="flex items-start gap-4 ">
+       {user?.role!=='vendor' || location.pathname !== '/public-profile' && <div className="flex items-start gap-4 ">
           <div className="flex-1" />
           <div className="flex-1 flex justify-end items-start">
             <label className="flex items-center gap-2 select-none cursor-pointer text-xs sm:text-sm text-gray-500">

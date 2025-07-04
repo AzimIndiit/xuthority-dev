@@ -128,3 +128,69 @@ export async function updateProduct(id: string, product: any): Promise<ApiRespon
 export async function deleteProduct(id: string): Promise<ApiResponse<any>> {
   return ApiService.delete(`/products/${id}`);
 }
+
+// Get user products by ID with pagination
+export async function getUserProductsById(userId: string, options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: string;
+  search?: string;
+}): Promise<ApiResponse<{
+  data: Product[];
+  meta:
+  {pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  }
+  
+}>> {
+  const params = new URLSearchParams();
+  if (options?.page) params.append('page', options.page.toString());
+  if (options?.limit) params.append('limit', options.limit.toString());
+  if (options?.sortBy) params.append('sortBy', options.sortBy);
+  if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
+  if (options?.status) params.append('status', options.status);
+  if (options?.search) params.append('search', options.search);
+  
+  const queryString = params.toString();
+  return ApiService.get(`/products/user/${userId}${queryString ? `?${queryString}` : ''}`);
+}
+
+// Get current user's products (my products) with pagination
+export async function getMyProducts(options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: string;
+  search?: string;
+}): Promise<ApiResponse<{
+  products: Product[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+    hasNext: boolean;
+    hasPrev: boolean;
+  };
+  total: number;
+}>> {
+  const params = new URLSearchParams();
+  if (options?.page) params.append('page', options.page.toString());
+  if (options?.limit) params.append('limit', options.limit.toString());
+  if (options?.sortBy) params.append('sortBy', options.sortBy);
+  if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
+  if (options?.status) params.append('status', options.status);
+  if (options?.search) params.append('search', options.search);
+  
+  const queryString = params.toString();
+  return ApiService.get(`/products/my/products${queryString ? `?${queryString}` : ''}`);
+}

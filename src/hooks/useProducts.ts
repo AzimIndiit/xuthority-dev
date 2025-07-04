@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { addProduct, fetchProducts, Product, fetchProductBySlug, fetchProductById, updateProduct, deleteProduct, fetchProductsByCategory } from '../services/product';
+import { addProduct, fetchProducts, Product, fetchProductBySlug, fetchProductById, updateProduct, deleteProduct, fetchProductsByCategory, getUserProductsById, getMyProducts } from '../services/product';
 import FileUploadService from '@/services/fileUpload';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
@@ -222,5 +222,54 @@ export function useDeleteProduct() {
       console.error("Product delete error:", error);
       toast.error(error.response.data.message || "Failed to delete product");
     },
+  });
+}
+
+// Hook for user products by ID with pagination
+export function useUserProductsById(userId: string, options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: string;
+  search?: string;
+}) {
+  return useQuery({
+    queryKey: ['userProducts', userId, options],
+    queryFn: async () => {
+      const response = await getUserProductsById(userId, options);
+      if (response.success && response.data) {
+        return response;
+      }
+      throw new Error(response.error?.message || 'Failed to fetch user products');
+    },
+    enabled: !!userId,
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
+  });
+}
+
+// Hook for current user's products (my products) with pagination
+export function useMyProducts(options?: {
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  status?: string;
+  search?: string;
+}) {
+  return useQuery({
+    queryKey: ['myProducts', options],
+    queryFn: async () => {
+      const response = await getMyProducts(options);
+      if (response.success && response.data) {
+        return response.data;
+      }
+      throw new Error(response.error?.message || 'Failed to fetch my products');
+    },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false,
   });
 }

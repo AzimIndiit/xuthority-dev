@@ -97,22 +97,23 @@ export const useUserReviews = (userId: string, options?: {
 };
 
 // Hook for user reviews query by slug
-export const useUserReviewsBySlug = (slug: string, options?: {
+export const useUserReviewsById = (userId: string, options?: {
   page?: number;
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }) => {
   return useQuery({
-    queryKey: ['userReviewsBySlug', slug, options],
+    queryKey: ['userReviewsById', userId, options],
     queryFn: async () => {
-      const response = await AuthService.getUserReviewsBySlug(slug, options);
+      const response = await AuthService.getUserReviews(userId, options);
       if (response.success && response.data) {
         return response.data;
       }
       throw new Error(response.error?.message || 'Failed to fetch user reviews');
     },
-    enabled: !!slug,
+    select: (data: any) => data,
+    enabled: !!userId,
     staleTime: 2 * 60 * 1000, // 2 minutes
   });
 };

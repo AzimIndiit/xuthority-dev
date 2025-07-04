@@ -79,6 +79,7 @@ export function useHelpfulVote() {
     onSuccess: () => {
       // Invalidate and refetch product reviews
       queryClient.invalidateQueries({ queryKey: ['productReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['userReviewsById'] });
       // toast.success('Thank you for your feedback!');
     },
     onError: (error: any) => {
@@ -91,6 +92,7 @@ export function useHelpfulVote() {
     mutationFn: removeHelpfulVote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['userReviewsById'] });
       // toast.success('Vote removed');
     },
     onError: (error: any) => {

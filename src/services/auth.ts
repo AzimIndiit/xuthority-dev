@@ -10,6 +10,7 @@ export interface User {
   slug?: string;
   email: string;
   role?: 'user' | 'vendor';
+  userType?: 'user' | 'vendor';
   companyName?: string;
   companyEmail?: string;
   industry?: string;
@@ -237,6 +238,7 @@ export class AuthService {
     disputes: number;
     followers: number;
     following: number;
+    products?: number;
   }>> {
     return await ApiService.get(`/users/${userId}/profile-stats`);
   }
@@ -301,6 +303,7 @@ export class AuthService {
     disputes: number;
     followers: number;
     following: number;
+    products?: number;
   }>> {
     return await ApiService.get(`/users/slug/${slug}/profile-stats`);
   }

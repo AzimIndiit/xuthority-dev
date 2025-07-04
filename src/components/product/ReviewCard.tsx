@@ -165,7 +165,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
           <div>
             <p className="font-semibold text-gray-900 text-[13px] leading-tight">{getUserDisplayName(review.reviewer as any)}</p>
             <p className="text-xs text-gray-600 leading-tight">
-              {review.reviewer.title.split(' ').slice(0, 2).join(' ')}
+              {review.reviewer.title?.split(' ').slice(0, 2).join(' ')}
               {review.reviewer.companyName && (
                 <>
                   , <span className="font-normal">{review.reviewer.companyName}</span>

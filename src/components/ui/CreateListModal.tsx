@@ -1,20 +1,20 @@
 import React from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { useProducts } from '@/hooks/useProducts';
 import { useCreateFavoriteList, useAddToFavorites } from '@/hooks/useFavorites';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FormInput } from '@/components/ui/FormInput';
+import { FormSelect } from '@/components/ui/FormSelect';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 // Form validation schema
 const createListSchema = z.object({
-  listName: z.string()
-    .min(1, 'List name is required')
+  listName: z.string().nonempty()
+    .min(2, 'List name is required')
     .max(100, 'List name must be less than 100 characters')
     .trim(),
   productId: z.string().optional(),
@@ -29,6 +29,11 @@ interface CreateListModalProps {
   className?: string;
 }
 
+const defaultValues: CreateListFormData = {
+  listName: '',
+  productId: '',
+};
+
 const CreateListModal: React.FC<CreateListModalProps> = ({
   isOpen,
   onOpenChange,
@@ -36,32 +41,31 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   className
 }) => {
   // Form setup with validation
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    formState: { errors, isValid }
-  } = useForm<CreateListFormData>({
+  const methods = useForm<CreateListFormData>({
     resolver: zodResolver(createListSchema),
     mode: 'onChange',
-    defaultValues: {
-      listName: '',
-      productId: '',
-    }
+    defaultValues,
   });
 
-  // Watch form values
-  const watchedProductId = watch('productId');
+  const { 
+    handleSubmit, 
+    reset, 
+    formState: { isSubmitting, isValid } 
+  } = methods;
 
   // API hooks
   const createListMutation = useCreateFavoriteList();
   const addToFavoritesMutation = useAddToFavorites();
   const { data: productsData, isLoading: productsLoading } = useProducts(1, 50);
 
-  // Process products data
-  const products = Array.isArray(productsData?.data) ? productsData.data : [];
+  // Process products data for FormSelect
+  const productOptions = React.useMemo(() => {
+    if (!productsData?.data) return [];
+    return productsData.data.map((product) => ({
+      value: product._id || product.id,
+      label: product.name,
+    }));
+  }, [productsData]);
 
   // Form submission handler
   const onSubmit = async (data: CreateListFormData) => {
@@ -88,6 +92,11 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
     }
   };
 
+  // Handle form errors
+  const onError = (errors: any) => {
+    console.log('Form validation errors:', errors);
+  };
+
   // Handle modal close
   const handleClose = () => {
     reset();
@@ -95,7 +104,7 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   };
 
   // Loading state
-  const isSubmitting = createListMutation.isPending || addToFavoritesMutation.isPending;
+  const isFormSubmitting = createListMutation.isPending || addToFavoritesMutation.isPending;
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -120,68 +129,37 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            {/* List Name Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-3">
-                List Name
-              </label>
-              <Input
-                {...register('listName')}
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit, onError)} className="space-y-6">
+              {/* List Name Field */}
+              <FormInput
+                name="listName"
+                label="List Name"
                 placeholder="Enter List Name"
-                className={cn(
-                  "w-full h-12 px-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-                  errors.listName && "border-red-500 focus:ring-red-500"
-                )}
-                disabled={isSubmitting}
+                maxLength={100}
+                disabled={isFormSubmitting}
               />
-              {errors.listName && (
-                <p className="mt-2 text-sm text-red-600">{errors.listName.message}</p>
-              )}
-            </div>
 
-            {/* Add Product Field */}
-            <div>
-              <label className="block text-sm font-medium text-gray-900 mb-3">
-                Add Product
-              </label>
-              <Select
-                value={watchedProductId}
-                onValueChange={(value) => setValue('productId', value)}
-                disabled={isSubmitting}
+              {/* Add Product Field */}
+              <FormSelect
+                name="productId"
+                label="Add Product"
+                placeholder="Select Product"
+                options={productOptions}
+                searchable
+                disabled={productsLoading || isFormSubmitting}
+              />
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={!isValid || isFormSubmitting}
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8 disabled:opacity-50"
               >
-                <SelectTrigger className="w-full h-12 px-4 border border-gray-200 rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                  <SelectValue placeholder="Select Product" />
-                </SelectTrigger>
-                <SelectContent>
-                  {productsLoading ? (
-                    <SelectItem value="" disabled>
-                      Loading products...
-                    </SelectItem>
-                  ) : products.length === 0 ? (
-                    <SelectItem value="" disabled>
-                      No products available
-                    </SelectItem>
-                  ) : (
-                    products.map((product) => (
-                      <SelectItem key={product._id || product.id} value={product._id || product.id}>
-                        {product.name}
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Submit Button */}
-            <Button
-              type="submit"
-              disabled={!isValid || isSubmitting}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8 disabled:opacity-50"
-            >
-              {isSubmitting ? 'Creating...' : 'Continue'}
-            </Button>
-          </form>
+                {isFormSubmitting ? 'Creating...' : 'Continue'}
+              </Button>
+            </form>
+          </FormProvider>
         </div>
       </DialogContent>
     </Dialog>

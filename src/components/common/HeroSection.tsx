@@ -27,7 +27,6 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     ? {
         backgroundImage: `url(${backgroundImage})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
       }
     : {};
@@ -39,10 +38,10 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
     >
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         <div className="text-center mx-auto my-20">
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-4">
+          <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-900 mb-4">
             {title}
           </h1>
-          <p className="text-base md:text-lg text-gray-700 mb-6 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-base  text-gray-700 mb-6 leading-relaxed max-w-3xl mx-auto">
             {subtitle}
           </p>
           {children}
@@ -53,7 +52,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
             <img
               src={illustration}
               alt={illustrationAlt}
-              className="w-full max-w-xl mx-auto h-full"
+              className="w-full max-w-xl mx-auto h-[250px]"
               style={illustrationStyle}
             />
           </div>

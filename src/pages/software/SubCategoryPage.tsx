@@ -97,7 +97,7 @@ const SubCategoryPage = () => {
   );
 
   // Memoize pagination calculations
-  const pagination = useMemo(() => {
+  const pagination: any = useMemo(() => {
     return productsResult?.meta?.pagination || {
       page: 1,
       limit: PAGE_SIZE,
@@ -112,7 +112,7 @@ const SubCategoryPage = () => {
     return Array.isArray(productsResult?.data) ? productsResult?.data : [];
   }, [productsResult?.data]);
 
-  const total = pagination.total;
+  const total = pagination?.total || 0;
   const totalPages = pagination.pages;
   const start = (page - 1) * PAGE_SIZE + 1;
   const end = Math.min(page * PAGE_SIZE, total);

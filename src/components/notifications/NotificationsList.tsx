@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Settings, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { NotificationItem } from './NotificationItem';
+import { NotificationSettings } from './NotificationSettings';
 import { useNotifications, useMarkAllNotificationsAsRead } from '@/hooks/useNotifications';
 import { NotificationListParams } from '@/types/notification';
 import LottieLoader from '@/components/LottieLoader';
@@ -48,9 +49,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
             <Button variant="ghost" size="sm" disabled>
               Mark All Read
             </Button>
-            <Button variant="ghost" size="icon" disabled>
-              <Settings className="w-5 h-5" />
-            </Button>
+            <NotificationSettings />
           </div>
         </div>
         <div className="p-8 flex flex-col items-center justify-center">
@@ -70,9 +69,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
             <Button variant="ghost" size="sm" disabled>
               Mark All Read
             </Button>
-            <Button variant="ghost" size="icon" disabled>
-              <Settings className="w-5 h-5" />
-            </Button>
+            <NotificationSettings />
           </div>
         </div>
         <div className="p-8 flex flex-col items-center justify-center">
@@ -105,9 +102,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
           >
             Mark All Read
           </Button>
-          <Button variant="ghost" size="icon" className="text-gray-500 hover:text-gray-700">
-            <Settings className="w-5 h-5" />
-          </Button>
+          <NotificationSettings />
         </div>
       </div>
 

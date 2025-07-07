@@ -1,5 +1,5 @@
 import { StyledAccordion } from "@/components/ui/StyledAccordion";
-import { useFeaturedSoftwares } from "@/hooks/useFeaturedSoftwares";
+import { usePopularSoftwares } from "@/hooks/useFeaturedSoftwares";
 import { useMemo } from "react";
 
 interface ProductItem {
@@ -15,10 +15,10 @@ interface CategoryItem {
 }
 
 const PopularSoftwareSection = () => {
-  const { featuredSoftwares, isLoading, error, hasData } = useFeaturedSoftwares({
+  const { popularSoftwares, isLoading, error, hasData } = usePopularSoftwares({
     limit: 12, // Get more softwares to ensure good coverage
-    productsPerSoftware: 6, // Get more products per software
-    minRating: 3.0, // Only show well-rated products
+    productsPerSoftware: 4, // Get top 4 products per software
+    minRating: 3, // Only show well-rated products
     sortBy: 'totalReviews',
     sortOrder: 'desc'
   });
@@ -27,16 +27,16 @@ const PopularSoftwareSection = () => {
   const categories: CategoryItem[] = useMemo(() => {
     if (!hasData) return [];
 
-    return featuredSoftwares.map((item) => ({
+    return popularSoftwares.map((item) => ({
       title: item.software.name,
       items: item.topProducts.map((product) => ({
-        value: `${product.name} (★ ${product.avgRating.toFixed(1)} • ${product.totalReviews} reviews)`,
+        value: `${product.name}`,
         rating: product.avgRating,
         reviews: product.totalReviews,
         slug: product.slug
       }))
     }));
-  }, [featuredSoftwares, hasData]);
+  }, [popularSoftwares, hasData]);
 
   // Loading state
   if (isLoading) {
@@ -56,14 +56,32 @@ const PopularSoftwareSection = () => {
               {Array.from({ length: 6 }).map((_, idx) => (
                 <div
                   key={idx}
-                  className="bg-[#e6f0fa] px-6 py-4 rounded-xl animate-pulse"
+                  className="bg-[#e6f0fa] rounded-xl overflow-hidden"
                 >
-                  <div className="h-6 bg-gray-300 rounded mb-4"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                    <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                  {/* Accordion header skeleton */}
+                  <div className="px-6 py-4 border-b border-[#d1dfe9]">
+                    <div className="flex items-center justify-between">
+                      <div className="h-6 bg-gray-300 rounded w-3/4 animate-pulse"></div>
+                      <div className="h-5 w-5 bg-gray-300 rounded animate-pulse"></div>
+                    </div>
                   </div>
+                  
+                  {/* Accordion content skeleton - show for first 3 items */}
+                  {idx < 3 && (
+                    <div className="px-6 py-4 space-y-3">
+                      {Array.from({ length: 4 }).map((_, itemIdx) => (
+                        <div key={itemIdx} className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse"></div>
+                          </div>
+                          <div className="ml-4 flex items-center space-x-2">
+                            <div className="h-3 w-8 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-3 w-16 bg-gray-200 rounded animate-pulse"></div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -121,12 +139,7 @@ const PopularSoftwareSection = () => {
           ))}
         </div>
         
-        {/* Show total count */}
-        <div className="mt-8 text-center">
-          <p className="text-gray-500 text-sm">
-            Showing {categories.length} featured software categories with top-rated products
-          </p>
-        </div>
+       
       </div>
     </section>
   );

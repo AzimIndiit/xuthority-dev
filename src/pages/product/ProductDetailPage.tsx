@@ -11,15 +11,174 @@ import ProductReviews from "@/components/product/ProductReviews";
 import { Product } from "@/services/product";
 import { formatCurrency } from '@/utils/formatCurrency';
 
+// Skeleton component for the product detail page
+const ProductDetailSkeleton = () => {
+  return (
+    <div className="bg-white min-h-[100vh]">
+      {/* Header Skeleton */}
+      <div className="relative">
+        {/* Banner skeleton */}
+        <div className="h-48 sm:h-64 lg:h-80 bg-gray-200 animate-pulse" />
+        
+        {/* Product info overlay skeleton */}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 sm:p-6 lg:p-8">
+          <div className="w-full lg:max-w-screen-xl mx-auto">
+            <div className="flex items-end gap-4">
+              {/* Logo skeleton */}
+              <div className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24 bg-gray-300 rounded-lg animate-pulse" />
+              
+              {/* Product info skeleton */}
+              <div className="flex-1">
+                <div className="h-8 bg-gray-300 rounded w-1/3 mb-2 animate-pulse" />
+                <div className="flex items-center gap-4">
+                  <div className="h-5 bg-gray-300 rounded w-24 animate-pulse" />
+                  <div className="h-5 bg-gray-300 rounded w-32 animate-pulse" />
+                </div>
+              </div>
+              
+              {/* Price skeleton */}
+              <div className="h-8 bg-gray-300 rounded w-32 animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation skeleton */}
+      <div className="sticky top-0 z-40 bg-white border-b">
+        <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+          <div className="flex gap-8 py-4">
+            {['Overview', 'Pricing', 'Media', 'Company', 'Reviews'].map((_, idx) => (
+              <div key={idx} className="h-6 bg-gray-200 rounded w-20 animate-pulse" />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <main className="w-full">
+        {/* Overview Section Skeleton */}
+        <section className="bg-[#F7F7F7] py-12">
+          <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main content skeleton */}
+              <div className="lg:col-span-2 space-y-6">
+                <div className="bg-white rounded-lg p-6">
+                  <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse" />
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+                    <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
+                    <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg p-6">
+                  <div className="h-6 bg-gray-200 rounded w-40 mb-4 animate-pulse" />
+                  <div className="grid grid-cols-2 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="h-10 bg-gray-200 rounded animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Sidebar skeleton */}
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg p-6">
+                  <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse" />
+                  <div className="space-y-3">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pricing Section Skeleton */}
+        <section className="py-12">
+          <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+            <div className="h-8 bg-gray-200 rounded w-48 mb-8 animate-pulse" />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="border rounded-lg p-6">
+                  <div className="h-6 bg-gray-200 rounded w-32 mb-4 animate-pulse" />
+                  <div className="h-10 bg-gray-200 rounded w-24 mb-4 animate-pulse" />
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((j) => (
+                      <div key={j} className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Media Section Skeleton */}
+        <section className="py-12 bg-gray-50">
+          <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+            <div className="h-8 bg-gray-200 rounded w-32 mb-8 animate-pulse" />
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="aspect-video bg-gray-200 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Company Info Section Skeleton */}
+        <section className="py-12">
+          <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+            <div className="max-w-3xl mx-auto">
+              <div className="h-8 bg-gray-200 rounded w-48 mb-6 animate-pulse" />
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Reviews Section Skeleton */}
+        <section className="py-12 bg-gray-50">
+          <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+            <div className="h-8 bg-gray-200 rounded w-32 mb-8 animate-pulse" />
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-lg p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse" />
+                    <div className="flex-1">
+                      <div className="h-5 bg-gray-200 rounded w-32 mb-2 animate-pulse" />
+                      <div className="h-4 bg-gray-200 rounded w-24 mb-4 animate-pulse" />
+                      <div className="space-y-2">
+                        <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+                        <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  );
+};
+
 export default function ProductDetailPage() {
   const { productSlug } = useParams<{ productSlug: string }>();
   const { data, isLoading, isError } = useProductBySlug(productSlug || "");
   const product : Product = data?.data;
 
-  // Optionally, handle loading and error states
+  // Show skeleton loader while loading
   if (isLoading) {
-    return <div className="text-center py-12">Loading product...</div>;
+    return <ProductDetailSkeleton />;
   }
+  
   if (isError || !product) {
     return <div className="text-center py-12 text-red-500">Product not found.</div>;
   }
@@ -77,7 +236,7 @@ export default function ProductDetailPage() {
           <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
             {/* Wavy line background */}
 
-      {product.pricing.length > 0 &&      <ProductPricing pricing={product.pricing} />}
+      {product.pricing.length > 0 &&      <ProductPricing pricing={product.pricing}  />}
           </div>
         </section>
         <section id="media">

@@ -95,7 +95,7 @@ const ProductPricing = ({pricing}: {pricing: any}) => {
         <div className="mt-16 flex items-stretch gap-x-4 sm:gap-x-8 overflow-x-auto py-4">
             {pricing?.map((plan: any) => (
             <div key={plan.planName} className="w-80 sm:w-96 flex-shrink-0">
-              <PricingCard {...plan} />
+              <PricingCard {...plan}  />
             </div>
           ))}
         </div>

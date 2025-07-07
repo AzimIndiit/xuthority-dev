@@ -9,6 +9,7 @@ interface StarRatingProps {
   starClassName?: string;
   onRatingChange?: (rating: number) => void;
   size?: "sm" | "md" | "lg" | "xl";
+  showEmpty?: boolean; // Add this prop to always show empty stars
 }
 
 const StarRating = ({
@@ -17,7 +18,8 @@ const StarRating = ({
   className,
   starClassName,
   onRatingChange,
-  size = "lg"
+  size = "lg",
+  showEmpty = false // Default to false for backward compatibility
 }: StarRatingProps) => {
   // Size variants for stars
   const sizeClasses = {
@@ -37,7 +39,7 @@ const StarRating = ({
   };
 
   // Handle case for no rating: all stars are gray outlines
-  if (!rating || rating === 0) {
+  if (!rating || rating === 0 || showEmpty) {
     return (
       <div className={cn("flex items-center gap-0.5 text-gray-300", className)}>
         {[...Array(totalStars)].map((_, i) => (

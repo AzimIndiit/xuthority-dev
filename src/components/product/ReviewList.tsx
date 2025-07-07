@@ -42,7 +42,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
   if (reviews.length === 0) {
     return (
       <div className="text-center py-20">
-        <p className="text-lg text-gray-500">No reviews yet. Be the first to write a review!</p>
+        <p className="text-lg text-gray-500">No reviews yet.</p>
       </div>
     );
   }

@@ -50,7 +50,7 @@ export const ValuesSection: React.FC<ValuesSectionProps> = ({
   className = ""
 }) => {
   return (
-    <div className={`py-16 bg-white ${className}`}>
+    <div className={`py-16 bg-gradient-to-b from-red-100/50 via-white to-red-100/50 ${className} `}>
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -60,7 +60,7 @@ export const ValuesSection: React.FC<ValuesSectionProps> = ({
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {values.map((value) => (
-            <div key={value.id} className="bg-gray-50 rounded-lg p-8 text-center">
+            <div key={value.id} className="border bg-gray-50/60 border-gray-200 rounded-lg p-8 text-center">
               <div className="flex justify-center mb-6">
                 <img
                   src={value.image}

@@ -34,6 +34,7 @@ const RefundPolicyPage = lazy(() => import("@/pages/legal").then(module => ({ de
 // Lazy load vendor pages
 const ForVendorsPage = lazy(() => import("@/pages/vendor").then(module => ({ default: module.ForVendorsPage })));
 const AboutPage = lazy(() => import("@/pages/about").then(module => ({ default: module.AboutPage })));
+const ComparePage = lazy(() => import("@/pages/product/ComparePage"));
 // Lazy load software category routes
 const ProductDetailPage = lazy(
   () => import("@/pages/product/ProductDetailPage")
@@ -251,6 +252,14 @@ const router = createBrowserRouter([
           }
         ],
       },
+      {
+        path: "/product-compare",
+        Component: (props: any) => (
+          <Suspense fallback={<Loader />}>
+            <ComparePage {...props} />
+          </Suspense>
+        ),
+      },        
       {
         path: "/product-detail/:productSlug/reviews",
         Component: (props: any) => (

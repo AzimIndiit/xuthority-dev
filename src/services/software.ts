@@ -5,6 +5,8 @@ export interface Software {
   name: string;
   slug: string;
   status: string;
+  isPopular?: boolean;
+  isFeatured?: boolean;
 }
 
 export interface Product {
@@ -71,6 +73,8 @@ export interface FeaturedSoftware {
   };
   topProducts: Product[];
   productCount: number;
+  avgRating?: number;
+  totalReviews?: number;
   hasMinimumProducts: boolean;
 }
 
@@ -108,6 +112,7 @@ export interface FeaturedSoftwaresParams {
   minRating?: number;
   sortBy?: 'createdAt' | 'avgRating' | 'totalReviews' | 'productCount' | 'name';
   sortOrder?: 'asc' | 'desc';
+  endpoint?: 'featured-with-products' | 'popular-with-products';
 }
 
 export const SoftwareService = {
@@ -130,7 +135,23 @@ export const SoftwareService = {
     if (params.sortBy) query.append('sortBy', params.sortBy);
     if (params.sortOrder) query.append('sortOrder', params.sortOrder);
 
-    const response = await api.get(`/software/featured-with-products?${query.toString()}`);
+    const endpoint = params.endpoint || 'featured-with-products';
+    const response = await api.get(`/software/${endpoint}?${query.toString()}`);
     return response.data;
+  },
+
+  getPopularSoftwaresWithProducts: async (params: FeaturedSoftwaresParams = {}): Promise<FeaturedSoftwaresResponse> => {
+    return SoftwareService.getFeaturedSoftwaresWithProducts({
+      ...params,
+      endpoint: 'popular-with-products'
+    });
   }
+};
+
+// Export a convenient function for the hook
+export const getFeaturedSoftwares = (params: FeaturedSoftwaresParams = {}) => {
+  if (params.endpoint === 'popular-with-products') {
+    return SoftwareService.getPopularSoftwaresWithProducts(params);
+  }
+  return SoftwareService.getFeaturedSoftwaresWithProducts(params);
 }; 

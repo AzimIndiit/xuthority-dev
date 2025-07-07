@@ -61,7 +61,7 @@ pricing: z
   .array(
     z.object({
       name: z.string().min(1, 'Pricing name is required'),
-      price: z.number().min(0, 'Price must be a positive number'),
+      price: z.coerce.number().min(0, 'Price must be a positive number'),
       seats: z.string().min(1, 'No of seats is required'),
       description: z.string().min(1, 'Pricing description is required'),
       features: z
@@ -531,7 +531,7 @@ console.log('mediaUrls', mediaFiles)
                     min={0} 
                     max={1000} 
                     step={1}
-                  
+                 
                     onKeyDown={(e) => {
                       // Prevent minus and plus signs
                       if (e.key === '-' || e.key === '+') {
@@ -581,7 +581,7 @@ console.log('mediaUrls', mediaFiles)
           </div>
           
           <div className="flex sm:justify-end w-full">
-            <Button type="submit" disabled={isSubmitting || addProductMutation.isPending} className="w-full sm:w-40 h-12 rounded-full bg-blue-600 text-white text-lg font-semibold">Save</Button>
+            <Button type="submit" disabled={isSubmitting || addProductMutation.isPending} className="w-full sm:w-40 h-12 rounded-full bg-blue-600 text-white text-lg font-semibold" loading={addProductMutation.isPending}>Save</Button>
           </div>
         </form>
       </FormProvider>

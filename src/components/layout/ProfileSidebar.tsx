@@ -21,6 +21,33 @@ interface ProfileSidebarProps {
   onFollowingClick?: () => void;
 }
 
+// Skeleton component for Profile Header
+const ProfileHeaderSkeleton: React.FC = () => {
+  return (
+    <>
+      {/* Profile Header Skeleton */}
+      <div className="flex items-center space-x-4 mb-4">
+        <div className="w-16 h-16 bg-gray-200 rounded-full animate-pulse" />
+        <div className="flex items-center space-x-6">
+          <div className="text-center rounded-lg p-2">
+            <div className="h-6 w-12 bg-gray-200 rounded mb-1 animate-pulse" />
+            <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+          </div>
+          <div className="text-center rounded-lg p-2">
+            <div className="h-6 w-12 bg-gray-200 rounded mb-1 animate-pulse" />
+            <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <div className="h-6 w-32 bg-gray-200 rounded mb-2 animate-pulse" />
+        <div className="h-4 w-40 bg-gray-200 rounded animate-pulse" />
+      </div>
+    </>
+  );
+};
+
 const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   user,
   sidebarItems,
@@ -33,39 +60,45 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-100 p-6 ">
       {/* Profile Header */}
-      <div className="flex items-center space-x-4 mb-4">
-        <Avatar className="w-16 h-16">
-          <AvatarImage className="object-cover" src={user?.avatar || ''} alt="Profile" />
-          <AvatarFallback className="text-lg">{getUserInitials(user)}</AvatarFallback>
-        </Avatar>
-        <div className="flex items-center space-x-6">
-          <button
-            onClick={onFollowersClick}
-            className="text-center  rounded-lg p-2 transition-all duration-200 cursor-pointer group"
-            disabled={!onFollowersClick}
-          >
-            <div className="text-xl font-black text-gray-800 ">
-              {formatNumber(userStats?.followers || 0)}
+      {userStatsLoading ? (
+        <ProfileHeaderSkeleton />
+      ) : (
+        <>
+          <div className="flex items-center space-x-4 mb-4">
+            <Avatar className="w-16 h-16">
+              <AvatarImage className="object-cover" src={user?.avatar || ''} alt="Profile" />
+              <AvatarFallback className="text-lg">{getUserInitials(user)}</AvatarFallback>
+            </Avatar>
+            <div className="flex items-center space-x-6">
+              <button
+                onClick={onFollowersClick}
+                className="text-center  rounded-lg p-2 transition-all duration-200 cursor-pointer group"
+                disabled={!onFollowersClick}
+              >
+                <div className="text-xl font-black text-gray-800 ">
+                  {formatNumber(userStats?.followers || 0)}
+                </div>
+                <div className="text-sm text-gray-500 ">Followers</div>
+              </button>
+              <button
+                onClick={onFollowingClick}
+                className="text-center rounded-lg p-2 transition-all duration-200 cursor-pointer group"
+                disabled={!onFollowingClick}
+              >
+                <div className="text-xl font-black text-gray-800 ">
+                  {formatNumber(userStats?.following || 0)}
+                </div>
+                <div className="text-sm text-gray-500 ">Following</div>
+              </button>
             </div>
-            <div className="text-sm text-gray-500 ">Followers</div>
-          </button>
-          <button
-            onClick={onFollowingClick}
-            className="text-center rounded-lg p-2 transition-all duration-200 cursor-pointer group"
-            disabled={!onFollowingClick}
-          >
-            <div className="text-xl font-black text-gray-800 ">
-              {formatNumber(userStats?.following || 0)}
-            </div>
-            <div className="text-sm text-gray-500 ">Following</div>
-          </button>
-        </div>
-      </div>
+          </div>
 
-      <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900">{getTruncatedDisplayName(user, 15)}</h3>
-        <p className="text-sm text-gray-500">{user?.email}</p>
-      </div>
+          <div className="mb-4">
+            <h3 className="text-xl font-bold text-gray-900">{getTruncatedDisplayName(user, 15)}</h3>
+            <p className="text-sm text-gray-500">{user?.email}</p>
+          </div>
+        </>
+      )}
 
       {/* Divider */}
       <div className="border-t border-gray-200 mb-4"></div>

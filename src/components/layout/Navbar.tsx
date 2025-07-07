@@ -71,11 +71,11 @@ export default function Navbar() {
   const handleLogout = async () => {
     try {
       await logoutMutation.mutateAsync();
+      window.location.reload();
       localStorage.clear();
       queryClient.clear();
       resetReview();
       setDrawerOpen(false)
-      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
     }
@@ -83,8 +83,10 @@ export default function Navbar() {
 
   const handleLogoutClick = () => setShowLogoutModal(true);
   const handleLogoutConfirm = async () => {
-    setShowLogoutModal(false);
+    
+ 
     await handleLogout();
+    setShowLogoutModal(false);
   };
 
   return (

@@ -11,10 +11,68 @@ import LottieLoader from '@/components/LottieLoader';
 import useUserStore from '@/store/useUserStore';
 import useUIStore from '@/store/useUIStore';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import SecondaryLoader from '../ui/SecondaryLoader';
 
 interface QuestionCardProps {
   question: Question;
 }
+
+// Skeleton component for QuestionCard
+export const QuestionCardSkeleton: React.FC = () => {
+  return (
+    <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200">
+      {/* Header skeleton */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start mb-4 sm:gap-4">
+        <div className="flex-1 mb-4 sm:mb-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <div className="h-6 bg-gray-200 rounded w-3/4 animate-pulse" />
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-32 mt-2 animate-pulse" />
+        </div>
+        <div className="flex flex-row-reverse items-center sm:justify-end flex-wrap sm:flex-col justify-between gap-2">
+          <div className="h-8 bg-gray-200 rounded w-32 animate-pulse" />
+        </div>
+      </div>
+      
+      {/* Answers skeleton */}
+      <div className="space-y-4 divide-y divide-gray-200">
+        {[1, 2, 3].map((index) => (
+          <div key={index} className={index > 0 ? 'pt-4' : ''}>
+            <AnswerCardSkeleton />
+          </div>
+        ))}
+      </div>
+      
+      {/* View all answers button skeleton */}
+      <div className="text-center mt-6">
+        <div className="h-10 bg-gray-200 rounded-full w-40 mx-auto animate-pulse" />
+      </div>
+    </div>
+  );
+};
+
+// Skeleton component for AnswerCard
+const AnswerCardSkeleton: React.FC = () => {
+  return (
+    <div className="space-y-3">
+      {/* Author info skeleton */}
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+        <div className="flex-1">
+          <div className="h-4 bg-gray-200 rounded w-32 mb-1 animate-pulse" />
+          <div className="h-3 bg-gray-200 rounded w-24 animate-pulse" />
+        </div>
+      </div>
+      
+      {/* Answer content skeleton */}
+      <div className="space-y-2 pl-13">
+        <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+        <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
+        <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+      </div>
+    </div>
+  );
+};
 
 const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -115,8 +173,13 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
       </div>
       
       {answersLoading && transformedAnswers.length === 0 ? (
-        <div className="flex justify-center py-8">
-          <LottieLoader size="small" />
+        // Show answer skeletons while loading
+        <div className="space-y-4 divide-y divide-gray-200">
+          {[1, 2, 3].map((index) => (
+            <div key={index} className={index > 0 ? 'pt-4' : ''}>
+              <AnswerCardSkeleton />
+            </div>
+          ))}
         </div>
       ) : (
         <>

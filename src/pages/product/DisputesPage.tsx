@@ -7,6 +7,7 @@ import { getUserDisplayName } from '@/utils/userHelpers';
 import LottieLoader from '@/components/LottieLoader';
 import useUserStore from '@/store/useUserStore';
 import { DISPUTE_REASONS } from '@/services/dispute';
+import SecondaryLoader from '@/components/ui/SecondaryLoader';
 
 const DisputesPage = () => {
   const { user, isLoggedIn } = useUserStore();
@@ -81,8 +82,8 @@ const DisputesPage = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <LottieLoader size="large" />
+      <div className="min-h-[60vh] bg-white flex items-center justify-center">
+        <SecondaryLoader containerClasses='min-h-[60vh]' />
       </div>
     );
   }

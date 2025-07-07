@@ -47,8 +47,8 @@ const PricingCard: React.FC<PricingCardProps> = ({
           {icon}
         </div>
         <div>
-          <p className={cn("text-sm font-medium", isPopular ? "text-blue-200" : "text-gray-500")}>{seats}</p>
-          <h3 className="text-2xl font-bold">{name}</h3>
+          <p className={cn("text-sm font-medium", isPopular ? "text-blue-200" : "text-gray-500")}>For {seats} Seats</p>
+           <h3 className="text-2xl font-bold">{name}</h3>
         </div>
       </div>
 

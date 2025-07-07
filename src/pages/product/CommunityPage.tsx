@@ -3,14 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChevronDown, Plus, ListFilter, PlusCircle } from "lucide-react";
 import { Question, MyAnswer } from "@/types/community";
-import QuestionCard from "@/components/product/QuestionCard";
+import QuestionCard, { QuestionCardSkeleton } from "@/components/product/QuestionCard";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import MyAnswerCard from '@/components/product/MyAnswerCard';
+import MyAnswerCard, { MyAnswerCardSkeleton } from '@/components/product/MyAnswerCard';
 import AskQuestionModal from "@/components/product/AskQuestionModal";
 import WriteAnswreModal from "@/components/product/WriteAnswreModal";
 import { useQuestions, useAnswers, useUserAnswers } from "@/hooks/useCommunity";
@@ -19,6 +19,7 @@ import { formatDate } from "@/utils/formatDate";
 import { getUserDisplayName } from "@/utils/userHelpers";
 import useUserStore from "@/store/useUserStore";
 import LottieLoader from "@/components/LottieLoader";
+import SecondaryLoader from "@/components/ui/SecondaryLoader";
 
 const CommunityPage = () => {
   const { productSlug } = useParams();
@@ -77,14 +78,6 @@ const CommunityPage = () => {
     }
   };
 
-  if (questionsLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <LottieLoader size="large" />
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white min-h-screen">
       <main className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
@@ -138,19 +131,33 @@ const CommunityPage = () => {
           </div>
           <TabsContent value="community-qa">
             <div className="space-y-6 mt-6">
-             {
+              {questionsLoading ? (
+                // Show skeleton loaders while loading
+                <>
+                  {[1, 2, 3, 4].map((index) => (
+                    <QuestionCardSkeleton key={index} />
+                  ))}
+                </>
+              ) : questions.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  No questions have been asked yet. Be the first to ask!
+                </div>
+              ) : (
                 questions.map((question) => (
-                        <QuestionCard key={question.id} question={question} />
-                      ))}
-            
+                  <QuestionCard key={question.id} question={question} />
+                ))
+              )}
             </div>
           </TabsContent>
           <TabsContent value="my-answers">
             <div className="space-y-6 mt-6">
               {userAnswersLoading ? (
-                <div className="flex justify-center py-12">
-                  <LottieLoader size="medium" />
-                </div>
+                // Show skeleton loaders while loading
+                <>
+                  {[1, 2, 3, 4].map((index) => (
+                    <MyAnswerCardSkeleton key={index} />
+                  ))}
+                </>
               ) : myAnswers.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
                   You haven't answered any questions yet.

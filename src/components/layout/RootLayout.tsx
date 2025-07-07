@@ -5,6 +5,7 @@ import { AuthModal } from "@/features/auth/AuthModal";
 import Breadcrumb from "./Breadcrumb";
 import { Toaster } from "react-hot-toast";
 import ScrollToTop from "@/components/ScrollToTop";
+import CompareButton from "@/components/CompareButton";
 
 // Root layout with Navbar
 function RootLayout() {
@@ -18,6 +19,7 @@ function RootLayout() {
       </main>
       <Footer />
       <AuthModal />
+      <CompareButton />
       <Toaster position="top-center" reverseOrder={false} />
     </>
   );

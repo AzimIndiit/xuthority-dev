@@ -16,6 +16,107 @@ import UserProducts from './UserProducts';
 import useUserStore from '@/store/useUserStore';
 import useUIStore from '@/store/useUIStore';
 
+// Skeleton loader component for public profile
+const PublicProfileSkeleton: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 sm:grid-cols-18 gap-4 lg:gap-8">
+          {/* Left Sidebar - Profile Info Skeleton */}
+          <div className="sm:col-span-8 lg:col-span-6 xl:col-span-5">
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardContent className="">
+                {/* Profile Picture and Stats Skeleton */}
+                <div className="flex flex-col">
+                  <div className="flex items-center gap-2">
+                    {/* Avatar Skeleton */}
+                    <div className="h-16 w-16 bg-gray-200 rounded-full animate-pulse" />
+                    
+                    {/* Followers/Following Stats Skeleton */}
+                    <div className="flex space-x-6 mt-3 mb-1">
+                      <div className="text-center">
+                        <div className="h-5 w-12 bg-gray-200 rounded animate-pulse mb-1" />
+                        <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
+                      </div>
+                      <div className="text-center">
+                        <div className="h-5 w-12 bg-gray-200 rounded animate-pulse mb-1" />
+                        <div className="h-3 w-16 bg-gray-200 rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-between items-center gap-2">
+                    <div className="flex flex-col">
+                      {/* Name Skeleton */}
+                      <div className="h-5 w-32 bg-gray-200 rounded animate-pulse mt-1 mb-2" />
+                      {/* Email Skeleton */}
+                      <div className="h-3 w-40 bg-gray-200 rounded animate-pulse mb-2" />
+                    </div>
+                    {/* Follow Button Skeleton */}
+                    <div className="h-8 w-20 bg-gray-200 rounded-full animate-pulse" />
+                  </div>
+                </div>
+
+                {/* Social Links Skeleton */}
+                <div className="mb-6">
+                  <div className="h-5 w-24 bg-gray-200 rounded animate-pulse mb-3" />
+                  <div className="flex space-x-3">
+                    <div className="h-5 w-5 bg-gray-200 rounded animate-pulse" />
+                    <div className="h-5 w-5 bg-gray-200 rounded animate-pulse" />
+                  </div>
+                </div>
+
+                {/* Profile Stats Skeleton */}
+                <div>
+                  <div className="h-5 w-28 bg-gray-200 rounded animate-pulse mb-3" />
+                  <div className="flex gap-6 sm:gap-2">
+                    {/* Stat Card 1 */}
+                    <div className="flex-1 bg-gray-100 rounded-2xl py-4 px-2 h-32 w-32">
+                      <div className="flex flex-col items-center">
+                        <div className="h-6 w-6 bg-gray-200 rounded animate-pulse mb-3" />
+                        <div className="h-6 w-8 bg-gray-200 rounded animate-pulse mb-1" />
+                        <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                      </div>
+                    </div>
+                    {/* Stat Card 2 */}
+                    <div className="flex-1 bg-gray-100 rounded-2xl py-4 px-2 h-32 w-32">
+                      <div className="flex flex-col items-center">
+                        <div className="h-6 w-6 bg-gray-200 rounded animate-pulse mb-3" />
+                        <div className="h-6 w-8 bg-gray-200 rounded animate-pulse mb-1" />
+                        <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Right Side - Content Skeleton */}
+          <div className="sm:col-span-10 lg:col-span-12 xl:col-span-13">
+            <Card className="bg-white border border-gray-200 shadow-sm">
+              <CardContent className="p-6">
+                {/* Tab/Content Skeleton */}
+                <div className="space-y-4">
+                  <div className="h-8 w-48 bg-gray-200 rounded animate-pulse mb-4" />
+                  {/* Content Items */}
+                  {[1, 2, 3].map((i) => (
+                    <div key={i} className="border-b border-gray-200 pb-4 last:border-0">
+                      <div className="h-5 w-3/4 bg-gray-200 rounded animate-pulse mb-2" />
+                      <div className="h-4 w-full bg-gray-200 rounded animate-pulse mb-2" />
+                      <div className="h-4 w-2/3 bg-gray-200 rounded animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const PublicProfileBySlugPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
   const { isLoggedIn } = useUserStore();
@@ -41,14 +142,7 @@ const PublicProfileBySlugPage: React.FC = () => {
   const toggleFollowMutation = useToggleFollow();
   const isFollowing = followStatus?.isFollowing || false;
   if (userLoading || statsLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <PublicProfileSkeleton />;
   }
 
   if ( !publicProfile) {

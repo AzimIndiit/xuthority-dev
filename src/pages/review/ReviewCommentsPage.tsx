@@ -24,6 +24,91 @@ import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import { transformBackendReview } from '@/types/review';
 import ReviewCard from '@/components/product/ReviewCard';
 
+// Skeleton component for the entire page
+const ReviewCommentsPageSkeleton: React.FC = () => {
+  return (
+    <div className="min-h-screen bg-gray-50 py-8">
+      <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+        {/* Header skeleton */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-5 w-5 bg-gray-200 rounded animate-pulse" />
+            <div className="h-5 w-24 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+
+        {/* Review Card skeleton */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse" />
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+                <div className="h-5 w-20 bg-gray-200 rounded animate-pulse" />
+              </div>
+              <div className="h-4 w-24 bg-gray-200 rounded mb-3 animate-pulse" />
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
+                <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Comments Section skeleton */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-4">
+          <div className="p-6 border-b border-gray-200">
+            <div className="h-6 w-32 bg-gray-200 rounded animate-pulse" />
+          </div>
+
+          {/* Comment Form skeleton */}
+          <div className="p-6 border-b border-gray-200">
+            <div className="h-24 bg-gray-200 rounded mb-4 animate-pulse" />
+            <div className="flex justify-end">
+              <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* Comments List skeleton */}
+          <div className="p-6">
+            <div className="space-y-6">
+              {[1, 2, 3].map((index) => (
+                <CommentSkeleton key={index} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Skeleton component for individual comments
+const CommentSkeleton: React.FC = () => {
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+          </div>
+          <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+        </div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+        </div>
+        <div className="mt-3">
+          <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ReviewCommentsPage: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -243,12 +328,9 @@ const ReviewCommentsPage: React.FC = () => {
     setPage(prev => prev + 1);
   };
 
+  // Show skeleton loader when loading initial data
   if (!reviewId || (reviewLoading && !reviewFromState) || !review) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <LottieLoader size="large" />
-      </div>
-    );
+    return <ReviewCommentsPageSkeleton />;
   }
 
   const isLoadingInitial = repliesLoading && page === 1 && allReplies.length === 0;
@@ -304,8 +386,11 @@ console.log(allReplies,'allReplies');
           {/* Comments List */}
           <div className="p-6">
             {isLoadingInitial ? (
-              <div className="flex justify-center py-12">
-                <LottieLoader size="medium" />
+              // Show comment skeletons while loading
+              <div className="space-y-6">
+                {[1, 2, 3, 4, 5].map((index) => (
+                  <CommentSkeleton key={index} />
+                ))}
               </div>
             ) : allReplies.length === 0 ? (
               <div className="text-center py-12 text-gray-500">

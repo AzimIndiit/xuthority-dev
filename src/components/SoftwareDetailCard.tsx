@@ -8,6 +8,8 @@ import { formatCurrency } from "@/utils/formatCurrency";
 import ConfirmationModal from "./ui/ConfirmationModal";
 import { useState } from "react";
 import { useDeleteProduct } from "@/hooks/useProducts";
+import useCompareStore from "@/store/useCompareStore";
+import { useToast } from "@/hooks/useToast";
 
 interface SoftwareDetailCardProps {
   id: string;
@@ -78,6 +80,54 @@ export default function SoftwareDetailCard({
   ? Math.min(...entryPrice.map(p => Number(p.price) || 0))
   : null;
 const deleteMutation = useDeleteProduct();
+
+  // Compare store integration
+  const { 
+    addProduct, 
+    removeProduct, 
+    isProductInCompare, 
+    canAddMore,
+    products: compareProducts 
+  } = useCompareStore();
+  const { success, error, info } = useToast();
+  
+  const isInCompare = isProductInCompare(id);
+
+  const handleCompareChange = (checked: boolean) => {
+    if (checked) {
+      if (!canAddMore()) {
+        error("You can only compare up to 3 products at a time");
+        return;
+      }
+      
+      // Add product to compare
+      addProduct({
+        id,
+        logo,
+        name,
+        rating,
+        reviewCount,
+        logoBackground,
+        description,
+        users,
+        industries,
+        marketSegment,
+        entryPrice,
+        slug
+      });
+      
+      success(`${name} has been added to comparison (${compareProducts.length + 1}/3)`);
+    } else {
+      // Remove product from compare
+      removeProduct(id);
+      
+      info(`${name} has been removed from comparison`);
+    }
+    
+    // Call the parent's onChange if provided
+    onCompareChange?.(checked);
+  };
+
   const viewProductPage = () => {
     navigate(`/product-detail/${slug}`);
   };
@@ -120,11 +170,17 @@ const deleteMutation = useDeleteProduct();
             <label className="flex items-center gap-2 select-none cursor-pointer text-xs sm:text-sm text-gray-500">
               <input
                 type="checkbox"
-                checked={compareChecked}
-                onChange={(e) => onCompareChange?.(e.target.checked)}
+                checked={isInCompare}
+                onChange={(e) => handleCompareChange(e.target.checked)}
                 className="accent-blue-600 w-4 h-4 rounded border-gray-300"
+                disabled={!isInCompare && !canAddMore()}
               />
               Compare Product
+              {compareProducts.length > 0 && (
+                <span className="text-xs text-gray-400">
+                  ({compareProducts.length}/3)
+                </span>
+              )}
             </label>
           </div>
         </div>}

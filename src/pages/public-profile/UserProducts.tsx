@@ -9,6 +9,73 @@ import { useNavigate } from 'react-router-dom';
 import SoftwareDetailCard from '@/components/SoftwareDetailCard';
 import useUIStore from '@/store/useUIStore';
 import { useReviewStore } from '@/store/useReviewStore';
+import SecondaryLoader from '@/components/ui/SecondaryLoader';
+import { Card } from '@/components/ui/card';
+
+// Skeleton loader for software detail cards
+const SoftwareDetailCardSkeleton: React.FC = () => {
+  return (
+    <div className="relative w-full mx-auto h-full">
+      {/* Floating Logo Skeleton */}
+      <div className="absolute -top-8 left-4 md:left-6 z-10">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-lg animate-pulse" />
+      </div>
+      
+      <Card className="relative bg-white rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
+        {/* Compare checkbox skeleton */}
+        <div className="flex items-start gap-4">
+          <div className="flex-1" />
+          <div className="h-4 w-28 bg-gray-200 rounded animate-pulse" />
+        </div>
+        
+        {/* Name and Rating Skeleton */}
+        <div className="flex sm:flex-row flex-col sm:items-start justify-between gap-4 mt-8">
+          <div className="flex-1">
+            <div className="h-6 w-48 bg-gray-200 rounded animate-pulse mb-2" />
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+              <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+          <div className="h-10 w-32 bg-gray-200 rounded animate-pulse" />
+        </div>
+        
+        {/* Description Skeleton */}
+        <div>
+          <div className="h-5 w-40 bg-gray-200 rounded animate-pulse mb-2" />
+          <div className="space-y-2">
+            <div className="h-4 w-full bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 w-full bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 w-3/4 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+        
+        {/* Other Info Skeleton */}
+        <div>
+          <div className="h-5 w-24 bg-gray-200 rounded animate-pulse mb-2" />
+          <div className="divide-y divide-gray-200">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-2 py-2">
+                <div className="h-5 w-5 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+                <div className="h-4 w-32 bg-gray-200 rounded animate-pulse ml-1" />
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Bottom Actions Skeleton */}
+        <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4">
+          <div className="h-5 w-28 bg-gray-200 rounded animate-pulse" />
+          <div className="flex sm:flex-row flex-col sm:items-center gap-2">
+            <div className="h-10 w-40 bg-gray-200 rounded-full animate-pulse" />
+            <div className="h-10 w-32 bg-gray-200 rounded-full animate-pulse" />
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+};
 
 const UserProducts = ({publicProfile}) => {
     const { isLoggedIn, user } = useUserStore();
@@ -67,8 +134,10 @@ const UserProducts = ({publicProfile}) => {
                 {/* Products Content */}
                 <div className="my-6 mt-12">
                     {productsLoading ? (
-                        <div className="flex items-center justify-center py-12">
-                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <div className="grid grid-cols-1 gap-6 gap-y-8">
+                          {[1, 2, 3].map((i) => (
+                            <SoftwareDetailCardSkeleton key={i} />
+                          ))}
                         </div>
                     ) : products && products?.length > 0 ? (
                         <div className="grid grid-cols-1 gap-6 gap-y-8">

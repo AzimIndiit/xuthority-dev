@@ -5,6 +5,7 @@ import { useSoftwareOptions } from "@/hooks/useSoftwareOptions";
 import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
 import { useNavigate } from "react-router-dom";
+import SecondaryLoader from "./ui/SecondaryLoader";
 
 const DUMMY_LOGO = "https://placehold.co/48x48/png";
 
@@ -114,6 +115,54 @@ export default function SoftwareGrid() {
   );
   const products=Array.isArray(productsResult?.data) ? productsResult?.data : []
 
+  // Show full skeleton loader when software options are loading
+  if (softwareLoading) {
+    return (
+      <section className="py-8 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50">
+        <div className="w-full lg:max-w-screen-xl mx-auto">
+          {/* Title skeleton */}
+          <div className="flex justify-center mb-8">
+            <div className="h-8 sm:h-10 w-96 bg-gray-200 rounded animate-pulse" />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-4 lg:gap-8 items-start">
+            {/* Mobile skeleton */}
+            <div className="flex flex-col sm:hidden w-full">
+              <div className="flex items-center justify-between mb-3">
+                <div className="h-7 w-24 bg-gray-200 rounded animate-pulse" />
+                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
+              </div>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                {[1, 2, 3, 4].map((i) => (
+                  <div key={i} className="h-10 w-32 bg-gray-200 rounded-xl animate-pulse flex-shrink-0" />
+                ))}
+              </div>
+            </div>
+
+            {/* Desktop sidebar skeleton */}
+            <aside className="hidden sm:block w-48 lg:w-64 flex-shrink-0 mb-4 md:mb-0 space-y-4">
+              <div className="bg-white border border-gray-200 rounded-xl">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                  <div key={i} className="h-14 bg-gray-200 animate-pulse border-b border-gray-100 last:border-b-0" />
+                ))}
+              </div>
+              <div className="h-12 bg-gray-200 rounded animate-pulse" />
+            </aside>
+
+            {/* Software cards grid skeleton */}
+            <div className="flex-1 w-full">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 !gap-y-12">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <ProductSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-8 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50" >
       <div className="w-full lg:max-w-screen-xl mx-auto">
@@ -187,11 +236,11 @@ export default function SoftwareGrid() {
           </aside>
 
           {/* Software Cards Grid */}
-          <div className="flex-1 w-full mt-10min-h-[30vh] sm:min-h-[40vh] mt-10">
-            {/* Loader for the whole grid */}
-            {isLoading || softwareLoading || isFetching ? (
+          <div className="flex-1 w-full min-h-[30vh] sm:min-h-[40vh] mt-10">
+            {/* Show loader when products are loading or fetching */}
+            {isLoading || isFetching ? (
               <div className="flex justify-center items-center min-h-[400px]">
-                <LottieLoader />
+                <SecondaryLoader />
               </div>
             ) : products.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[400px]">

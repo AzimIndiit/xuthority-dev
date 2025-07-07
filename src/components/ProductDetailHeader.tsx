@@ -68,10 +68,10 @@ export default function ProductDetailHeader({
         <div className="relative sm:-mt-4">
           <div className="flex flex-col md:flex-row items-start md:items-end gap-6">
             {/* Logo */}
-            <div className="flex-shrink-0 absolute -top-4 left-0 " >
+            <div className="flex-shrink-0 absolute -top-4 left-0 rounded-xl  shadow-lg border-2  sm:border-3 border-white object-contain " style={{background:`${product.brandColors}`}}>
               <img
-                style={{background:`${product.brandColors}`}}
-                className="h-24 w-24 sm:h-34 sm:w-34 rounded-xl  shadow-lg border-2  sm:border-3 border-white object-contain"
+                
+                className="h-24 w-24 sm:h-34 sm:w-34 object-contain p-4"
                 src={product.logoUrl}
                 alt={`${product.name} logo`}
               />

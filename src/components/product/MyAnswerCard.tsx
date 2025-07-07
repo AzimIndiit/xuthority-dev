@@ -11,6 +11,42 @@ interface MyAnswerCardProps {
   myAnswer: MyAnswer;
 }
 
+// Skeleton component for MyAnswerCard
+export const MyAnswerCardSkeleton: React.FC = () => {
+  return (
+    <div className="bg-white p-6 rounded-lg border border-gray-200">
+      <div className="flex flex-col justify-between sm:items-start">
+        <div className="flex justify-between w-full">
+          <div className="flex-1">
+            {/* Question skeleton */}
+            <div className="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse" />
+            <div className="flex items-center gap-2 justify-between">
+              {/* Date skeleton */}
+              <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" />
+              {/* Mobile buttons skeleton */}
+              <div className="gap-2 self-end sm:self-start flex-shrink-0 flex sm:hidden">
+                <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse" />
+                <div className="h-8 w-8 bg-gray-200 rounded-full animate-pulse" />
+              </div>
+            </div>
+          </div>
+          {/* Desktop buttons skeleton */}
+          <div className="gap-2 self-end sm:self-start flex-shrink-0 hidden sm:flex">
+            <div className="h-8 w-24 bg-gray-200 rounded-full animate-pulse" />
+            <div className="h-8 w-28 bg-gray-200 rounded-full animate-pulse" />
+          </div>
+        </div>
+        
+        {/* Answer content skeleton */}
+        <div className="mt-4 space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+          <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MyAnswerCard: React.FC<MyAnswerCardProps> = ({ myAnswer }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);

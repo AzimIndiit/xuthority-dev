@@ -70,7 +70,7 @@ export default function FilterDropdown({ filters, onFilterChange, onApply, onCle
       segment: "all",
       categories: [],
       industries: [],
-      price: [10, 250],
+      price: null,
     };
     onFilterChange(resetFilters);
     if (onClear) {
@@ -127,13 +127,15 @@ export default function FilterDropdown({ filters, onFilterChange, onApply, onCle
         <div className="mb-4">
             <div className="flex justify-between items-center mb-2">
                 <h4 className="font-bold text-base sm:text-lg">Pricing</h4>
-                <span className="text-gray-600 font-medium">${filters.price[0]} - ${filters.price[1]}</span>
+                <span className="text-gray-600 font-medium">
+                  ${filters.price ? filters.price[0] : 10} - ${filters.price ? filters.price[1] : 250}
+                </span>
             </div>
             <Slider
                 min={0}
                 max={500}
                 step={10}
-                value={filters.price}
+                value={filters.price || [10, 250]}
                 onValueChange={handlePriceChange}
                 className="w-full"
             />

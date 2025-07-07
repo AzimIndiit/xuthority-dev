@@ -116,7 +116,10 @@ export function useAddProduct() {
     onSuccess: (data) => {
       toast.success("Product added successfully");
       queryClient.setQueryData(queryKeys.products, data.product);
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.products });
+      queryClient.invalidateQueries({ queryKey: ['myProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['userProducts'] });
     },
 
     onError: (error: any) => {
@@ -190,7 +193,11 @@ export function useUpdateProduct() {
     onSuccess: (data) => {
       toast.success("Product updated successfully");
       queryClient.setQueryData(queryKeys.products, data.product);
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.products });
+      queryClient.invalidateQueries({ queryKey: ['myProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['userProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['product'] });
     },
 
     onError: (error: any) => {
@@ -216,7 +223,11 @@ export function useDeleteProduct() {
     },
     onSuccess: (data) => {
       toast.success("Product deleted successfully");
+      // Invalidate all product-related queries
       queryClient.invalidateQueries({ queryKey: queryKeys.products });
+      queryClient.invalidateQueries({ queryKey: ['myProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['userProducts'] });
+      queryClient.invalidateQueries({ queryKey: ['product'] });
     },
     onError: (error: any) => {
       console.error("Product delete error:", error);

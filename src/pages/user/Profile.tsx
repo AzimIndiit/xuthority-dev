@@ -7,7 +7,6 @@ import {
   BellIcon,
   LogOutIcon,
   Badge,
-  ShoppingCart,
   HelpCircle,
   Grid,
   CreditCard,
@@ -26,8 +25,10 @@ import AddProductPage from './AddProductPage';
 import EditProductPage from './EditProductPage';
 import MyReviews from '@/components/user/MyReviews';
 import MyFavorites from '@/components/user/MyFavorites';
-import { NotificationsPage } from '../notifications';
 import { NotificationsList } from '@/components/notifications';
+import UserDisputes from './UserDisputes';
+import MyBadgesPage from './MyBadgesPage';
+import SecondaryLoader from '@/components/ui/SecondaryLoader';
 
 const ProfilePage: React.FC = () => {
   const { tab, subTab } = useParams<{ tab?: string, subTab?: string }>();
@@ -60,12 +61,9 @@ const ProfilePage: React.FC = () => {
 
   // Use the useProfile hook to trigger React Query
   const { data: user, isLoading, error } = useProfile();
-console.log('user', user)
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
-  if (error || !user) {
+
+  if (error) {
     return <div>Error loading profile or user not authenticated</div>;
   }
 
@@ -206,6 +204,20 @@ console.log('user', user)
         current: 'Profile / Products',
       };
     }
+
+    if (activeTab === 'dispute-management') {
+ 
+      return {
+        home: 'Home',
+        current: 'Profile / Dispute Management',
+      };
+    }
+    if (activeTab === 'my-badges') {
+      return {
+        home: 'Home',
+        current: 'Profile / My Badges',
+      };
+    }
     return {
       home: 'Home',
       current: 'My Profile',
@@ -226,7 +238,7 @@ console.log('user', user)
     }
     setActiveTab(tabId);
     // Update URL when tab changes
-    if (tabId === 'followers' || tabId === 'following' || tabId === 'products') {
+    if (tabId) {
       navigate(`/profile/${tabId}`);
     } else {
       navigate(`/profile`);
@@ -291,9 +303,12 @@ console.log('user', user)
         return <MyReviews />;
       case 'my-favourites':
         return <MyFavorites />;
-
+      case 'my-badges':
+        return <MyBadgesPage />;
       case 'notifications':
         return <NotificationsList />;
+      case 'dispute-management':
+        return <UserDisputes />;
 
       // Placeholder for other tabs
       default:
@@ -307,10 +322,9 @@ console.log('user', user)
         );
     }
   };
-console.log(' activeTab',  activeTab)
   return (
     <>
-      <ProfileLayout
+      <ProfileLayout isLoading={isLoading}
         user={userForProfile}
         sidebarItems={sidebarItems}
         activeTab={activeTab}

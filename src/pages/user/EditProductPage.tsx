@@ -53,8 +53,9 @@ const schema = z.object({
         )
         .min(1, 'At least one description is required'),
     })
-      )
-      .optional(), 
+  )
+  .optional()
+  .default([]), 
 
 pricing: z
   .array(
@@ -72,7 +73,8 @@ pricing: z
         .min(1, 'At least one feature is required'),
     })
   )
-  .optional(), 
+  .optional()
+  .default([]),
 });
 
 type FormData = z.infer<typeof schema>;
@@ -91,8 +93,8 @@ const defaultValues: FormData = {
   description: '',
   logoUrl: '',
   mediaUrls: [],
-  features: [{ title: '', description: [{value: ''}] }],
-  pricing: [{ name: '', price: 0, seats: '', description: '', features: [{value: ''}] }],
+  features: [],
+  pricing: [],
 };
 
 interface PricingFeaturesFieldArrayProps {
@@ -333,9 +335,21 @@ const EditProductPage: React.FC = () => {
   
 
   const onSubmit = async (data: FormData) => {
-   
+    // Filter out empty features and pricing
+    const filteredData = {
+      ...data,
+      features: data.features?.filter(feature => 
+        feature.title.trim() !== '' || 
+        feature.description.some(desc => desc.value.trim() !== '')
+      ),
+      pricing: data.pricing?.filter(price => 
+        price.name.trim() !== '' || 
+        price.description.trim() !== '' ||
+        price.price > 0
+      )
+    };
     
-    await addProductMutation.mutateAsync({id:productID,product:data as any});
+    await addProductMutation.mutateAsync({id:productID,product:filteredData as any});
     navigate('/profile/products');
   };
 
@@ -464,7 +478,7 @@ const EditProductPage: React.FC = () => {
           {/* Features */}
           <div>
             <div className='flex justify-between items-center mb-4'>
-              <h2 className="font-semibold text-lg">Features</h2>
+              <h2 className="font-semibold text-lg">Features <span className="text-sm font-normal text-gray-500">(Optional)</span></h2>
               <button
                 disabled={addProductMutation.isPending}
                 type="button"
@@ -479,7 +493,7 @@ const EditProductPage: React.FC = () => {
               <div key={field.id} className="mb-6 grid grid-cols-1 gap-4 border rounded-lg p-6 bg-white">
                 <div className='flex justify-between items-center mb-4'>
                   <h3 className="font-semibold text-lg">Feature {idx + 1}</h3>
-                  {idx !== 0 && (
+                  {/* {idx !== 0 && ( */}
                     <button
                       disabled={addProductMutation.isPending}
                       type="button"
@@ -489,7 +503,7 @@ const EditProductPage: React.FC = () => {
                     >
                       -
                     </button>
-                  )}
+                  {/* )} */}
                 </div>
                 <FormInput name={`features.${idx}.title`} label="Feature Title" maxLength={100} placeholder='Enter feature title' disabled={addProductMutation.isPending} />
                 <FeaturesDescriptionFieldArray nestIndex={idx} control={control} />
@@ -500,7 +514,7 @@ const EditProductPage: React.FC = () => {
           {/* Pricing */}
           <div>
             <div className='flex justify-between items-center mb-4'>
-              <h2 className="font-semibold text-xl">Pricing</h2>
+              <h2 className="font-semibold text-xl">Pricing <span className="text-sm font-normal text-gray-500">(Optional)</span></h2>
               <button
                 disabled={addProductMutation.isPending}
                 type="button"
@@ -515,7 +529,7 @@ const EditProductPage: React.FC = () => {
                 <div key={field.id} className="mb-8 p-6 rounded-lg border bg-white">
                 <div className='flex justify-between items-center mb-4'>
                   <h3 className="font-semibold text-lg">Pricing Plan {idx + 1}</h3>
-                  {idx !== 0 && (
+                  {/* {idx !== 0 && ( */}
                     <button
                       disabled={addProductMutation.isPending}
                       type="button"
@@ -525,7 +539,7 @@ const EditProductPage: React.FC = () => {
                     >
                       -
                     </button>
-                  )}
+                  {/* )} */}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                   <FormInput name={`pricing.${idx}.name`} label="Plan Name" maxLength={100} placeholder="Enter plan name" disabled={addProductMutation.isPending} />

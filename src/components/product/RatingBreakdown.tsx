@@ -32,7 +32,7 @@ const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
     <div className='w-full lg:w-50'>
     <h3 className="text-lg font-bold text-gray-900 mb-1">Reviews</h3>
       <div className="flex lg:flex-col flex-row lg:items-start items-center mb-4 gap-3">
-        <p className="text-5xl font-bold text-gray-900">{rating}</p>
+        <p className="text-5xl font-bold text-gray-900">{rating.toFixed(1)}</p>
         <div className="ml-4 lg:ml-0">
           <StarRating rating={rating} starClassName="w-6 h-6" />
           <p className="text-sm text-gray-600 mt-1">({reviewCount} Reviews)</p>

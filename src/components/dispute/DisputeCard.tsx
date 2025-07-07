@@ -12,9 +12,10 @@ import { useNavigate } from 'react-router-dom';
 import { useReviewStore } from '@/store/useReviewStore';
 import { Product } from '@/services/product';
 import { useDeleteReview } from '@/hooks/useReview';
-import { useAddExplanation, useUpdateExplanation } from '@/hooks/useDispute';
+import { useAddExplanation, useDeleteDispute, useUpdateExplanation } from '@/hooks/useDispute';
 import ConfirmationModal from '../ui/ConfirmationModal';
 import { formatDate } from '@/utils/formatDate';
+import DisputeModal from '../product/DisputeModal';
 
 interface DisputeCardProps {
   review: DisputedReview;
@@ -24,9 +25,8 @@ interface DisputeCardProps {
 }
 
 const statusStyles = {
-  Active: 'bg-green-100 text-green-800',
-  Resolved: 'bg-blue-100 text-blue-800',
-  Dismissed: 'bg-gray-100 text-gray-800',
+  active: 'bg-green-100 text-green-800',
+  resolved: 'bg-blue-100 text-blue-800',
 };
 
 const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, refetchDisputes }) => {
@@ -36,11 +36,12 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [explanation, setExplanation] = useState(dispute.explanations || '');
   const [editExplanation, setEditExplanation] = useState(dispute.explanations ? false : true);
-  
-  const deleteReviewMutation = useDeleteReview();
+  const [isDeleteDisputeModalOpen, setIsDeleteDisputeModalOpen] = useState(false);
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+    const deleteReviewMutation = useDeleteReview();
   const addExplanationMutation = useAddExplanation();
   const updateExplanationMutation = useUpdateExplanation();
-
+  const deleteDisputeMutation = useDeleteDispute();
   // Update explanation state when dispute changes
   useEffect(() => {
     setExplanation(dispute.explanations || '');
@@ -83,6 +84,14 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
     return user?.id === authorId;
   };
 
+  const handleDeleteDispute = () => {
+    deleteDisputeMutation.mutate(dispute.id, {
+      onSuccess: () => {
+        setIsDeleteDisputeModalOpen(false);
+        refetchDisputes();
+      }
+    });
+  };
   return (
     <div className="bg-white p-4  rounded-lg border border-gray-200 shadow-sm">
       {/* Review Section */}
@@ -123,7 +132,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
           </div>
           <p className="text-gray-700 mt-4 text-xs sm:text-sm">{review.content}</p>
         </div>
-     { review.isOwnReview &&   <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
+     { review.isOwnReview &&  dispute.status === 'active' &&  <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
           <Button onClick={() => {
              setSelectedSoftware({
               id: product._id,
@@ -161,11 +170,36 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
         <h3 className="text-lg sm:text-xl font-bold text-gray-900">Dispute</h3>
   
         <div className="mt-2">
-          <div className="flex items-center gap-2">
-            <h4 className="text-base sm:text-lg font-semibold text-gray-900">{dispute.reason}</h4>
-            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full ${statusStyles[dispute.status]}`}>
+          <div className="flex items-center gap-2 justify-between w-full">
+        <div className='flex items-center gap-2 '>
+        <h4 className="text-base sm:text-lg font-semibold text-gray-900">{dispute.reason}</h4>
+            <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize ${statusStyles[dispute.status]}`}>
               {dispute.status}
             </span>
+        </div>
+            { dispute.isOwner && location.pathname === '/profile/dispute-management' &&   <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
+          <Button onClick={() => {
+            console.log('Opening dispute modal with data:', dispute);
+            setIsDisputeModalOpen(true);
+          }}
+           className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-4 py-2 !text-xs font-semibold flex items-center h-10">
+            <Edit className="w-2 h-2" />
+          <span className="hidden sm:block text-xs"> Edit Dispute</span>
+          </Button>
+          <Button 
+            variant="destructive" 
+            className="rounded-full px-4 py-2 !text-xs font-semibold flex items-center h-10"
+            onClick={() => setIsDeleteDisputeModalOpen(true)}
+            disabled={deleteDisputeMutation.isPending}
+          >
+            {deleteDisputeMutation.isPending ? (
+              <Loader2 className="w-2 h-2 animate-spin" />
+            ) : (
+              <Trash2 className="w-2 h-2" />
+            )}
+            <span className="hidden sm:block text-xs"> Delete Dispute</span>
+          </Button> 
+          </div>}
           </div>
           <div className="text-gray-700 mt-2 space-y-2 text-xs sm:text-sm">
             <p>{dispute.description}</p>
@@ -175,7 +209,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       </div>
 
       {/* Explanation Section */}
-      {dispute.explanations && (
+      {dispute.explanations && user?.role === 'user' && dispute.status === 'active' && (
         <div className='mt-4'>
           <h3 className="text-lg sm:text-xl font-bold text-gray-900">Explanation</h3>
           <div className="mt-2 flex justify-between items-center text-gray-700 text-sm bg-gray-50 p-3 rounded-lg border border-gray-20">
@@ -191,7 +225,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       )}
 
       {/* Add/Edit Explanation Section */}
-      {  editExplanation && dispute.status === 'Active' && review.isOwnReview && <div className="mt-8">
+      {  editExplanation && dispute.status === 'active' && review.isOwnReview  && <div className="mt-8">
         <h3 className="text-xl font-bold text-gray-900">
           {dispute.explanations ? 'Edit' : 'Add'} Explanation
         </h3>
@@ -229,7 +263,29 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
         description="Are you sure you want to delete this review? This action cannot be undone."
         confirmText="Delete"
         cancelText="Cancel"
+        isLoading={deleteReviewMutation.isPending}
       />
+  {/* Delete Dispute Confirmation Modal */}
+<ConfirmationModal
+        isOpen={isDeleteDisputeModalOpen}
+        onOpenChange={setIsDeleteDisputeModalOpen}
+        onConfirm={handleDeleteDispute}
+        title="Delete Dispute"
+        description="Are you sure you want to delete this dispute? This action cannot be undone."
+        confirmText="Delete"
+        isLoading={deleteDisputeMutation.isPending}
+        cancelText="Cancel"
+      />
+
+
+<DisputeModal
+          isOpen={isDisputeModalOpen}
+          onOpenChange={setIsDisputeModalOpen}
+          reviewId={review.id}
+          isEdit={true}
+          dispute={dispute}
+          onSuccess={refetchDisputes}
+        />
     </div>
   );
 };

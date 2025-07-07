@@ -75,6 +75,7 @@ export default function Navbar() {
       queryClient.clear();
       resetReview();
       setDrawerOpen(false)
+      window.location.reload();
     } catch (error) {
       console.error('Logout error:', error);
     }

@@ -18,8 +18,8 @@ const integrations = [
 ];
 
 const   IntegrationCard = ({ name, image }: { name: string, image: string }) => (
-  <div className="flex flex-col items-center text-center gap-3">
-    <div className="w-28 h-28 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-5 transition-all duration-300 hover:shadow-md hover:border-gray-300">
+  <div className="flex flex-col items-center text-center gap-2">
+    <div className="w-16 h-16  bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-3 transition-all duration-300 hover:shadow-md hover:border-gray-300">
       <img
         src={image}
         alt={`${name} logo`}
@@ -38,7 +38,7 @@ const ProductIntegrations = ({integrations}: {integrations: any}) => {
         Integrations
       </h2>
       <div className="border bg-white rounded-2xl p-8">
-        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-8 gap-x-6 gap-y-8 place-items-center">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-12 gap-x-6 gap-y-8 place-items-center">
           {integrations.map((integration: any) => (
             <IntegrationCard key={integration.name} {...integration} />
           ))}

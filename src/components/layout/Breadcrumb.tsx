@@ -21,9 +21,9 @@ const breadcrumbNameMap: { [key: string]: string } = {
 const Breadcrumb = () => {
   const location = useLocation();
   const pathnames = location?.pathname?.split("/").filter((x) => x);
-console.log(pathnames[0]);
+console.log(pathnames[0],"sdasd");
   // Don't render breadcrumbs on the homepage.
-  if (pathnames.length === 0 || ['for-vendors','about-us'].includes(pathnames[0])) {
+  if (pathnames.length === 0 || ['for-vendors','about-us',].includes(pathnames[0])) {
     return null;
   }
 
@@ -51,18 +51,18 @@ console.log(pathnames[0]);
               const linkTo = value === 'followers' || value === 'following' ? '/profile' : value === 'product-detail' ? '/' : to;
 
               // Check if this item should be non-clickable
-              const shouldBeNonClickable = isLast || value === 'public-profile';
+              const shouldBeNonClickable = isLast || value === 'public-profile' || value === 'product-detail';
 
               return (
                 <React.Fragment key={to}>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
                     {shouldBeNonClickable ? (
-                      <BreadcrumbPage className="font-semibold text-blue-600 capitalize">
+                      <BreadcrumbPage className="font-semibold text-gray-700 capitalize">
                         {name}
                       </BreadcrumbPage>
                     ) : (
-                      <BreadcrumbLink asChild className="text-gray-700 hover:text-blue-600 capitalize">
+                      <BreadcrumbLink asChild className="text-gray-700 hover:text-blue-600 capitalize font-semibold">
                         <Link to={linkTo}>{name}</Link>
                       </BreadcrumbLink>
                     )}

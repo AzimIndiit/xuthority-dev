@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useCreateDispute } from '@/hooks/useDispute';
+import { useCreateDispute, useUpdateDispute } from '@/hooks/useDispute';
 import { DISPUTE_REASONS } from '@/services/dispute';
 import { X } from 'lucide-react';
 
@@ -24,16 +24,42 @@ interface DisputeModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
   reviewId: string;
+  isEdit?: boolean;
+  dispute?: any;
+  onSuccess?: () => void;
 }
 
 const DisputeModal: React.FC<DisputeModalProps> = ({ 
   isOpen, 
   onOpenChange,
-  reviewId
+  reviewId,
+  isEdit,
+  dispute,
+  onSuccess
 }) => {
   const [reason, setReason] = useState('');
   const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('');
   const createDisputeMutation = useCreateDispute();
+  const updateDisputeMutation = useUpdateDispute();
+
+  useEffect(() => {
+    if (isOpen) {
+      if (isEdit && dispute) {
+       
+        setReason(dispute.reasonValue || dispute.reason);
+        setDescription(dispute.description || '');
+        setStatus(dispute.status || '');
+      } else {
+        // Reset values for create mode
+        setReason('');
+        setDescription('');
+        setStatus('');
+      }
+    }
+  }, [isOpen, isEdit, dispute]);
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,16 +69,32 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
     }
 
     try {
-      await createDisputeMutation.mutateAsync({
+      if (isEdit) {
+        await updateDisputeMutation.mutateAsync({
+          id: dispute.id,
+          data: {
+            reason: reason as any,
+            description: description.trim(),
+            status: status.toLowerCase() as any
+          }
+        });
+      } else {  
+        await createDisputeMutation.mutateAsync({
         reviewId,
         reason: reason as any,
         description: description.trim()
       });
-      
+      }
       // Reset form and close modal on success
       setReason('');
       setDescription('');
+      setStatus('');
       onOpenChange(false);
+      
+      // Call onSuccess callback if provided
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       // Error is handled by the mutation hook
     }
@@ -61,6 +103,7 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
   const handleClose = () => {
     setReason('');
     setDescription('');
+    setStatus('');
     onOpenChange(false);
   };
 
@@ -79,7 +122,7 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
           <form onSubmit={handleSubmit}>
             <DialogHeader className="p-6 pb-4">
               <DialogTitle className="text-2xl font-bold text-center">
-                Dispute a Review
+                {isEdit? 'Edit Dispute': 'Dispute a Review'}
               </DialogTitle>
               <DialogDescription className="text-center text-gray-600 mt-2">
                 Describe your issue, and we'll review it to find a solution.
@@ -95,10 +138,11 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
                   value={reason}
                   onValueChange={setReason}
                   required
+                  disabled={createDisputeMutation.isPending || updateDisputeMutation.isPending}
                 >
                   <SelectTrigger 
                     id="reason"
-                    className="w-full h-12 rounded-lg border-gray-300"
+                    className="w-full h-12 rounded-full border-gray-300"
                   >
                     <SelectValue placeholder="Select Reason" />
                   </SelectTrigger>
@@ -127,6 +171,7 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
                   className="min-h-[150px] rounded-lg border-gray-300 resize-none"
                   required
                   minLength={10}
+                  disabled={createDisputeMutation.isPending || updateDisputeMutation.isPending}
                   maxLength={2000}
                 />
                 <p className="text-xs text-gray-500 text-right">
@@ -134,12 +179,43 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
                 </p>
               </div>
 
+              {isEdit &&
+                 <div className="space-y-2">
+                 <Label htmlFor="status" className="text-sm font-medium text-gray-700">
+                   Status
+                 </Label>
+                    <Select
+                    disabled={updateDisputeMutation.isPending}
+                    value={status}
+                    onValueChange={setStatus}
+                    required
+                  >
+                    <SelectTrigger 
+                      id="status"
+                      className="w-full h-12 rounded-full border-gray-300"
+                    >
+                      <SelectValue placeholder="Select Status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {['active', 'resolved'].map((status) => (
+                        <SelectItem 
+                          key={status} 
+                          value={status}
+                        >
+                          {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  </div>
+                  }
+
               <Button 
                 type="submit" 
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-base font-medium"
-                disabled={!reason || !description.trim() || description.trim().length < 10 || createDisputeMutation.isPending}
+                disabled={!reason || !description.trim() || description.trim().length < 10 || (isEdit && !status) || createDisputeMutation.isPending || updateDisputeMutation.isPending}
               >
-                {createDisputeMutation.isPending ? 'Submitting...' : 'Submit'}
+                {createDisputeMutation.isPending || updateDisputeMutation.isPending ? 'Submitting...' : 'Submit'}
               </Button>
             </div>
           </form>

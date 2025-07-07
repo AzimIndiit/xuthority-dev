@@ -122,7 +122,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
             </h2>
             <div className="flex items-center mt-2">
               <StarRating rating={rating} />
-              <p className="ml-2 text-lg text-gray-600">({reviewCount}) {rating} out of 5</p>
+              <p className="ml-2 text-lg text-gray-600">({reviewCount}) {rating.toFixed(1)} out of 5.0</p>
             </div>
           </div>
        { (!isLoggedIn ||  user?.role !== 'vendor') &&   <Button onClick={onWriteReview} className="bg-red-600 text-white hover:bg-red-700 mt-4 md:mt-0 px-8 py-4 text-lg rounded-none">

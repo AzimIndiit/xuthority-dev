@@ -40,7 +40,7 @@ export default function SoftwareCard({id, name, logo, rating, reviewCount, logoB
           <div className=" flex flex-col lg:flex-row lg:items-center gap-2 justify-start">
                       <StarRating rating={rating} />
                       <span className="text-gray-600 text-xs sm:text-sm">
-                        ({reviewCount}) {rating} out of 5
+                        ({reviewCount}) {rating.toFixed(1)} out of 5.0
                       </span>
                     </div>
         </div>

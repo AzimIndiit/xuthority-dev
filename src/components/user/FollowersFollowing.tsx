@@ -112,12 +112,21 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
     const newTab = value as 'followers' | 'following';
     onTabChange?.(newTab);
   };
-  console.log(followersData,"followersData");
-  console.log(followingData,"followingData");
+
   return (
     <div className="">
        
       {/* Search Bar */}
+      <div className='flex items-center gap-2 mb-6'> 
+      <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+        
+        Followers</h1>
+        
+      </div>
       <div className="relative mb-6">
         <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
         <Input

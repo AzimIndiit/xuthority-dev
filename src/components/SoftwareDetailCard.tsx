@@ -114,7 +114,7 @@ const deleteMutation = useDeleteProduct();
       <Card className="relative bg-white rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
         {/* Logo space is handled above */}
         {/* Logo and Compare */}
-       {user?.role!=='vendor' || location.pathname !== '/public-profile' && <div className="flex items-start gap-4 ">
+       {(user?.role !== 'vendor' && location.pathname !== '/public-profile' && location.pathname !== '/profile/products') && <div className="flex items-start gap-4 ">
           <div className="flex-1" />
           <div className="flex-1 flex justify-end items-start">
             <label className="flex items-center gap-2 select-none cursor-pointer text-xs sm:text-sm text-gray-500">
@@ -140,7 +140,7 @@ const deleteMutation = useDeleteProduct();
             <div className=" flex items-center gap-2 mt-1">
               <StarRating rating={rating} />
               <span className="text-gray-600 text-xs sm:text-sm">
-                ({reviewCount}) {rating} out of 5
+                ({reviewCount}) {rating.toFixed(1)} out of 5.0
               </span>
             </div>
           </div>

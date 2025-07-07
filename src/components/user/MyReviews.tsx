@@ -4,13 +4,15 @@ import { useUserReviews } from '@/hooks/useAuth';
 import { usePagination } from '@/hooks/usePagination';
 import SoftwareReviewCard from '@/components/product/SoftwareReviewCard';
 import Pagination from '@/components/ui/pagination';
-import { Star as StarIcon } from 'lucide-react';
+import { ArrowLeft, ArrowLeftIcon, Star as StarIcon } from 'lucide-react';
+import SecondaryLoader from '@/components/ui/SecondaryLoader';
+import { useNavigate } from 'react-router-dom';
 
 const MyReviews: React.FC = () => {
   const { user } = useUserStore();
   const userId = user?.id || user?._id;
   const itemsPerPage = 10;
-
+  const navigate = useNavigate();
   // Pagination state
   const pagination = usePagination({
     initialPage: 1,
@@ -26,6 +28,7 @@ const MyReviews: React.FC = () => {
     sortOrder: 'desc',
   });
 
+
   // Update total items for pagination
   React.useEffect(() => {
     if (reviewsData?.pagination?.totalItems) {
@@ -39,15 +42,20 @@ const MyReviews: React.FC = () => {
 
   return (
     <div className="">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">My Reviews</h1>
-        {/* Sorting dropdown can be added here if needed */}
-      </div>
+   
+      <div className='flex items-center gap-2 mb-6'> 
+      <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+        
+        My Reviews</h1>
+        
+      </div>  
       <div className="space-y-6">
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
+          <SecondaryLoader text="Loading your reviews..." containerClasses='min-h-[60vh]' />
         ) : reviews.length > 0 ? (
           reviews.map((review: any) => (
             <SoftwareReviewCard

@@ -6,6 +6,7 @@ import { Product } from '@/services/product';
 import SoftwareDetailCard from '@/components/SoftwareDetailCard';
 import { ArrowLeftIcon } from 'lucide-react';
 import Pagination from '@/components/ui/pagination';
+import SecondaryLoader from '@/components/ui/SecondaryLoader';
 
 const ProductsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -18,8 +19,10 @@ const ProductsPage: React.FC = () => {
   });
   
   const navigate = useNavigate();
-  const products = Array.isArray(productsData?.products) ? productsData.products : [];
+  const products = Array.isArray(productsData) ? productsData : [];
+  console.log(productsData,"productsData");
   const totalPages = productsData?.pagination?.totalPages || 1;
+
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -45,9 +48,7 @@ const ProductsPage: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+        <SecondaryLoader text="Loading your products..." containerClasses='min-h-[60vh]' />
       ) : isError ? (
         <div className="text-center text-red-500">Failed to load products.</div>
       ) : (
@@ -64,7 +65,7 @@ const ProductsPage: React.FC = () => {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-12 gap-y-12">
+            <div className="grid grid-cols-1 gap-6 mt-12 gap-y-12">
               {products.map((item: Product, idx: number) => (
                 <SoftwareDetailCard
                   id={item._id}

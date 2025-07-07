@@ -60,7 +60,7 @@ export default function ProductDetailHeader({
                     <div className=" flex items-center gap-2">
                       <StarRating rating={product.rating} />
                       <span className="text-gray-600 text-xs sm:text-sm">
-                        ({product.reviewCount}) {product.rating} out of 5
+                        ({product.reviewCount}) {product.rating.toFixed(1)} out of 5.0
                       </span>
                     </div>
                   </div>

@@ -47,16 +47,16 @@ const ProductOverview = ({product}: {product: any}) => {
       <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
         {productDetails.name} Overview
       </h2>
-      <p className="mt-4 text-gray-600 leading-relaxed text-sm md:text-base">
-        {isExpanded ? fullText : truncatedText}
-        {!isExpanded && (
+      <p className="mt-4 text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-line">
+        {fullText}
+        {/* {!isExpanded && (
           <button
             onClick={() => setIsExpanded(true)}
             className="text-blue-600 hover:underline ml-1"
           >
             See More
           </button>
-        )}
+        )} */}
       </p>
 
       {/* <div className="mt-10">
@@ -114,8 +114,8 @@ const ProductOverview = ({product}: {product: any}) => {
           </div>
         </div>
       </div>
-      {product.features && <ProductFeatures features={product.features} />}
-      {product.integrations && <ProductIntegrations integrations={product.integrations} />}
+      {product.features.length > 0 && <ProductFeatures features={product.features} />}
+      {product.integrations.length > 0 && <ProductIntegrations integrations={product.integrations} />}
     </div>
   );
 };

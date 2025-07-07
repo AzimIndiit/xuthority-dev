@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useToast } from '@/hooks/useToast';
 import * as disputeService from '@/services/dispute';
+import { queryClient } from '@/lib/queryClient';
 
 // Query keys
 const QUERY_KEYS = {
@@ -39,13 +40,13 @@ export const useDispute = (id: string) => {
 };
 
 export const useCreateDispute = () => {
-  const queryClient = useQueryClient();
   const { success, error } = useToast();
 
   return useMutation({
     mutationFn: disputeService.createDispute,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.disputes] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.allDisputes] });
       success('Dispute created successfully');
     },
     onError: (err: any) => {
@@ -55,7 +56,6 @@ export const useCreateDispute = () => {
 };
 
 export const useUpdateDispute = () => {
-  const queryClient = useQueryClient();
   const { success, error } = useToast();
 
   return useMutation({
@@ -63,6 +63,7 @@ export const useUpdateDispute = () => {
       disputeService.updateDispute(id, data),
     onSuccess: (response, { id }) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.disputes] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.allDisputes] });
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.dispute, id] });
       success('Dispute updated successfully');
     },
@@ -73,13 +74,13 @@ export const useUpdateDispute = () => {
 };
 
 export const useDeleteDispute = () => {
-  const queryClient = useQueryClient();
   const { success, error } = useToast();
 
   return useMutation({
     mutationFn: disputeService.deleteDispute,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.disputes] });
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.allDisputes] });
       success('Dispute deleted successfully');
     },
     onError: (err: any) => {
@@ -89,7 +90,6 @@ export const useDeleteDispute = () => {
 };
 
 export const useAddExplanation = () => {
-  const queryClient = useQueryClient();
   const { success, error } = useToast();
 
   return useMutation({
@@ -108,7 +108,6 @@ export const useAddExplanation = () => {
 };
 
 export const useUpdateExplanation = () => {
-  const queryClient = useQueryClient();
   const { success, error } = useToast();
 
   return useMutation({

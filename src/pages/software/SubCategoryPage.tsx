@@ -30,7 +30,7 @@ const SubCategoryPage = () => {
     segment: "all",
     categories: [],
     industries: [],
-    price: [10, 250],
+    price: null as [number, number] | null,
   });
   
   // Applied filter state (sent to API)
@@ -38,18 +38,24 @@ const SubCategoryPage = () => {
     segment: "all",
     categories: [],
     industries: [],
-    price: [10, 250],
+    price: null as [number, number] | null,
   });
 
   // Memoize API payload to prevent unnecessary API calls
   const apiPayload = useMemo(() => {
-    return {
+    const payload: any = {
       segment: appliedFilters.segment,
       categories: appliedFilters.categories,
       industries: appliedFilters.industries,
-      price: appliedFilters.price as [number, number],
       sortBy: sortValue
     };
+    
+    // Only include price if it's been set
+    if (appliedFilters.price !== null) {
+      payload.price = appliedFilters.price;
+    }
+    
+    return payload;
   }, [appliedFilters, sortValue]);
 
   // Handle local filter changes (UI only)
@@ -74,7 +80,7 @@ const SubCategoryPage = () => {
       segment: "all",
       categories: [],
       industries: [],
-      price: [10, 250],
+      price: null as [number, number] | null,
     };
     setLocalFilters(resetFilters);
     setAppliedFilters(resetFilters);

@@ -1,6 +1,7 @@
 import React from 'react';
 import ProfileSidebar from './ProfileSidebar';
 import { User } from '@/services/auth';
+import SecondaryLoader from '../ui/SecondaryLoader';
 
 interface SidebarItem {
   id: string;
@@ -20,6 +21,7 @@ interface ProfileLayoutProps {
   children: React.ReactNode;
   onFollowersClick?: () => void;
   onFollowingClick?: () => void;
+  isLoading?: boolean;
 }
 
 const ProfileLayout: React.FC<ProfileLayoutProps> = ({
@@ -30,7 +32,8 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
   breadcrumb,
   children,
   onFollowersClick,
-  onFollowingClick
+  onFollowingClick,
+  isLoading
 }) => {
   return (
     <div className="min-h-screen bg-gray-50">
@@ -50,7 +53,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
 
           {/* Right Content */}
           <div className="col-span-4 lg:col-span-3  lg:px-8">
-            {children}
+            {isLoading? <SecondaryLoader text="Loading profile..." containerClasses='min-h-[60vh]' /> : children}
           </div>
         </div>
       </div>

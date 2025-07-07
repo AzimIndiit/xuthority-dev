@@ -3,7 +3,7 @@ import { useFavoriteLists, useFavoriteListProducts, useDeleteFavoriteList } from
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, Star } from 'lucide-react';
+import { ArrowLeftIcon, Plus, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import LottieLoader from '@/components/LottieLoader';
@@ -141,7 +141,13 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     <div className={cn("max-w-7xl mx-auto", className)}>
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <h1 className=" sm:text-2xl text-xl font-bold text-gray-900">My Favorites</h1>
+      <div className='flex items-center gap-2'> 
+      <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span>
+      <h1 className=" sm:text-2xl text-xl font-bold text-gray-900">My Favorites</h1>
+      </div>
         
         <div className="flex items-center gap-4">
    

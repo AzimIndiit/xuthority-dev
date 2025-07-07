@@ -11,8 +11,6 @@ import DisputesPage from '@/pages/product/DisputesPage';
 import WriteReviewPage from '@/pages/review/WriteReviewPage';
 import ReviewCommentsPage from '@/pages/review/ReviewCommentsPage';
 import AuthCallback from '@/pages/auth/AuthCallback';
-import ProductsPage from '../pages/user/ProductsPage';
-import AddProductPage from '../pages/user/AddProductPage';
 import UserOnlyRoute from './UserOnlyRoute';
 
 const ResetPasswordPage = lazy(() => import("@/pages/auth/ResetPasswordPage"));
@@ -22,16 +20,11 @@ const AuthLayout = ({ children }: { children?: React.ReactNode }) => (
     {children || <Outlet />}
   </div>
 );
-const Login = () => <div>Login Page</div>;
-const Register = () => <div>Register Page</div>;
-const ConcertsHome = () => <div>Concerts Home</div>;
-const ConcertsCity = () => <div>Concerts City</div>;
-const ConcertsTrending = () => <div>Concerts Trending</div>;
+
 const RootLayout = lazy(() => import("@/components/layout/RootLayout"));
 const Home = lazy(() => import("@/pages/Home"));
 const ResourcesPage = lazy(() => import("@/pages/resource/ResourcesPage").then(module => ({ default: module.ResourcesPage })));
 const BlogDetailPage = lazy(() => import("@/pages/resource/BlogDetailPage").then(module => ({ default: module.BlogDetailPage })));
-const CategoryPage = lazy(() => import("@/pages/resource/CategoryPage").then(module => ({ default: module.CategoryPage })));
 
 // Lazy load legal pages
 const TermsConditionsPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.TermsConditionsPage })));
@@ -48,11 +41,8 @@ const ProductDetailPage = lazy(
 
 // Lazy load user and vendor routes
 const UserProfile = lazy(() => import("../pages/user/Profile"));
-// const PublicProfile = lazy(() => import('../pages/user/PublicProfile'));
 const PublicProfileBySlug = lazy(() => import('../pages/public-profile/PublicProfileBySlug'));
 
-// Lazy load notifications page
-const NotificationsPage = lazy(() => import("@/pages/notifications").then(module => ({ default: module.NotificationsPage })));
 
 
 const Loader = () => (
@@ -92,22 +82,7 @@ const router = createBrowserRouter([
         path: "auth",
         Component: AuthLayout,
         children: [
-          {
-            path: "login",
-            Component: (props: any) => (
-              <AuthGuard>
-                <Login {...props} />
-              </AuthGuard>
-            ),
-          },
-          {
-            path: "register",
-            Component: (props: any) => (
-              <AuthGuard>
-                <Register {...props} />
-              </AuthGuard>
-            ),
-          },
+       
           {
             path: "callback",
             Component: AuthCallback,
@@ -124,14 +99,7 @@ const router = createBrowserRouter([
           },
         ],
       },
-      {
-        path: "concerts",
-        children: [
-          { index: true, Component: ConcertsHome },
-          { path: ":city", Component: ConcertsCity },
-          { path: "trending", Component: ConcertsTrending },
-        ],
-      },
+      
       // Protected routes
       {
         element: <ProtectedRoute />,

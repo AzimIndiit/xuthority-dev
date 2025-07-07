@@ -4,6 +4,7 @@ import useUserStore from '@/store/useUserStore';
 import { AuthService, LoginRequest, UserRegisterRequest, VendorRegisterRequest, UpdateProfileRequest, ChangePasswordRequest } from '../services/auth';
 import { FileUploadService } from '../services/fileUpload';
 import toast from 'react-hot-toast';
+import { queryClient } from '@/lib/queryClient';
 
 
 
@@ -156,7 +157,6 @@ export const useUserProfileStatsBySlug = (slug: string) => {
 // Hook for login mutation
 export const useLogin = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { loginWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
@@ -193,7 +193,6 @@ export const useLogin = () => {
 // Hook for user registration mutation
 export const useRegisterUser = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { registerUserWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
@@ -232,7 +231,6 @@ export const useRegisterUser = () => {
 // Hook for vendor registration mutation
 export const useRegisterVendor = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const { registerVendorWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
@@ -276,6 +274,7 @@ export const useLogout = () => {
   return useMutation({
     mutationFn: async () => {
       await logoutWithAPI();
+      
       // Navigate to home after logout
       // navigate('/');
     },
@@ -287,7 +286,6 @@ export const useLogout = () => {
 
 // Hook for profile update mutation
 export const useUpdateProfile = () => {
-  const queryClient = useQueryClient();
   const { updateUser } = useUserStore();
 
   return useMutation({
@@ -318,7 +316,6 @@ export const useUpdateProfile = () => {
 
 // Hook for profile update with image upload
 export const useUpdateProfileWithImage = () => {
-  const queryClient = useQueryClient();
   const { updateUser } = useUserStore();
 
   return useMutation({

@@ -9,6 +9,7 @@ import {
   DialogClose,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 
 interface ConfirmationModalProps {
   isOpen: boolean;
@@ -19,6 +20,7 @@ interface ConfirmationModalProps {
   confirmText?: string;
   cancelText?: string;
   confirmVariant?: 'default' | 'destructive';
+  isLoading?: boolean;
 }
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -30,6 +32,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   confirmText = 'Confirm',
   cancelText = 'Cancel',
   confirmVariant = 'destructive',
+  isLoading = false,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -46,8 +49,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               {cancelText}
             </Button>
           </DialogClose>
-          <Button type="button" className='rounded-full bg-blue-600 text-white hover:bg-blue-700' variant={confirmVariant} onClick={onConfirm} > 
-            {confirmText}
+          <Button type="button" disabled={isLoading} className='rounded-full bg-blue-600 text-white hover:bg-blue-700' variant={confirmVariant} onClick={onConfirm} > 
+            {isLoading ? <Loader2 className="w-2 h-2 animate-spin" /> : confirmText}
           </Button>
         </DialogFooter>
       </DialogContent>

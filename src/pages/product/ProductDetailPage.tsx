@@ -77,7 +77,7 @@ export default function ProductDetailPage() {
           <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
             {/* Wavy line background */}
 
-      {product.pricing &&      <ProductPricing pricing={product.pricing} />}
+      {product.pricing.length > 0 &&      <ProductPricing pricing={product.pricing} />}
           </div>
         </section>
         <section id="media">

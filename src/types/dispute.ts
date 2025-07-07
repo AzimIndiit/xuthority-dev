@@ -36,7 +36,8 @@ export interface Dispute {
   disputer: Author;
   date: string;
   reason: string;
-  status: 'Active' | 'Resolved' | 'Dismissed';
+  reasonValue?: string; // Original value for editing (e.g., 'spam-or-fake-review')
+  status: 'active' | 'resolved' ;
   description: string;
   explanations?: string;
   claims: string[]; 

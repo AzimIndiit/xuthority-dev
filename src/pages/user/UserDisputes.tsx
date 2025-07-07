@@ -1,25 +1,28 @@
 import React, { useMemo } from 'react';
 import DisputeCard from '@/components/dispute/DisputeCard';
 import { DisputedReview, Dispute } from '@/types/dispute';
-import { useAllDisputes, useDispute, useVendorDisputes } from '@/hooks/useDispute';
+import {  useVendorDisputes } from '@/hooks/useDispute';
 import { formatDate } from '@/utils/formatDate';
 import { getUserDisplayName } from '@/utils/userHelpers';
 import LottieLoader from '@/components/LottieLoader';
 import useUserStore from '@/store/useUserStore';
 import { DISPUTE_REASONS } from '@/services/dispute';
+import SecondaryLoader from '@/components/ui/SecondaryLoader';
+import { ArrowLeft, ArrowLeftIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const DisputesPage = () => {
+const UserDisputes = () => {
   const { user, isLoggedIn } = useUserStore();
-
+  const navigate = useNavigate();
   // Only fetch disputes if user is logged in and is a vendor
   const isVendor = user?.role === 'vendor';
   
   // Fetch disputes from API
-  const { data: disputesData, isLoading ,refetch: refetchDisputes } = useAllDisputes({
+  const { data: disputesData, isLoading ,refetch: refetchDisputes } = useVendorDisputes({
     page: 1,
     limit: 10,
     sortBy: 'createdAt',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
   });
 
   // Transform API data to match the UI structure
@@ -37,13 +40,14 @@ const DisputesPage = () => {
         rating: dispute.review.overallRating,
         date: formatDate(dispute.review.createdAt || dispute.createdAt),
         content: dispute.review.content,
-        isOwnReview: dispute.review.reviewer._id === user?.id,
+        isOwnReview: dispute.review.reviewer._id === user?._id,
         firstName: dispute.review.reviewer.firstName,
         lastName: dispute.review.reviewer.lastName,
         avatar: dispute.review.reviewer.avatar,
         companyName: dispute.review.reviewer.companyName,
         companySize: dispute.review.reviewer.companySize,
         isVerified: dispute.review.reviewer.isVerified,
+        slug: dispute.review.reviewer.slug,
       };
 
       // Find the label for the dispute reason
@@ -71,7 +75,7 @@ const DisputesPage = () => {
         explanations: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?.content : '',
         explanationsId: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?._id : null,
         // Add additional fields for ownership check
-        isOwner: user?.id === dispute.vendor._id,
+        isOwner: user?.id === dispute.vendor,
         vendorId: dispute.vendor._id,
         reviewId: dispute.review._id,
       };
@@ -80,18 +84,23 @@ const DisputesPage = () => {
   }, [disputesData, user]);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <LottieLoader size="large" />
-      </div>
-    );
+    return <SecondaryLoader text="Loading disputes..." containerClasses='min-h-[60vh]' />;
   }
 
-  console.log('transformedDisputes', isLoading);
   return (
-    <div className="bg-white min-h-screen">
-      <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Disputes</h1>
+    <div className=" min-h-screen">
+      <div className="w-full lg:max-w-screen-xl mx-auto">
+      <div className='flex items-center gap-2'> 
+      <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+        
+        Disputes</h1>
+        
+      </div>
+       
         {transformedDisputes.length === 0 ? (
           <div className="text-center py-12 text-gray-500">
             <p>No disputes found.</p>
@@ -109,4 +118,4 @@ const DisputesPage = () => {
   );
 };
 
-export default DisputesPage; 
+export default UserDisputes; 

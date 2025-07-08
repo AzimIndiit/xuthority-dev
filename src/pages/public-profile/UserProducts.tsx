@@ -156,6 +156,7 @@ const UserProducts = ({publicProfile}) => {
                                     marketSegment={product.marketSegment?.map((segment: any) => segment.name).join(', ')}
                                     entryPrice={product.pricing}
                                     slug={product.slug}
+                                    features={product.features}
                                     onWriteReview={()=>{
                                         if(!isLoggedIn){
                                             openAuthModal();

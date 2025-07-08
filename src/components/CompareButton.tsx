@@ -1,16 +1,20 @@
 import { Button } from "./ui/button";
 import { X } from "lucide-react";
 import useCompareStore, { MIN_COMPARE_PRODUCTS } from "@/store/useCompareStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export default function CompareButton() {
   const { products, clearProducts, removeProduct } = useCompareStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isVisible, setIsVisible] = useState(false);
   
   const canCompare = products.length >= MIN_COMPARE_PRODUCTS;
+  
+  // Hide on compare page
+  const isOnComparePage = location.pathname === '/product-compare';
   
   useEffect(() => {
     if (products.length > 0) {
@@ -27,7 +31,8 @@ export default function CompareButton() {
     }
   };
   
-  if (!isVisible && products.length === 0) return null;
+  // Don't render if on compare page or no products
+  if (isOnComparePage || (!isVisible && products.length === 0)) return null;
   
   return (
     <div

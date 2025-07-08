@@ -13,6 +13,7 @@ import useUIStore from "@/store/useUIStore";
 import { useReviewStore } from "@/store/useReviewStore";
 import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
+import SecondaryLoader from "@/components/ui/SecondaryLoader";
 
 const PAGE_SIZE = 10;
 
@@ -135,7 +136,7 @@ const SubCategoryPage = () => {
     <section className="flex justify-center items-center py-8">
         {isLoading ?(
           <div className="flex justify-center items-center py-8">
-            <LottieLoader />
+            <SecondaryLoader />
           </div>
         ):(
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -172,6 +173,7 @@ const SubCategoryPage = () => {
               industries={product.industries?.map((industry: any) => industry.name).join(", ") || "All Industries"}
               marketSegment={product.marketSegment?.map((segment: any) => segment.name).join(", ") || "All Segments"}
               entryPrice={product.pricing}
+              features={product.features}
                              onWriteReview={() => {
                  if (!isLoggedIn) {
                    openAuthModal();
@@ -181,8 +183,13 @@ const SubCategoryPage = () => {
                  setCurrentStep(2);
                  navigate("/write-review");
                }}
+               websiteUrl={product.websiteUrl}
+               whoCanUse={product.whoCanUse}
                id={product._id}
                slug={product.slug}
+               industriesAll={product.industries}
+               marketSegmentAll={product.marketSegment}
+               whoCanUseAll={product.whoCanUse}
             />
           ))}
         </div>

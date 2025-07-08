@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useSoftwareCategories, useSolutionCategories } from "@/hooks/useCategoryOptions";
+import SecondaryLoader from "@/components/ui/SecondaryLoader";
 
 const SoftwareCategoryPage = () => {
   const { category } = useParams<{ category: string }>();
@@ -49,7 +50,11 @@ const SoftwareCategoryPage = () => {
   };
 
   if (isSoftwareLoading || isSolutionLoading) {
-    return <div className="text-center py-8">Loading categories...</div>;
+    return (
+      <div className="flex justify-center items-center py-8">
+        <SecondaryLoader />
+      </div>
+    );
   }
   if (isSoftwareError || isSolutionError) {
     return <div className="text-center py-8 text-red-500">Failed to load categories.</div>;

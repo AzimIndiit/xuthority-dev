@@ -81,6 +81,7 @@ const ProductsPage: React.FC = () => {
                   marketSegment={item.marketSegment?.map((marketSegment: any) => marketSegment.name).join(', ')}
                   entryPrice={item.pricing as any}
                   slug={item.slug}
+                  features={item.features}
                 />
               ))}
             </div>

@@ -1,18 +1,40 @@
 import { create } from 'zustand';
 
+interface PriceObject {
+  price: number | string;
+  currency?: string;
+  billingPeriod?: string;
+  planName?: string;
+  [key: string]: any;
+}
+
+interface FeatureDescription {
+  value: string;
+}
+
+interface ProductFeature {
+  title: string;
+  description: FeatureDescription[];
+}
+
 interface CompareProduct {
   id: string;
   logo?: string;
   name: string;
-  rating: number;
-  reviewCount: number;
+  avgRating: number;
+  totalReviews: number;
+  websiteUrl?: string;
   logoBackground: string;
   description: string;
   users: string;
-  industries: string;
-  marketSegment: string;
-  entryPrice: string;
+  industries: any[];
+  marketSegment: any[];
+  entryPrice: PriceObject[] | string; // Can be array of price objects or string
   slug?: string;
+  features?: ProductFeature[]; // Add features array
+  whoCanUse?: any[];
+  [key: string]: any;
+
 }
 
 interface CompareStore {

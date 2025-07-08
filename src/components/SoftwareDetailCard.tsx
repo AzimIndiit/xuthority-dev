@@ -11,6 +11,15 @@ import { useDeleteProduct } from "@/hooks/useProducts";
 import useCompareStore from "@/store/useCompareStore";
 import { useToast } from "@/hooks/useToast";
 
+interface FeatureDescription {
+  value: string;
+}
+
+interface ProductFeature {
+  title: string;
+  description: FeatureDescription[];
+}
+
 interface SoftwareDetailCardProps {
   id: string;
   logo?: string;
@@ -29,6 +38,12 @@ interface SoftwareDetailCardProps {
   compareChecked?: boolean;
   onCompareChange?: (checked: boolean) => void;
   slug?: string;
+  features?: ProductFeature[];
+  websiteUrl?: string;
+  whoCanUse?: string[];
+  industriesAll?: any[];
+  marketSegmentAll?: any[];
+  whoCanUseAll?: any[];
 }
 
 function renderStars(rating: number) {
@@ -69,8 +84,12 @@ export default function SoftwareDetailCard({
   onTry,
   compareChecked = false,
   onCompareChange,
-
-  slug
+  features,
+  slug,
+  websiteUrl,
+  whoCanUse,
+  industriesAll,
+  marketSegmentAll,
 }: SoftwareDetailCardProps) {
   const {user, isLoggedIn} = useUserStore();
   const navigate = useNavigate();
@@ -105,15 +124,18 @@ const deleteMutation = useDeleteProduct();
         id,
         logo,
         name,
-        rating,
-        reviewCount,
+        avgRating: rating,
+        totalReviews: reviewCount,
         logoBackground,
         description,
         users,
-        industries,
-        marketSegment,
+        industries: industriesAll,
+        marketSegment: marketSegmentAll,
         entryPrice,
-        slug
+        slug,
+        features,
+        websiteUrl,
+        whoCanUse
       });
       
       success(`${name} has been added to comparison (${compareProducts.length + 1}/3)`);

@@ -1,5 +1,14 @@
 import { ApiService, ApiResponse } from './api';
 
+interface FeatureDescription {
+  value: string;
+}
+
+interface ProductFeature {
+  title: string;
+  description: FeatureDescription[];
+}
+
 export interface Product {
   _id: string;
   name: string;
@@ -13,7 +22,7 @@ export interface Product {
   ratingDistribution?:any[];
   industries?: string[];
   marketSegment?: string[];
-  features?: string[];
+  features?: ProductFeature[];
   whoCanUse?: string[];
   softwareIds?: string[];
   solutionIds?: string[];

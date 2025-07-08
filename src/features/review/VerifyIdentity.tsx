@@ -118,8 +118,12 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   };
 
   // Handler for screenshot upload
-  const handleScreenshotUploaded = (file: File) => {
-   
+  const handleScreenshotUploaded = (fileUrl: string) => {
+    setVerificationData({
+      screenshot: fileUrl,
+      method: "screenshot",
+      isVerified: true,
+    });
     setScreenshotModalOpen(false);
     toast.verification.success('Screenshot uploaded successfully!');
     setCurrentStep(3);

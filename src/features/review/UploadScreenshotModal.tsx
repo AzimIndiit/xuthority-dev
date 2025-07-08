@@ -12,11 +12,13 @@ import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FileUploadService } from "@/services/fileUpload";
+import { useToast } from "@/hooks/useToast";
 
 interface UploadScreenshotModalProps {
   open: boolean;
   onClose: () => void;
-  onSuccess?: (file: File) => void;
+  onSuccess?: (fileUrl: string) => void;
   softwareName?: string;
 }
 
@@ -51,6 +53,8 @@ const UploadScreenshotModal: React.FC<UploadScreenshotModalProps> = ({
   softwareName,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
+  
   const {
     register,
     handleSubmit,
@@ -95,10 +99,31 @@ const UploadScreenshotModal: React.FC<UploadScreenshotModalProps> = ({
   };
 
   const onSubmit = async (data: FormValues) => {
-    // Simulate async upload
-    await new Promise((res) => setTimeout(res, 1200));
-    if (onSuccess) onSuccess(data.file);
-    // reset();
+    try {
+      // Upload file using FileUploadService
+      const response = await FileUploadService.uploadFile(data.file);
+      
+      if (response.success && response.data && response.data.length > 0) {
+        // Get the file URL from the first uploaded file
+        const fileUrl = response.data[0].url;
+        
+        // Call onSuccess with the file URL
+        if (onSuccess) {
+          onSuccess(fileUrl);
+        }
+        
+        // Show success message
+        toast.success('Screenshot uploaded successfully!');
+        
+        // Reset form
+        reset();
+      } else {
+        throw new Error('Failed to upload file');
+      }
+    } catch (error: any) {
+      console.error('File upload failed:', error);
+      toast.error(error.message || 'Failed to upload screenshot. Please try again.');
+    }
   };
 
   // Normalize file value to always be a File or undefined

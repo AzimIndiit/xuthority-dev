@@ -18,7 +18,7 @@ import { useCreateOTP } from "@/hooks/useOTP";
 interface CompanyVerifyModalProps {
   open: boolean;
   onClose: () => void;
-  onSuccess: (companyEmail: string) => void;
+  onSuccess: (companyEmail: string, companyName: string) => void;
 }
 
 const schema = z.object({
@@ -43,7 +43,7 @@ const createOTP = useCreateOTP();
   const onSubmit = async (data: FormValues) => {
     try {
       const response = await createOTP.mutateAsync({email: data.companyEmail, type: 'review_verification'});
-      onSuccess(data.companyEmail);
+      onSuccess(data.companyEmail, data.companyName);
 
     } catch (error) {
       // Error is already handled by the hook

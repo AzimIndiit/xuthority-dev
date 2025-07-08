@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CompanyVerifyModal from "./CompanyVerifyModal";
 import OtpVerifyModal from "./OtpVerifyModal";
 import { useToast } from "@/hooks/useToast";
@@ -98,9 +98,30 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   
   // Local state to store the company email for OTP verification
   const [currentCompanyEmail, setCurrentCompanyEmail] = useState<string>('');
+  const [currentCompanyName, setCurrentCompanyName] = useState<string>('');
+
+  // Cleanup effect to clear states on unmount
+  useEffect(() => {
+    return () => {
+      // Clear all local states when component unmounts
+      setCompanyModalOpen(false);
+      setOtpModalOpen(false);
+      setScreenshotModalOpen(false);
+      setShowVerificationModal(false);
+      setShowVendorInvitationModal(false);
+      setCurrentCompanyEmail('');
+      setCurrentCompanyName('');
+    };
+  }, []);
 
   // Handler for OTP verification
   const handleOtpVerified = () => {
+    setVerificationData({
+      companyName: currentCompanyName,
+      companyEmail: currentCompanyEmail,
+      method: "company-email",
+      isVerified: true,
+    });
     setOtpModalOpen(false);
     toast.verification.success('OTP verified successfully!');
     setCurrentStep(3);
@@ -110,9 +131,10 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
     toast.otp.success("OTP resent!");
   };
 
-  const handleCompanyVerified = (companyEmail: string) => {
+  const handleCompanyVerified = (companyEmail: string, companyName: string) => {
     // Store the company email for OTP verification
     setCurrentCompanyEmail(companyEmail);
+    setCurrentCompanyName(companyName);
     setCompanyModalOpen(false);
     setOtpModalOpen(true);
   };

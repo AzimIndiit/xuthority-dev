@@ -104,10 +104,10 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
 
   const watchedRating = watch("rating");
   const watchedSubRatings = watch("subRatings");
-
+console.log('userReview', userReview)
   // Set edit mode and populate form when existing review is found
   useEffect(() => {
-    if (userReview) {
+    if (userReview !== null) {
       setIsEditMode(true);
       setExistingReview(userReview);
       
@@ -264,7 +264,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
               key={rating}
               type="button"
               onClick={() => handleSubRatingChange(category, rating)}
-              className={`w-8 h-8 rounded-full text-sm font-medium transition-colors ${
+              className={`w-8 h-8 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                 currentRating === rating.toString()
                   ? "bg-blue-600 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
@@ -276,7 +276,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           <button
             type="button"
             onClick={() => setValue(`subRatings.${category}` as any, 'N/A', { shouldValidate: true })}
-            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer ${
               currentRating === 'N/A'
                 ? "bg-blue-600 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"

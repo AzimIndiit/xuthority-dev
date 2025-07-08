@@ -28,7 +28,7 @@ console.log(pathnames[0],"sdasd");
   }
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-yellow-50 via-amber-50 to-orange-50 py-5">
+    <section className="relative overflow-hidden bg-gradient-to-r from-yellow-50 via-amber-50 to-orange-50 py-5" style={{backgroundImage: 'url("/svg/breadcrumb_bg.svg") ', backgroundSize: 'cover', backgroundPosition: 'center' }}>
       <div className="lg:max-w-screen-xl mx-auto px-4 lg:px-6 relative z-10">
         <ShadcnBreadcrumb>
           <BreadcrumbList>
@@ -74,12 +74,12 @@ console.log(pathnames[0],"sdasd");
         </ShadcnBreadcrumb>
       </div>
        {/* Decorative elements to mimic the design */}
-       <div className="absolute top-1/2 left-0 w-full h-full z-0">
+       {/* <div className="absolute top-1/2 left-0 w-full h-full z-0">
          <div className="absolute top-0 left-[5%] w-32 h-1 bg-yellow-400/80 -rotate-45" />
          <div className="absolute top-10 right-[10%] w-40 h-1.5 bg-orange-300/80 -rotate-45" />
          <div className="absolute bottom-5 left-[20%] w-24 h-0.5 bg-yellow-400/60 -rotate-45" />
          <div className="absolute bottom-10 right-[30%] w-24 h-1 bg-red-300/60 -rotate-45" />
-      </div>
+      </div> */}
     </section>
   );
 };

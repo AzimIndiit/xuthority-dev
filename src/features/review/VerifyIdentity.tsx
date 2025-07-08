@@ -95,8 +95,9 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   const [screenshotModalOpen, setScreenshotModalOpen] = useState(false);
   const [showVerificationModal, setShowVerificationModal] = useState(false);
   const [showVendorInvitationModal, setShowVendorInvitationModal] = useState(false);
- 
-
+  
+  // Local state to store the company email for OTP verification
+  const [currentCompanyEmail, setCurrentCompanyEmail] = useState<string>('');
 
   // Handler for OTP verification
   const handleOtpVerified = () => {
@@ -110,6 +111,8 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   };
 
   const handleCompanyVerified = (companyEmail: string) => {
+    // Store the company email for OTP verification
+    setCurrentCompanyEmail(companyEmail);
     setCompanyModalOpen(false);
     setOtpModalOpen(true);
   };
@@ -217,7 +220,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
         onClose={() => setOtpModalOpen(false)}
         onResend={handleResendOtp}
         onSuccess={handleOtpVerified}
-        email={verificationData.companyEmail || ''}
+        email={currentCompanyEmail}
       />
       <UploadScreenshotModal
         open={screenshotModalOpen}

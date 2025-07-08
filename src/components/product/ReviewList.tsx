@@ -42,6 +42,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
   if (reviews.length === 0) {
     return (
       <div className="text-center py-20">
+        <img src="/svg/no_data.svg" alt="No reviews" className="w-1/2 mx-auto" />
         <p className="text-lg text-gray-500">No reviews yet.</p>
       </div>
     );

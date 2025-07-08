@@ -67,15 +67,10 @@ const ReviewList: React.FC<ReviewListProps> = ({
             variant="outline"
             size="lg"
             disabled={isLoading}
+            loading={isLoading}
           >
-            {isLoading ? (
-              <>
-                <LottieLoader size="small" />
-                <span className="ml-2">Loading...</span>
-              </>
-            ) : (
-              'Load More Reviews'
-            )}
+          
+              Load More Reviews
           </Button>
         </div>
       )}

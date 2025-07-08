@@ -62,7 +62,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
           Notifications</h1>
      </div>
         <div className="flex items-center gap-2">
-          {/* <Button 
+          <Button 
             variant="ghost" 
             size="sm" 
             onClick={handleMarkAllAsRead}
@@ -70,7 +70,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
           >
             Mark All Read
-          </Button> */}
+          </Button>
           <NotificationSettings />
         </div>
       </div>
@@ -116,15 +116,19 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
               {/* Load More Button */}
               {data?.pagination && 
                data.pagination.page * data.pagination.limit < data.total && (
-                <div className="p-4 border-t border-gray-200">
+                <div className="p-4 border-t border-gray-200 flex justify-center">
+                  
                   <Button
-                    variant="outline"
-                    onClick={handleLoadMore}
-                    disabled={isLoading}
-                    className="w-full"
-                  >
-                    {isLoading ? 'Loading...' : 'Load More'}
-                  </Button>
+            onClick={handleLoadMore}
+            variant="outline"
+            size="lg"
+            disabled={isLoading}
+            loading={isLoading}
+            className='w-full rounded-full'
+          >
+          
+              Load More 
+          </Button>
                 </div>
               )}
             </>

@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { NotificationService } from '../services/notification';
 import { NotificationListParams } from '../types/notification';
 import toast from 'react-hot-toast';
+import { queryClient } from '@/lib/queryClient';
 
 // Query keys
 export const notificationQueryKeys = {
@@ -46,7 +47,7 @@ export const useUnreadNotificationsCount = () => {
 
 // Hook for marking notification as read
 export const useMarkNotificationAsRead = () => {
-  const queryClient = useQueryClient();
+
 
   return useMutation({
     mutationFn: async (notificationId: string) => {
@@ -69,7 +70,7 @@ export const useMarkNotificationAsRead = () => {
 
 // Hook for marking all notifications as read
 export const useMarkAllNotificationsAsRead = () => {
-  const queryClient = useQueryClient();
+
 
   return useMutation({
     mutationFn: async () => {
@@ -93,7 +94,7 @@ export const useMarkAllNotificationsAsRead = () => {
 
 // Hook for deleting a notification
 export const useDeleteNotification = () => {
-  const queryClient = useQueryClient();
+
 
   return useMutation({
     mutationFn: async (notificationId: string) => {

@@ -61,7 +61,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({
     <div
       onClick={handleClick}
       className={cn(
-        'flex items-start gap-3 p-4 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0',
+        'flex items-start gap-3 p-4 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0 space-y-2 border rounded-md bg-white',
         !notification.isRead && 'bg-blue-50/30',
         className
       )}

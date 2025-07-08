@@ -1,0 +1,381 @@
+import React, { useState } from 'react';
+import { Check, CreditCard, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import SecondaryLoader from '@/components/ui/SecondaryLoader';
+import { 
+  useSubscriptionPlans, 
+  useCurrentSubscription, 
+  useCreateCheckoutSession, 
+  useCancelSubscription,
+  useResumeSubscription,
+  useCreateBillingPortalSession,
+  type SubscriptionPlan 
+} from '@/hooks/useSubscription';
+
+const MySubscriptionPage: React.FC = () => {
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  
+  // API hooks
+  const { data: subscriptionPlans, isLoading: plansLoading } = useSubscriptionPlans();
+  const { data: currentSubscription, isLoading: subscriptionLoading } = useCurrentSubscription();
+  const createCheckoutSession = useCreateCheckoutSession();
+  const cancelSubscription = useCancelSubscription();
+  const resumeSubscription = useResumeSubscription();
+  const createBillingPortalSession = useCreateBillingPortalSession();
+
+  // Mock data for development - remove when API is ready
+  const mockPlans: SubscriptionPlan[] = [
+    {
+      id: 'basic',
+      name: 'Basic',
+      description: 'Collaborate and optimize your team processes',
+      price: 0,
+      currency: 'USD',
+      period: 'for 7 days',
+      isActive: false,
+      isFree: true,
+      trialDays: 7,
+      features: [
+        'Basic Product Listing',
+        'Basic Analytics',
+        'Standard Branding',
+        'Review Response'
+      ],
+      buttonText: 'Try For Free',
+      buttonVariant: 'default',
+      planType: 'free',
+      formattedPrice: 'Free'
+    },
+    {
+      id: 'standard',
+      name: 'Standard',
+      description: 'Collaborate and optimize your team processes',
+      price: 12,
+      currency: 'USD',
+      period: 'monthly',
+      isActive: true,
+      isFree: false,
+      trialDays: 7,
+      features: [
+        'Enhanced branding',
+        'Advanced analytics.',
+        'Review management.',
+        'Dispute management.'
+      ],
+      buttonText: 'Renew',
+      buttonVariant: 'default',
+      planType: 'standard',
+      formattedPrice: '$12.00',
+      expiryDate: 'Jan 02, 2025'
+    }
+  ];
+
+  // Use API data, fallback to mock data if loading, or empty array if still loading
+  const plans = subscriptionPlans || (plansLoading ? [] : mockPlans);
+  
+  // Determine active plan based on current subscription
+  const activePlan = plans.find(plan => {
+    if (!currentSubscription) return false;
+    return plan.id === currentSubscription.plan.id; // Fixed: use plan.id instead of planId
+  });
+
+  const handlePlanAction = async (planId: string) => {
+    const plan = plans.find(p => p.id === planId);
+    
+    if (!plan) {
+      console.error('Plan not found:', planId);
+      return;
+    }
+
+    // Check if this is a reactivation of a cancelled subscription
+    if (activePlan?.id === plan.id && currentSubscription?.isCanceled) {
+      try {
+        await resumeSubscription.mutateAsync();
+        return;
+      } catch (error) {
+        console.error('Error reactivating subscription:', error);
+        return;
+      }
+    }
+
+    // For free plans, handle locally or redirect to signup
+    if (plan.isFree) {
+      // Handle free plan activation
+      console.log('Activating free plan:', planId);
+      // You might want to call a different endpoint for free plans
+      return;
+    }
+
+    // For paid plans, create Stripe checkout session
+    try {
+      await createCheckoutSession.mutateAsync(planId);
+      // Redirect happens automatically in the hook
+    } catch (error) {
+      console.error('Error creating checkout session:', error);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    try {
+      await cancelSubscription.mutateAsync(currentSubscription?.id);
+      setShowCancelModal(false);
+    } catch (error) {
+      console.error('Error cancelling subscription:', error);
+    }
+  };
+
+  const handleManageBilling = async () => {
+    try {
+      await createBillingPortalSession.mutateAsync();
+      // Redirect happens automatically in the hook
+    } catch (error) {
+      console.error('Error accessing billing portal:', error);
+    }
+  };
+
+  // Show loading state
+  if (plansLoading || subscriptionLoading) {
+    return (
+      <div className="space-y-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-6">
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">My Subscription</h1>
+            <p className="text-gray-600">
+              Manage your subscription plans and billing preferences
+            </p>
+          </div>
+        </div>
+        <div className="flex justify-center py-8">
+          <SecondaryLoader />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">My Subscription</h1>
+          <p className="text-gray-600">
+            Manage your subscription plans and billing preferences
+          </p>
+        </div>
+      </div>
+
+      {/* Subscription Plans */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {plans.length === 0 && plansLoading ? (
+          <div className="col-span-full flex justify-center py-8">
+            <SecondaryLoader />
+          </div>
+        ) : (
+          plans.map((plan) => {
+            const isActivePlan = activePlan?.id === plan.id;
+            return (
+          <Card 
+            key={plan.id} 
+            className={`relative transition-all duration-200 ${
+              isActivePlan 
+                ? 'border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100/50 shadow-lg ring-1 ring-blue-500/20' 
+                : 'border border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
+            }`}
+          >
+            {isActivePlan && (
+              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                <div className={`text-white px-4 py-1 rounded-full text-sm font-medium shadow-md ${
+                  currentSubscription?.isCanceled 
+                    ? 'bg-red-600' 
+                    : 'bg-blue-600'
+                }`}>
+                  {currentSubscription?.isCanceled ? 'Cancelled' : 'Current Plan'}
+                </div>
+              </div>
+            )}
+            
+            <CardHeader className="pb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                    isActivePlan ? 'bg-blue-600' : 'bg-blue-100'
+                  }`}>
+                    <div className={`w-6 h-6 rounded-full ${
+                      isActivePlan ? 'bg-white' : 'bg-blue-600'
+                    }`}></div>
+                  </div>
+                  <CardTitle className={`text-xl font-semibold ${
+                    isActivePlan ? 'text-blue-900' : 'text-gray-900'
+                  }`}>
+                    {plan.name}
+                  </CardTitle>
+                </div>
+                {/* {isActivePlan && (
+                  <Badge variant="default" className="bg-green-600 text-white shadow-sm">
+                    Active
+                  </Badge>
+                )} */}
+              </div>
+              
+              <p className={`mt-2 ${
+                isActivePlan ? 'text-blue-700' : 'text-gray-600'
+              }`}>
+                {plan.description}
+              </p>
+            </CardHeader>
+
+            <CardContent className="pt-0">
+              {/* Pricing */}
+              <div className="mb-6">
+                <div className="flex items-baseline gap-2">
+                  <span className={`text-4xl font-bold ${
+                    isActivePlan ? 'text-blue-900' : 'text-black'
+                  }`}>
+                    {plan.formattedPrice}
+                  </span>
+                  {plan.period && (
+                    <span className={`text-lg ${
+                      isActivePlan ? 'text-blue-700' : 'text-gray-600'
+                    }`}>
+                      /{plan.period}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="mb-6">
+                <h3 className={`font-semibold mb-3 ${
+                  isActivePlan ? 'text-blue-900' : 'text-gray-900'
+                }`}>
+                  What's included
+                </h3>
+                <ul className="space-y-3">
+                  {plan.features.map((feature, index) => (
+                    <li key={index} className="flex items-center gap-3">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        isActivePlan ? 'bg-green-600' : 'bg-blue-600'
+                      }`}>
+                        <Check className="w-3 h-3 text-white" />
+                      </div>
+                      <span className={`${
+                        isActivePlan ? 'text-blue-800' : 'text-gray-700'
+                      }`}>
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Action Button */}
+              <div className="space-y-3">
+                <Button
+                  onClick={() => handlePlanAction(plan.id)}
+                  disabled={createCheckoutSession.isPending || (isActivePlan && !currentSubscription?.isCanceled)}
+                  className={`w-full rounded-full text-white ${
+                    isActivePlan && !currentSubscription?.isCanceled
+                      ? 'bg-green-600 hover:bg-green-700' 
+                      : isActivePlan && currentSubscription?.isCanceled
+                      ? 'bg-blue-600 hover:bg-blue-700'
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                  variant="default"
+                >
+                  {isActivePlan && !currentSubscription?.isCanceled 
+                    ? 'Current Plan' 
+                    : isActivePlan && currentSubscription?.isCanceled
+                    ? 'Reactivate Plan'
+                    : createCheckoutSession.isPending 
+                    ? 'Processing...' 
+                    : plan.buttonText
+                  }
+                </Button>
+                
+                {isActivePlan && currentSubscription && (
+                  <div className="text-center space-y-1">
+                    {currentSubscription.isCanceled ? (
+                      <>
+                        <p className="text-sm text-red-600 font-medium">
+                          ⚠️ Cancelled - Access ends: {new Date(currentSubscription.currentPeriodEnd).toLocaleDateString()}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          You can still use all features until the end date
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="text-sm text-blue-700 font-medium">
+                          Expires: {new Date(currentSubscription.currentPeriodEnd).toLocaleDateString()}
+                        </p>
+                        {currentSubscription.isTrialing && currentSubscription.trialEnd && (
+                          <p className="text-xs text-amber-600">
+                            Trial ends: {new Date(currentSubscription.trialEnd).toLocaleDateString()}
+                          </p>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          );
+        }))}
+      </div>
+
+      {/* Billing Management Actions */}
+      {activePlan && (
+        <div className="flex justify-center gap-4">
+          <Button
+            onClick={handleManageBilling}
+            disabled={createBillingPortalSession.isPending}
+            variant="outline"
+            className="text-gray-600 border-gray-300 hover:bg-gray-50 rounded-full"
+          >
+            {createBillingPortalSession.isPending ? 'Loading...' : 'Manage Billing'}
+            <ExternalLink className="w-4 h-4 ml-2" />
+          </Button>
+          
+          {!currentSubscription?.isCanceled && (
+            <Button
+              onClick={() => setShowCancelModal(true)}
+              variant="outline"
+              className="text-blue-600 border-blue-600 hover:bg-blue-50 rounded-full"
+            >
+              Cancel My Subscription
+            </Button>
+          )}
+          
+          {currentSubscription?.isCanceled && (
+            <Button
+              onClick={() => resumeSubscription.mutateAsync()}
+              disabled={resumeSubscription.isPending}
+              variant="outline"
+              className="text-green-600 border-green-600 hover:bg-green-50 rounded-full"
+            >
+              {resumeSubscription.isPending ? 'Reactivating...' : 'Reactivate Subscription'}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {/* Cancel Subscription Modal */}
+      <ConfirmationModal
+        isOpen={showCancelModal}
+        onOpenChange={setShowCancelModal}
+        onConfirm={handleCancelSubscription}
+        title="Cancel Subscription"
+        description="Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period."
+        confirmText={cancelSubscription.isPending ? "Cancelling..." : "Yes, Cancel"}
+        cancelText="Keep Subscription"
+        confirmVariant="destructive"
+      />
+    </div>
+  );
+};
+
+export default MySubscriptionPage; 

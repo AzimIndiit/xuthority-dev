@@ -28,6 +28,7 @@ import MyFavorites from '@/components/user/MyFavorites';
 import { NotificationsList } from '@/components/notifications';
 import UserDisputes from './UserDisputes';
 import MyBadgesPage from './MyBadgesPage';
+import MySubscriptionPage from './MySubscriptionPage';
 import SecondaryLoader from '@/components/ui/SecondaryLoader';
 
 const ProfilePage: React.FC = () => {
@@ -218,6 +219,12 @@ const ProfilePage: React.FC = () => {
         current: 'Profile / My Badges',
       };
     }
+    if (activeTab === 'my-subscription') {
+      return {
+        home: 'Home',
+        current: 'Profile / My Subscription',
+      };
+    }
     return {
       home: 'Home',
       current: 'My Profile',
@@ -305,6 +312,8 @@ const ProfilePage: React.FC = () => {
         return <MyFavorites />;
       case 'my-badges':
         return <MyBadgesPage />;
+      case 'my-subscription':
+        return <MySubscriptionPage />;
       case 'notifications':
         return <NotificationsList />;
       case 'dispute-management':

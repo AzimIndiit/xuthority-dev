@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft, ArrowLeftIcon, Bell, ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -24,16 +24,45 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
     page: 1,
     limit: 20,
   });
+  
+  // State to accumulate all notifications across pages
+  const [allNotifications, setAllNotifications] = useState<any[]>([]);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMoreData, setHasMoreData] = useState(true);
 
-  const { data, isLoading, error, isError } = useNotifications(params);
+  const { data, isLoading, error, isError, isFetching } = useNotifications(params);
   const markAllAsReadMutation = useMarkAllNotificationsAsRead();
+
+  // Update accumulated notifications when new data arrives
+  useEffect(() => {
+    if (data?.notifications) {
+      if (params.page === 1) {
+        // First page - replace all notifications
+        setAllNotifications(data.notifications);
+      } else {
+        // Subsequent pages - append new notifications
+        setAllNotifications(prev => {
+          // Filter out duplicates based on _id
+          const existingIds = new Set(prev.map(notif => notif._id));
+          const newNotifications = data.notifications.filter(notif => !existingIds.has(notif._id));
+          return [...prev, ...newNotifications];
+        });
+      }
+      
+      // Check if there's more data to load
+      const totalLoaded = params.page * params.limit;
+      setHasMoreData(totalLoaded < (data.total || 0));
+      setIsLoadingMore(false);
+    }
+  }, [data, params.page, params.limit]);
 
   const handleMarkAllAsRead = () => {
     markAllAsReadMutation.mutate();
   };
 
   const handleLoadMore = () => {
-    if (data?.pagination && data.pagination.page * data.pagination.limit < data.total) {
+    if (hasMoreData && !isLoadingMore && !isFetching) {
+      setIsLoadingMore(true);
       setParams(prev => ({
         ...prev,
         page: prev.page! + 1,
@@ -41,26 +70,29 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
     }
   };
 
-  const unreadCount = data?.notifications?.filter(n => !n.isRead).length || 0;
+  // Reset pagination when component mounts or when mark all as read is called
+  useEffect(() => {
+    if (markAllAsReadMutation.isSuccess) {
+      setParams({ page: 1, limit: 20 });
+      setAllNotifications([]);
+      setHasMoreData(true);
+    }
+  }, [markAllAsReadMutation.isSuccess]);
 
-
-
- 
-  const notifications = data?.notifications || [];
+  const unreadCount = allNotifications.filter(n => !n.isRead).length || 0;
 
   return (
     <div className='w-full'>
       {/* Header */}
-      <div className="flex items-center justify-between ">
-     <div className='flex items-center gap-2'> 
-     <span className="block lg:hidden" onClick={() => navigate(-1)}>
-            {" "}
-            <ArrowLeftIcon className="w-6 h-6" />
+      <div className="flex items-center justify-between mb-6">
+        <div className='flex items-center gap-2'> 
+          <span className="block lg:hidden cursor-pointer" onClick={() => navigate(-1)}>
+            <ArrowLeftIcon className="w-6 h-6 text-gray-600 hover:text-gray-900" />
           </span>
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-        
-          Notifications</h1>
-     </div>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+            Notifications
+          </h1>
+        </div>
         <div className="flex items-center gap-2">
           <Button 
             variant="ghost" 
@@ -69,18 +101,17 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
             disabled={unreadCount === 0 || markAllAsReadMutation.isPending}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
           >
-            Mark All Read
+            {markAllAsReadMutation.isPending ? 'Marking...' : 'Mark All Read'}
           </Button>
           <NotificationSettings />
         </div>
       </div>
 
       {/* Notifications List */}
-      {isLoading ? (
+      {isLoading && params.page === 1 ? (
         <SecondaryLoader text="Loading notifications..." containerClasses='min-h-[60vh]' />
       ) : isError ? (
         <div className='w-full min-h-[60vh] flex items-center justify-center'>
-      
           <div className="p-8 flex flex-col items-center justify-center">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
               <Bell className="w-6 h-6 text-red-500" />
@@ -93,8 +124,8 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
         </div>
       ) : (
         <div className="divide-y divide-gray-100">
-          {notifications.length === 0 ? (
-            <div className="p-8 flex flex-col items-center justify-center">
+          {allNotifications.length === 0 && !isLoading ? (
+            <div className="p-8 flex flex-col items-center justify-center min-h-[40vh]">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <Bell className="w-6 h-6 text-gray-400" />
               </div>
@@ -104,34 +135,68 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
               </p>
             </div>
           ) : (
-            <>
-              {notifications.map((notification) => (
-                <NotificationItem
+            <div className='space-y-2'>
+              {allNotifications.map((notification, index) => (
+                <div 
                   key={notification._id}
-                  notification={notification}
-                  onClick={onNotificationClick}
-                />
+                  className=""
+                  style={{ animationDelay: `${Math.min(index * 50, 500)}ms` }}
+                >
+                  <NotificationItem
+                    notification={notification}
+                    onClick={onNotificationClick}
+                  />
+                </div>
               ))}
 
               {/* Load More Button */}
-              {data?.pagination && 
-               data.pagination.page * data.pagination.limit < data.total && (
-                <div className="p-4 border-t border-gray-200 flex justify-center">
-                  
+              {hasMoreData && (
+                <div className="p-6 border-t border-gray-200 flex justify-center">
                   <Button
-            onClick={handleLoadMore}
-            variant="outline"
-            size="lg"
-            disabled={isLoading}
-            loading={isLoading}
-            className='w-full rounded-full'
-          >
-          
-              Load More 
-          </Button>
+                    onClick={handleLoadMore}
+                    variant="outline"
+                    size="lg"
+                    disabled={isLoadingMore || isFetching}
+                    className="rounded-full !text-sm min-w-[120px] transition-all duration-200 hover:scale-105"
+                  >
+                    {isLoadingMore || isFetching ? (
+                      <div className="flex items-center gap-2">
+                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                        Loading...
+                      </div>
+                    ) : (
+                      'Load More'
+                    )}
+                  </Button>
                 </div>
               )}
-            </>
+
+              {/* Loading skeleton for new items */}
+              {isLoadingMore && (
+                <div className="divide-y divide-gray-100">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={`skeleton-${i}`} className="p-4 animate-pulse">
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
+                        <div className="flex-1 space-y-2">
+                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
+                        </div>
+                        <div className="w-6 h-6 bg-gray-200 rounded"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* End of list indicator */}
+              {!hasMoreData && allNotifications.length > 0 && (
+                <div className="p-4 text-center">
+                  <p className="text-sm text-gray-500">You've reached the end of your notifications</p>
+                </div>
+              )}
+            </div>
           )}
         </div>
       )}

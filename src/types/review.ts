@@ -102,45 +102,60 @@ export interface RatingDistribution {
 export function transformBackendReview(backendReview: BackendReview): Review {
   // Handle null or undefined input
   if (!backendReview) {
+    console.error('BackendReview is null or undefined');
     throw new Error('BackendReview is required for transformation');
   }
 
-  // Safely extract reviewer name with fallbacks
-  const reviewerName = backendReview.reviewer?.firstName + ' ' + backendReview.reviewer?.lastName || 'Anonymous User';
-  
-  return {
-    id: backendReview._id || 'unknown',
-    title: backendReview.title || 'Untitled Review',
-    rating: backendReview.overallRating || 1,
+  try {
+    // Safely extract reviewer with more defensive checks
+    const reviewer = backendReview.reviewer || {};
+    const product = backendReview.product || {};
+    const verification = backendReview.verification || {};
+
+    // Safely extract reviewer name with fallbacks
+    const firstName = reviewer.firstName || '';
+    const lastName = reviewer.lastName || '';
+    const reviewerName = `${firstName} ${lastName}`.trim() || 'Anonymous User';
+    
+    console.log('Transforming review with ID:', backendReview._id);
+    
+    return {
+      id: backendReview._id || 'unknown',
+      title: backendReview.title || 'Untitled Review',
+      rating: Number(backendReview.overallRating) || 1,
+     
+      date: new Date(backendReview.publishedAt || backendReview.submittedAt || Date.now()).toLocaleDateString(),
+      content: backendReview.content || '',
    
-    date: new Date(backendReview.publishedAt || backendReview.submittedAt || Date.now()).toLocaleDateString(),
-    content: backendReview.content || '',
- 
-    reviewer: {
-      id: backendReview.reviewer._id || '',
-      firstName: backendReview.reviewer.firstName || '',
-      lastName: backendReview.reviewer.lastName || '',
-      avatar: backendReview.reviewer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=f3f4f6&color=374151`,
-      title: backendReview.reviewer.title || 'Verified User',
-      isVerified: backendReview.reviewer.isVerified || false,
-      companyName: backendReview.reviewer.companyName || '',
-      companySize: backendReview.reviewer.companySize || '',
-      industry: backendReview.reviewer.industry || '',
-      slug: backendReview.reviewer.slug || '',
-    },
-    product: {
-      _id: backendReview.product._id || '',
-      name: backendReview.product.name || '',
-      slug: backendReview.product.slug || '',
-      userId: backendReview.product.userId || '',
-    },
-    verification: {
-      isVerified: backendReview.verification?.isVerified || false,
-      verificationType: backendReview.verification?.verificationType || '',
-      verificationData: backendReview.verification?.verificationData || {},
-      verifiedAt: backendReview.verification?.verifiedAt || '',
-    },
-  };
+      reviewer: {
+        id: reviewer._id || '',
+        firstName: firstName,
+        lastName: lastName,
+        avatar: reviewer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=f3f4f6&color=374151`,
+        title: reviewer.title || 'Verified User',
+        isVerified: Boolean(reviewer.isVerified),
+        companyName: reviewer.companyName || '',
+        companySize: reviewer.companySize || '',
+        industry: reviewer.industry || '',
+        slug: reviewer.slug || '',
+      },
+      product: {
+        _id: product._id || '',
+        name: product.name || '',
+        slug: product.slug || '',
+        userId: product.userId || '',
+      },
+      verification: {
+        isVerified: Boolean(verification.isVerified),
+        verificationType: verification.verificationType || '',
+        verificationData: verification.verificationData || {},
+        verifiedAt: verification.verifiedAt || '',
+      },
+    };
+  } catch (error) {
+    console.error('Error in transformBackendReview:', error, 'Review data:', backendReview);
+    throw error;
+  }
 }
 
 // Helper function to transform rating distribution from backend format

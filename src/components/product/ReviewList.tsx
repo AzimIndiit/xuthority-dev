@@ -31,7 +31,17 @@ const ReviewList: React.FC<ReviewListProps> = ({
   onLoadMore 
 }) => {
   const { user, isLoggedIn } = useUserStore();
+  
+  console.log('ReviewList render:', {
+    reviewsLength: reviews.length,
+    backendReviewsLength: backendReviews.length,
+    isLoading,
+    reviews: reviews,
+    backendReviews: backendReviews
+  });
+
   if (isLoading && reviews.length === 0) {
+    console.log('ReviewList: Showing loader because isLoading=true and no reviews');
     return (
       <div className="flex justify-center items-center py-20">
         <LottieLoader size="medium" />
@@ -40,6 +50,7 @@ const ReviewList: React.FC<ReviewListProps> = ({
   }
 
   if (reviews.length === 0) {
+    console.log('ReviewList: Showing no reviews message');
     return (
       <div className="text-center py-20">
         <img src="/svg/no_data.svg" alt="No reviews" className="w-1/2 mx-auto" />
@@ -48,17 +59,22 @@ const ReviewList: React.FC<ReviewListProps> = ({
     );
   }
 
+  console.log('ReviewList: Rendering', reviews.length, 'reviews');
+
   return (
     <div className="space-y-4">
-      {reviews.map((review, index) => (
-        <ReviewCard 
-          key={review.id} 
-          review={review} 
-          showComments={user?.role === 'user' || !isLoggedIn}
-          showDispute={user?.role === 'vendor'}
-          backendReview={backendReviews[index]}
-        />
-      ))}
+      {reviews.map((review, index) => {
+        console.log(`Rendering review ${index}:`, review);
+        return (
+          <ReviewCard 
+            key={review.id} 
+            review={review} 
+            showComments={user?.role === 'user' || !isLoggedIn}
+            showDispute={user?.role === 'vendor'}
+            backendReview={backendReviews[index]}
+          />
+        );
+      })}
       
       {pagination && pagination.hasNext && (
         <div className="flex justify-center mt-8">

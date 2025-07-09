@@ -139,10 +139,25 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
 
   // Transform data for UI
   const reviews: Review[] = useMemo(() => {
-    if (!reviewsResponse?.data || !Array.isArray(reviewsResponse.data)) return [];
+    if (!reviewsResponse?.data || !Array.isArray(reviewsResponse.data)) {
+      console.log('No reviews data or not array:', reviewsResponse?.data);
+      return [];
+    }
     
     try {
-      return reviewsResponse.data.map(transformBackendReview);
+      console.log('Raw reviews data:', reviewsResponse.data);
+      const transformedReviews = reviewsResponse.data.map((review, index) => {
+        try {
+          console.log(`Transforming review ${index}:`, review);
+          return transformBackendReview(review);
+        } catch (transformError) {
+          console.error(`Error transforming review ${index}:`, transformError, review);
+          return null;
+        }
+      }).filter(Boolean);
+      
+      console.log('Transformed reviews:', transformedReviews);
+      return transformedReviews as Review[];
     } catch (error) {
       console.error('Error transforming review data:', error);
       return [];
@@ -163,6 +178,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     return [];
   }, [reviewsResponse, statsResponse]);
 
+  console.log('reviewsResponse', reviewsResponse)
   const popularMentions = useMemo(() => {
     if (statsResponse?.data?.popularMentions && Array.isArray(statsResponse.data.popularMentions)) {
       // If popularMentions is an array of objects, extract the mention strings
@@ -174,6 +190,15 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     }
     return ['All Reviews'];
   }, [statsResponse]);
+
+  // Debug logging
+  console.log('Debug ProductReviews:', {
+    reviewsResponse: reviewsResponse?.data,
+    reviewsLength: reviews.length,
+    isLoading: reviewsLoading,
+    transformedReviews: reviews,
+    rawReviewsData: reviewsResponse
+  });
 
   // Get current stats
   const rating = Number(reviewsResponse?.meta?.productInfo?.avgRating || 
@@ -205,7 +230,16 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
   };
 
   // Show skeleton loading when data is loading
-  if (reviewsLoading && !reviewsResponse) {
+  const shouldShowSkeleton = reviewsLoading && !reviewsResponse;
+  console.log('Loading state check:', {
+    reviewsLoading,
+    hasReviewsResponse: !!reviewsResponse,
+    shouldShowSkeleton,
+    reviewsLength: reviews.length
+  });
+
+  if (shouldShowSkeleton) {
+    console.log('Showing skeleton loader');
     return (
       <div className="bg-[#F7F7F7] py-12">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -227,6 +261,13 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
       </div>
     );
   }
+
+  console.log('About to render normal component with:', {
+    reviewsCount: reviews.length,
+    reviewsLoading,
+    rating,
+    reviewCount
+  });
 
   return (
     <div className="bg-[#F7F7F7] py-12">

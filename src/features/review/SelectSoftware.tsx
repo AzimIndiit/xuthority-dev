@@ -12,6 +12,38 @@ import { useFetchProductById, useProducts, useProductsByCategory } from "@/hooks
 import { useSoftwareOptions } from "@/hooks/useSoftwareOptions";
 import useDebounce from "@/hooks/useDebounce";
 
+// Skeleton component for individual software cards
+const SoftwareCardSkeleton = () => (
+  <div className="h-full">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 h-full flex flex-col items-center text-center space-y-3 animate-pulse">
+      {/* Logo skeleton */}
+      <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+      
+      {/* Name skeleton */}
+      <div className="w-20 h-4 bg-gray-200 rounded"></div>
+      
+      {/* Rating skeleton */}
+      <div className="flex items-center gap-1">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
+        ))}
+      </div>
+      
+      {/* Review count skeleton */}
+      <div className="w-16 h-3 bg-gray-200 rounded"></div>
+    </div>
+  </div>
+);
+
+// Skeleton grid component
+const SoftwareSelectionSkeleton = () => (
+  <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 gap-y-10 min-h-[200px] sm:min-h-[300px]">
+    {[...Array(12)].map((_, index) => (
+      <SoftwareCardSkeleton key={index} />
+    ))}
+  </div>
+);
+
 const SelectSoftware = ({
   setShowStepper,
 }: {
@@ -92,9 +124,7 @@ const SelectSoftware = ({
 
       {/* Loading state */}
       {(isLoading || isFetching) && (
-        <div className="flex justify-center items-center py-8 min-h-[200px] sm:min-h-[300px] w-full">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
+        <SoftwareSelectionSkeleton />
       )}
             {/* No results state */}
       {(!isLoading || !isFetching) && products.length === 0  && (

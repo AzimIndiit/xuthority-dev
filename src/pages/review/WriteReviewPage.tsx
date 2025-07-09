@@ -9,6 +9,108 @@ import ReviewComplete from "@/features/review/ReviewComplete";
 import { useCurrentStep, useReviewStore } from "@/store/useReviewStore";
 import { useUserHasReviewed } from "@/hooks/useReview";
 
+// Skeleton loader for the entire WriteReviewPage
+const WriteReviewPageSkeleton = () => (
+  <div className="bg-white animate-pulse">
+    <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-12">
+      <div className="grid grid-cols-1 md:grid-cols-6">
+        {/* Left Column: Stepper Skeleton */}
+        <div className="sm:col-span-2 w-full sm:block hidden">
+          <div className="space-y-8">
+            {/* Stepper steps */}
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex items-center space-x-4">
+                <div className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                <div className="space-y-2 flex-1">
+                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        {/* Mobile Stepper Skeleton */}
+        <div className="sm:col-span-2 w-full sm:hidden block">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="h-6 bg-gray-200 rounded w-32"></div>
+              <div className="h-6 bg-gray-200 rounded w-16"></div>
+            </div>
+            <div className="flex space-x-2">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="flex-1 h-2 bg-gray-200 rounded"></div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column: Content Skeleton */}
+        <div className="sm:col-span-4 sm:border-l border-gray-200 sm:px-8">
+          <div className="space-y-8">
+            {/* Header skeleton */}
+            <div className="space-y-4">
+              <div className="h-16 bg-gray-200 rounded-lg w-3/4"></div>
+              <div className="space-y-2">
+                <div className="h-4 bg-gray-200 rounded w-full"></div>
+                <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+              </div>
+            </div>
+
+            {/* Main content skeleton */}
+            <div className="space-y-6">
+              {/* Section 1 */}
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-48"></div>
+                <div className="flex items-center gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="w-10 h-10 bg-gray-200 rounded"></div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Section 2 */}
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-32"></div>
+                <div className="h-12 bg-gray-200 rounded w-full"></div>
+              </div>
+
+              {/* Section 3 */}
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-36"></div>
+                <div className="h-32 bg-gray-200 rounded w-full"></div>
+              </div>
+
+              {/* Section 4 - Sub ratings */}
+              <div className="space-y-4">
+                <div className="h-6 bg-gray-200 rounded w-28"></div>
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="border border-gray-200 rounded-lg p-4">
+                      <div className="h-5 bg-gray-200 rounded w-32 mb-3"></div>
+                      <div className="flex items-center gap-2">
+                        {[...Array(8)].map((_, j) => (
+                          <div key={j} className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Submit button skeleton */}
+              <div className="flex justify-end pt-4">
+                <div className="h-12 bg-gray-200 rounded-full w-32"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const WriteReviewPage = () => {
   const [showStepper, setShowStepper] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -30,6 +132,16 @@ const WriteReviewPage = () => {
       setShowStepper(false);
     }
   }, [currentStep, selectedSoftware]);
+
+  // Scroll to top when reaching step 4 (ReviewComplete)
+  useEffect(() => {
+    if (currentStep === 4) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentStep]);
 
   // Handle LinkedIn verification callback
   useEffect(() => {
@@ -93,10 +205,7 @@ const WriteReviewPage = () => {
     }
   };
 if(isLoading) {
-  return <div className="flex items-center justify-center h-screen">
-    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-    <p className="text-gray-600">Checking existing review...</p>
-  </div>
+  return <WriteReviewPageSkeleton />;
 }
   return (
     <div className=" bg-white">

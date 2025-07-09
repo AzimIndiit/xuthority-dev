@@ -22,7 +22,7 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
 }) => {
     const { isLoggedIn, user } = useUserStore();
     const { openAuthModal } = useUIStore();
-    const { setSelectedSoftware } = useReviewStore();
+    const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const navigate = useNavigate();
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -198,6 +198,7 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
               logoUrl: software.logoUrl,
             
              });
+             setCurrentStep(3);
             navigate(`/write-review`);
           }} className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-4 py-2 !text-xs font-semibold flex items-center h-10">
             <Edit className="w-2 h-2" />

@@ -130,14 +130,14 @@ export const profileSchema = z.object({
   avatar: z.string().optional(),
   companyAvatar: z.string().optional(),
   displayName: z.string().optional(),
-  firstName: z.string().min(2, "First name must be at least 2 characters").max(50, "First name must be less than 50 characters"),
-  lastName: z.string().min(2, "Last name must be at least 2 characters").max(50, "Last name must be less than 50 characters"),
+  firstName: z.string().min(2, "First name must be at least 2 characters").trim().max(50, "First name must be less than 50 characters").nonempty("First name is required"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters").trim().max(50, "Last name must be less than 50 characters").nonempty("Last name is required"),
   email: z.string().email("Invalid email address"),
   region: z.string().min(1, "Please select a region"),
   description: z.string().optional().refine((val) => !val || val.length <= 1000, "Description must be less than 1000 characters"),
   industry: z.string().min(1, "Please select an industry"),
-  title: z.string().min(2, "Title must be at least 2 characters").max(100, "Title must be less than 100 characters"),
-  companyName: z.string().min(2, "Company name must be at least 2 characters").max(100, "Company name must be less than 100 characters"),
+  title: z.string().min(2, "Title must be at least 2 characters").trim().max(100, "Title must be less than 100 characters").nonempty("Title is required"),
+  companyName: z.string().min(2, "Company name must be at least 2 characters").trim().max(100, "Company name must be less than 100 characters").nonempty("Company name is required"),
   companySize: z.string().min(1, "Please select company size"),
   linkedinUrl: z
     .string()

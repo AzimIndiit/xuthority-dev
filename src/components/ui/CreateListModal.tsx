@@ -23,7 +23,7 @@ const listModalSchema = z.object({
   listName: z.string()
     .min(2, 'List name must be at least 2 characters')
     .max(100, 'List name must be less than 100 characters')
-    .trim(),
+    .trim().nonempty('List name is required'),
   productIds: z.array(z.string()).min(1, 'At least one product is required')
 });
 

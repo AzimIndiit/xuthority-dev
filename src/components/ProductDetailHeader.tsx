@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import StarRating from "./ui/StarRating";
@@ -6,8 +6,13 @@ import useUserStore from "@/store/useUserStore";
 import { useFollowStatus, useToggleFollow } from "@/hooks/useFollow";
 import toast from "react-hot-toast";
 import useUIStore from "@/store/useUIStore";
+import AddToListModal from "./ui/AddToListModal";
+import { useFavoriteStatus } from "@/hooks/useFavorites";
+import { useToast } from "@/hooks/useToast";
 
 interface Product {
+  _id?: string;
+  id?: string;
   name: string;
   rating: number;
   reviewCount: number;
@@ -24,19 +29,28 @@ interface ProductDetailHeaderProps {
     firstName: string;
     lastName: string;
   };
+  id: string;
 }
 
 export default function ProductDetailHeader({
   product,
   productOwner,
+  id,
 }: ProductDetailHeaderProps) {
   const {user} = useUserStore();
   const { isLoggedIn } = useUserStore();
   const { openAuthModal } = useUIStore();
+  const { success } = useToast();
+  const [showAddToListModal, setShowAddToListModal] = useState(false);
+  
   console.log(productOwner,"productOwner");
   const { data: followStatus } = useFollowStatus(productOwner._id || '');
   const toggleFollowMutation = useToggleFollow();
   const isFollowing = followStatus?.isFollowing || false;
+  
+  // Check if product is already in favorites
+  const { data: favoriteStatus } = useFavoriteStatus(id);
+  const isInFavorites = favoriteStatus?.isFavorite || false;
   const handleFollowToggle = async () => {
     if(!isLoggedIn) {
       openAuthModal();
@@ -54,6 +68,14 @@ export default function ProductDetailHeader({
     } catch (error) {
       toast.error('Failed to update follow status. Please try again.');
     }
+  };
+
+  const handleSaveToList = () => {
+    if(!isLoggedIn) {
+      openAuthModal();
+      return;
+    }
+    setShowAddToListModal(true);
   };
   return (
     <>
@@ -122,8 +144,15 @@ export default function ProductDetailHeader({
                 </div>
 
                 <div className={` flex-wrap items-center ${user?.role !== 'vendor' ? 'justify-between' : 'justify-end'} gap-4  w-full hidden sm:flex`}>
-                {user?.role !== 'vendor' &&  <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
-                    <Heart className="w-5 h-5" />
+                {user?.role !== 'vendor' &&  <button 
+                    onClick={handleSaveToList}
+                    className={`flex items-center gap-2 text-xs sm:text-sm transition-colors ${
+                      isInFavorites 
+                        ? 'text-red-500' 
+                        : 'text-gray-600 hover:text-red-500'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${isInFavorites ? 'fill-red-500' : ''}`} />
                     <span>Save to My List</span>
                   </button>}
 
@@ -162,9 +191,16 @@ export default function ProductDetailHeader({
             </div>
           </div>
         </div>
-        <div className={`flex items-center ${user?.role !== 'vendor' ? 'justify-between' : 'justify-end'} gap-4  w-full mt-4 sm:hidden`}>
-        {user?.role !== 'vendor' &&  <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
-            <Heart className="w-5 h-5" />
+        <div className={`flex items-center ${user?.role !== 'vendor' ? 'justify-between' : 'justify-end'} gap-4  w-full mt-8 sm:hidden`}>
+        {user?.role !== 'vendor' &&  <button 
+            onClick={handleSaveToList}
+            className={`flex items-center gap-2 text-xs sm:text-sm transition-colors ${
+              isInFavorites 
+                ? 'text-red-500' 
+                : 'text-gray-600 hover:text-red-500'
+            }`}
+          >
+            <Heart className={`w-5 h-5 ${isInFavorites ? 'fill-red-500' : ''}`} />
             <span>Save to My List</span>
           </button>}
           <div className="flex   text-xs sm:text-sm gap-2">
@@ -196,6 +232,16 @@ export default function ProductDetailHeader({
           </Button>
         </div>
       </div>
+      
+      <AddToListModal
+        isOpen={showAddToListModal}
+        onOpenChange={setShowAddToListModal}
+        productId={id}
+        productName={product.name}
+        onSuccess={() => {
+          success(`${product.name} has been added to your list!`);
+        }}
+      />
     </>
   );
 } 

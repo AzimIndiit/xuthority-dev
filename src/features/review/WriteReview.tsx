@@ -14,6 +14,69 @@ import { useToast } from '@/hooks/useToast';
 import { useUserHasReviewed } from '@/hooks/useReview';
 import { queryClient } from "@/lib/queryClient";
 
+// Skeleton loader component for WriteReview
+const WriteReviewSkeleton = () => (
+  <div className="space-y-8 animate-pulse">
+    <div className="max-w-2xl">
+      {/* Header skeleton */}
+      <div className="space-y-4 mb-8">
+        <div className="h-16 bg-gray-200 rounded-lg w-3/4"></div>
+        <div className="space-y-2">
+          <div className="h-4 bg-gray-200 rounded w-full"></div>
+          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+          <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+        </div>
+      </div>
+
+      {/* Overall Rating skeleton */}
+      <div className="space-y-4 mb-8">
+        <div className="h-6 bg-gray-200 rounded w-48"></div>
+        <div className="flex items-center gap-1">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="w-10 h-10 bg-gray-200 rounded"></div>
+          ))}
+        </div>
+      </div>
+
+      {/* Review Title skeleton */}
+      <div className="space-y-4 mb-8">
+        <div className="h-6 bg-gray-200 rounded w-32"></div>
+        <div className="h-12 bg-gray-200 rounded w-full"></div>
+      </div>
+
+      {/* Review Description skeleton */}
+      <div className="space-y-4 mb-8">
+        <div className="h-6 bg-gray-200 rounded w-36"></div>
+        <div className="h-32 bg-gray-200 rounded w-full"></div>
+      </div>
+
+      {/* Sub Ratings skeleton */}
+      <div className="space-y-6 mb-8">
+        <div className="h-6 bg-gray-200 rounded w-28"></div>
+        <div className="space-y-4">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="border border-gray-200 rounded-lg">
+              <div className="bg-gray-100 px-2 py-1 mb-3">
+                <div className="h-5 bg-gray-200 rounded w-32"></div>
+              </div>
+              <div className="flex items-center gap-2 p-2">
+                {[...Array(8)].map((_, j) => (
+                  <div key={j} className="w-8 h-8 bg-gray-200 rounded-full"></div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Submit Button skeleton */}
+      <div className="flex justify-end pt-4">
+        <div className="h-12 bg-gray-200 rounded-full w-32"></div>
+      </div>
+    </div>
+  </div>
+);
+
 interface WriteReviewProps {
   setShowStepper?: (show: boolean) => void;
 }
@@ -75,7 +138,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   const toast = useToast();
   const [isEditMode, setIsEditMode] = useState(false);
   const [existingReview, setExistingReview] = useState<Review | null>(null);
-  
+  console.log('selectedSoftware', selectedSoftware)
   // Check if user has already reviewed this product
   const { hasReviewed, review: userReview, isLoading: isCheckingReview } = useUserHasReviewed(selectedSoftware?.id);
 
@@ -295,14 +358,7 @@ console.log('userReview', userReview)
   };
 
   if (isCheckingReview) {
-    return (
-      <div className="flex items-center justify-center py-8">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Checking existing review...</p>
-        </div>
-      </div>
-    );
+    return <WriteReviewSkeleton />;
   }
 
   return (

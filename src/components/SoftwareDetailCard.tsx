@@ -6,10 +6,12 @@ import StarRating from "./ui/StarRating";
 import useUserStore from "@/store/useUserStore";
 import { formatCurrency } from "@/utils/formatCurrency";
 import ConfirmationModal from "./ui/ConfirmationModal";
+import AddToListModal from "./ui/AddToListModal";
 import { useState } from "react";
 import { useDeleteProduct } from "@/hooks/useProducts";
 import useCompareStore from "@/store/useCompareStore";
 import { useToast } from "@/hooks/useToast";
+import { useFavoriteStatus } from "@/hooks/useFavorites";
 
 interface FeatureDescription {
   value: string;
@@ -95,6 +97,7 @@ export default function SoftwareDetailCard({
   const navigate = useNavigate();
   const location = useLocation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAddToListModal, setShowAddToListModal] = useState(false);
   const minPrice = Array.isArray(entryPrice) && entryPrice.length > 0
   ? Math.min(...entryPrice.map(p => Number(p.price) || 0))
   : null;
@@ -109,6 +112,10 @@ const deleteMutation = useDeleteProduct();
     products: compareProducts 
   } = useCompareStore();
   const { success, error, info } = useToast();
+  
+  // Check if product is already in favorites
+  const { data: favoriteStatus } = useFavoriteStatus(id);
+  const isInFavorites = favoriteStatus?.isFavorite || false;
   
   const isInCompare = isProductInCompare(id);
 
@@ -207,7 +214,7 @@ const deleteMutation = useDeleteProduct();
           </div>
         </div>}
         {/* Name, Rating, Review, Write Review */}
-        <div className="flex sm:flex-row flex-col sm:items-start justify-between gap-4 mt-8">
+        <div className="flex sm:flex-row flex-col sm:items-start justify-between gap-4 mt-3">
           <div>
             <div
               onClick={viewProductPage}
@@ -296,10 +303,14 @@ const deleteMutation = useDeleteProduct();
         {/* Bottom Actions */}
        {location.pathname !== '/profile/products' && <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4 ">
           <button
-            onClick={onSave}
-            className="flex items-center gap-1 text-gray-500 hover:text-red-500 !text-[11px] xl:!text-[12px]  font-medium sm:px-2 py-1 rounded transition"
+            onClick={() => setShowAddToListModal(true)}
+            className={`flex items-center gap-1 !text-[11px] xl:!text-[12px] font-medium sm:px-2 py-1 rounded transition cursor-pointer ${
+              isInFavorites 
+                ? 'text-red-500' 
+                : 'text-gray-500 hover:text-red-500'
+            }`}
           >
-            <Heart className="w-5 h-5" /> Save to My List
+            <Heart className={`w-5 h-5 ${isInFavorites ? 'fill-red-500' : ''}`} /> Save to My List
           </button>
           <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
             <Button className="bg-white border hover:bg-white borderr-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 sm:ml-2">
@@ -326,6 +337,16 @@ const deleteMutation = useDeleteProduct();
         confirmText={deleteMutation.isPending ? "Deleting..." : "Yes I'm Sure"}
         cancelText="Cancel"
         confirmVariant="default"
+      />
+      
+      <AddToListModal
+        isOpen={showAddToListModal}
+        onOpenChange={setShowAddToListModal}
+        productId={id}
+        productName={name}
+        onSuccess={() => {
+          success(`${name} has been added to your list!`);
+        }}
       />
     </div>
   );

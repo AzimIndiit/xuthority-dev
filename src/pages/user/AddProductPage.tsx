@@ -24,8 +24,8 @@ const fileOrString = z.union([z.instanceof(File), z.string()]);
 const MAX_FILE_SIZE_MB = 10;
 const MAX_MEDIA_FILES = 5;
 const schema = z.object({
-  name: z.string().min(3, 'Product name is required'),
-  websiteUrl: z.string().url('Enter a valid URL'),
+  name: z.string().min(3, 'Product name is required').trim().nonempty('Product name is required'),
+  websiteUrl: z.string().url('Enter a valid URL').trim().nonempty('Website URL is required'),
   softwareIds: z.array(z.string()).min(1, 'Software is required'),
   solutionIds: z.array(z.string()).min(1, 'Solution is required'),
   whoCanUse: z.array(z.string()).min(1, 'Who can use is required'),
@@ -33,8 +33,8 @@ const schema = z.object({
   integrations: z.array(z.string()).min(1, 'Integration is required'),
   languages: z.array(z.string()).min(1, 'Language is required'),
   marketSegment: z.array(z.string()).min(1, 'Market segment is required'),
-  brandColors: z.string().min(1, 'Brand color is required'),
-  description: z.string().min(10, 'Description is required'),
+  brandColors: z.string().min(1, 'Brand color is required').trim().nonempty('Brand color is required'),
+  description: z.string().min(10, 'Description is required').trim().nonempty('Description is required'),
   logoUrl: fileOrString, // Required, single File or URL
 
   mediaUrls: z
@@ -44,11 +44,11 @@ const schema = z.object({
   features: z
   .array(
     z.object({
-      title: z.string().min(1, 'Feature title is required'),
+      title: z.string().min(1, 'Feature title is required') .trim().nonempty('Feature title is required'),
       description: z
         .array(
           z.object({
-            value: z.string().min(1, 'Feature description is required'),
+            value: z.string().min(1, 'Feature description is required') .trim().nonempty('Feature description is required'),
           })
         )
         .min(1, 'At least one description is required'),
@@ -60,14 +60,14 @@ const schema = z.object({
 pricing: z
   .array(
     z.object({
-      name: z.string().min(1, 'Pricing name is required'),
+      name: z.string().min(1, 'Pricing name is required') .trim().nonempty('Pricing name is required'),
       price: z.coerce.number().min(0, 'Price must be a positive number'),
-      seats: z.string().min(1, 'No of seats is required'),
-      description: z.string().min(1, 'Pricing description is required'),
+      seats: z.string().min(1, 'No of seats is required') .trim().nonempty('No of seats is required'),
+      description: z.string().min(1, 'Pricing description is required') .trim().nonempty('Pricing description is required'),
       features: z
         .array(
           z.object({
-            value: z.string().min(1, 'Feature is required'),
+            value: z.string().min(1, 'Feature is required') .trim().nonempty('Feature is required'),
           })
         )
         .min(1, 'At least one feature is required'),

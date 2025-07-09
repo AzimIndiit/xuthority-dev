@@ -19,7 +19,6 @@ function RootLayout() {
       </main>
       <Footer />
       <AuthModal />
-      <CompareButton />
       <Toaster position="top-center" reverseOrder={false} />
     </>
   );

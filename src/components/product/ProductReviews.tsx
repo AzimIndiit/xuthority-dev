@@ -150,27 +150,38 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
   }, [reviewsResponse]);
 
   const ratingDistribution: RatingDistribution[] = useMemo(() => {
-    if (reviewsResponse?.meta?.productInfo?.ratingDistribution) {
-      return transformRatingDistribution(reviewsResponse.meta.productInfo.ratingDistribution);
-    }
-    if (statsResponse?.data?.ratingDistribution) {
-      return transformRatingDistribution(statsResponse.data.ratingDistribution);
+    try {
+      if (reviewsResponse?.meta?.productInfo?.ratingDistribution) {
+        return transformRatingDistribution(reviewsResponse.meta.productInfo.ratingDistribution);
+      }
+      if (statsResponse?.data?.ratingDistribution) {
+        return transformRatingDistribution(statsResponse.data.ratingDistribution);
+      }
+    } catch (error) {
+      console.error('Error transforming rating distribution:', error);
     }
     return [];
   }, [reviewsResponse, statsResponse]);
 
-  console.log(reviews,'reviews');
   const popularMentions = useMemo(() => {
-    return statsResponse?.data?.popularMentions || ['All Reviews'];
+    if (statsResponse?.data?.popularMentions && Array.isArray(statsResponse.data.popularMentions)) {
+      // If popularMentions is an array of objects, extract the mention strings
+      return statsResponse.data.popularMentions.map((item: any) => {
+        if (typeof item === 'string') return item;
+        if (typeof item === 'object' && item.mention) return item.mention;
+        return String(item);
+      });
+    }
+    return ['All Reviews'];
   }, [statsResponse]);
 
   // Get current stats
-  const rating = reviewsResponse?.meta?.productInfo?.avgRating || 
+  const rating = Number(reviewsResponse?.meta?.productInfo?.avgRating || 
                  statsResponse?.data?.avgRating || 
-                 product.avgRating || 0;
-  const reviewCount = reviewsResponse?.meta?.productInfo?.totalReviews || 
+                 product.avgRating || 0);
+  const reviewCount = Number(reviewsResponse?.meta?.productInfo?.totalReviews || 
                       statsResponse?.data?.totalReviews || 
-                      product.totalReviews || 0;
+                      product.totalReviews || 0);
 
   const onWriteReview = () => {
     if (!isLoggedIn) {

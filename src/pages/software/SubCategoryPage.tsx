@@ -14,6 +14,7 @@ import { useReviewStore } from "@/store/useReviewStore";
 import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
 import SecondaryLoader from "@/components/ui/SecondaryLoader";
+import CompareButton from "@/components/CompareButton";
 
 // Skeleton for the header section
 const HeaderSkeleton = () => (
@@ -342,6 +343,8 @@ const SubCategoryPage = () => {
           </div>
         )}
       </div>
+      <CompareButton />
+
     </section>
   );
 };

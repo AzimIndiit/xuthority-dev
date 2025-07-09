@@ -117,13 +117,15 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
   const { isLoggedIn,user } = useUserStore();
   const navigate = useNavigate();
 
-  // State for filters
+  // State for filters and accumulated reviews
   const [filters, setFilters] = useState<ProductReviewFilters>({
     page: 1,
     limit: 10,
     sortBy: 'publishedAt',
     sortOrder: 'desc'
   });
+  const [allReviews, setAllReviews] = useState<Review[]>([]);
+  const [allBackendReviews, setAllBackendReviews] = useState<any[]>([]);
 
   // Fetch reviews and stats
   const { 
@@ -137,32 +139,44 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     isLoading: statsLoading 
   } = useProductReviewStats(product._id);
 
-  // Transform data for UI
-  const reviews: Review[] = useMemo(() => {
+  // Update accumulated reviews when new data arrives
+  React.useEffect(() => {
     if (!reviewsResponse?.data || !Array.isArray(reviewsResponse.data)) {
-      console.log('No reviews data or not array:', reviewsResponse?.data);
-      return [];
+      return;
     }
-    
+
     try {
-      console.log('Raw reviews data:', reviewsResponse.data);
       const transformedReviews = reviewsResponse.data.map((review, index) => {
         try {
-          console.log(`Transforming review ${index}:`, review);
           return transformBackendReview(review);
         } catch (transformError) {
           console.error(`Error transforming review ${index}:`, transformError, review);
           return null;
         }
-      }).filter(Boolean);
+      }).filter(Boolean) as Review[];
       
-      console.log('Transformed reviews:', transformedReviews);
-      return transformedReviews as Review[];
+      // If it's page 1, replace all reviews, otherwise append
+      if (filters.page === 1) {
+        setAllReviews(transformedReviews);
+        setAllBackendReviews(reviewsResponse.data);
+      } else {
+        setAllReviews(prev => [...prev, ...transformedReviews]);
+        setAllBackendReviews(prev => [...prev, ...reviewsResponse.data]);
+      }
     } catch (error) {
       console.error('Error transforming review data:', error);
-      return [];
     }
-  }, [reviewsResponse]);
+  }, [reviewsResponse, filters.page]);
+
+  // Reset accumulated reviews when filters change (except page)
+  React.useEffect(() => {
+    setAllReviews([]);
+    setAllBackendReviews([]);
+    setFilters(prev => ({ ...prev, page: 1 }));
+  }, [filters.sortBy, filters.sortOrder, filters.overallRating]);
+
+  // Use accumulated reviews for display
+  const reviews = allReviews;
 
   const ratingDistribution: RatingDistribution[] = useMemo(() => {
     try {
@@ -191,14 +205,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     return ['All Reviews'];
   }, [statsResponse]);
 
-  // Debug logging
-  console.log('Debug ProductReviews:', {
-    reviewsResponse: reviewsResponse?.data,
-    reviewsLength: reviews.length,
-    isLoading: reviewsLoading,
-    transformedReviews: reviews,
-    rawReviewsData: reviewsResponse
-  });
+
 
   // Get current stats
   const rating = Number(reviewsResponse?.meta?.productInfo?.avgRating || 
@@ -229,17 +236,10 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     }));
   };
 
-  // Show skeleton loading when data is loading
-  const shouldShowSkeleton = reviewsLoading && !reviewsResponse;
-  console.log('Loading state check:', {
-    reviewsLoading,
-    hasReviewsResponse: !!reviewsResponse,
-    shouldShowSkeleton,
-    reviewsLength: reviews.length
-  });
+  // Show skeleton loading when data is loading (only for first page)
+  const shouldShowSkeleton = reviewsLoading && filters.page === 1 && reviews.length === 0;
 
   if (shouldShowSkeleton) {
-    console.log('Showing skeleton loader');
     return (
       <div className="bg-[#F7F7F7] py-12">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -261,13 +261,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
       </div>
     );
   }
-
-  console.log('About to render normal component with:', {
-    reviewsCount: reviews.length,
-    reviewsLoading,
-    rating,
-    reviewCount
-  });
 
   return (
     <div className="bg-[#F7F7F7] py-12">
@@ -307,7 +300,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
         <div className='mt-8'>
           <ReviewList 
             reviews={reviews} 
-            backendReviews={reviewsResponse?.data}
+            backendReviews={allBackendReviews}
             productSlug={product.slug}
             isLoading={reviewsLoading}
             pagination={reviewsResponse?.meta?.pagination}

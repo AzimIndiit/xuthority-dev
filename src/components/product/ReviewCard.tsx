@@ -70,8 +70,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
     
     setIsDisputeModalOpen(true);
   };
-  console.log(backendReview,'backendReview');
- 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* Header: Title, Actions */}
@@ -145,7 +143,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
         <span className="text-gray-600 text-xs ml-2">{review?.date || new Date().toLocaleDateString()}</span>
       </div>
       {/* Review Content */}
-      <p className="text-gray-700 text-[13px] leading-relaxed px-4 mb-2">
+      <p className="text-gray-700 text-[13px] leading-relaxed px-4 mb-2  whitespace-pre-line">
         {review.content}
       </p>
       {/* Footer: Reviewer Info and Verification */}

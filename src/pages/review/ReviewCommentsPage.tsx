@@ -454,7 +454,9 @@ console.log(allReplies,'allReplies');
               </div>
             ) : allReplies.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
-                No comments yet. Be the first to comment!
+                <img src="/svg/no_data.svg" alt="No reviews" className="w-1/4 mx-auto mb-4" />
+                <p className="text-lg text-gray-500">No comments yet.</p>
+          
               </div>
             ) : (
               <>

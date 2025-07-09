@@ -117,8 +117,6 @@ export function transformBackendReview(backendReview: BackendReview): Review {
     const lastName = reviewer.lastName || '';
     const reviewerName = `${firstName} ${lastName}`.trim() || 'Anonymous User';
     
-    console.log('Transforming review with ID:', backendReview._id);
-    
     return {
       id: backendReview._id || 'unknown',
       title: backendReview.title || 'Untitled Review',

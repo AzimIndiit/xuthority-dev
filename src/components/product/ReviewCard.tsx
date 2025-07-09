@@ -12,15 +12,17 @@ import { cn } from '@/lib/utils';
 import { getUserDisplayName } from '@/utils/userHelpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import DisputeModal from './DisputeModal';
+import { highlightText } from '@/utils/textHighlight';
 
 interface ReviewCardProps {
   review: Review;
   backendReview?: ProductReview; // Optional backend review data for enhanced features
   showComments?: boolean;
   showDispute?: boolean;
+  searchQuery?: string;
 }
 
-const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComments, showDispute }) => {
+const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComments, showDispute, searchQuery = '' }) => {
   const { isLoggedIn, user } = useUserStore();
   const { openAuthModal } = useUIStore();
   const { productSlug } = useParams();
@@ -77,7 +79,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
         <div className="flex-1 min-w-0">
           <h3 className="text-[15px] font-semibold text-gray-900 mb-0 leading-tight">
             <span className="font-normal text-black">"</span>
-            {review.title}
+            {highlightText(review.title, searchQuery)}
             <span className="font-normal text-black">"</span>
           </h3>
         </div>
@@ -144,7 +146,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
       </div>
       {/* Review Content */}
       <p className="text-gray-700 text-[13px] leading-relaxed px-4 mb-2  whitespace-pre-line">
-        {review.content}
+        {highlightText(review.content, searchQuery)}
       </p>
       {/* Footer: Reviewer Info and Verification */}
       <div className="bg-pink-50 px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-pink-100">

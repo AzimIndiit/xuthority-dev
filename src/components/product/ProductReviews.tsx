@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import StarRating from '@/components/ui/StarRating';
 import { Button } from '@/components/ui/button';
 import RatingBreakdown from './RatingBreakdown';
@@ -12,7 +12,6 @@ import { useReviewStore } from '@/store/useReviewStore';
 import { useNavigate } from 'react-router-dom';
 import { Product } from '@/services/product';
 import { ProductReviewFilters } from '@/services/review';
-import LottieLoader from '../LottieLoader';
 
 // Skeleton loader for the header section
 const HeaderSkeleton = () => (
@@ -64,49 +63,6 @@ const SearchSkeleton = () => (
   </div>
 );
 
-// Skeleton loader for individual review items
-const ReviewItemSkeleton = () => (
-  <div className="bg-white p-6 rounded-lg border border-gray-200 animate-pulse">
-    <div className="flex items-start justify-between mb-4">
-      <div className="flex items-center space-x-3">
-        <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-        <div className="space-y-1">
-          <div className="h-4 bg-gray-200 rounded w-32"></div>
-          <div className="h-3 bg-gray-200 rounded w-24"></div>
-        </div>
-      </div>
-      <div className="flex items-center space-x-1">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
-        ))}
-      </div>
-    </div>
-    
-    <div className="space-y-2 mb-4">
-      <div className="h-4 bg-gray-200 rounded w-full"></div>
-      <div className="h-4 bg-gray-200 rounded w-4/5"></div>
-      <div className="h-4 bg-gray-200 rounded w-3/5"></div>
-    </div>
-    
-    <div className="flex items-center justify-between">
-      <div className="h-4 bg-gray-200 rounded w-20"></div>
-      <div className="flex space-x-2">
-        <div className="h-8 bg-gray-200 rounded w-16"></div>
-        <div className="h-8 bg-gray-200 rounded w-16"></div>
-      </div>
-    </div>
-  </div>
-);
-
-// Skeleton loader for the review list section
-const ReviewListSkeleton = () => (
-  <div className="space-y-6">
-    {[...Array(5)].map((_, i) => (
-      <ReviewItemSkeleton key={i} />
-    ))}
-  </div>
-);
-
 interface ProductReviewsProps {
   product: Product;
 }
@@ -122,10 +78,24 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     page: 1,
     limit: 10,
     sortBy: 'publishedAt',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
+    search: '',
   });
   const [allReviews, setAllReviews] = useState<Review[]>([]);
   const [allBackendReviews, setAllBackendReviews] = useState<any[]>([]);
+  const isInitialMount = useRef(true);
+  const [hasLoadedInitialData, setHasLoadedInitialData] = useState(false);
+  const [ratingDistributionData, setRatingDistributionData] = useState<RatingDistribution[]>([]);
+
+  // Reset initial mount flag when product changes
+  React.useEffect(() => {
+    isInitialMount.current = true;
+    setHasLoadedInitialData(false);
+    setAllReviews([]);
+    setAllBackendReviews([]);
+    setRatingDistributionData([]);
+    setFilters(prev => ({ ...prev, search: '', page: 1 }));
+  }, [product._id]);
 
   // Fetch reviews and stats
   const { 
@@ -163,36 +133,63 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
         setAllReviews(prev => [...prev, ...transformedReviews]);
         setAllBackendReviews(prev => [...prev, ...reviewsResponse.data]);
       }
+
+      // Mark that we've loaded initial data
+      if (!hasLoadedInitialData) {
+        setHasLoadedInitialData(true);
+      }
     } catch (error) {
       console.error('Error transforming review data:', error);
     }
-  }, [reviewsResponse, filters.page]);
+  }, [reviewsResponse, filters.page, hasLoadedInitialData]);
 
-  // Reset accumulated reviews when filters change (except page)
+  // Reset accumulated reviews when filters change (except page) - Fixed to avoid infinite loop
   React.useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    
     setAllReviews([]);
     setAllBackendReviews([]);
-    setFilters(prev => ({ ...prev, page: 1 }));
-  }, [filters.sortBy, filters.sortOrder, filters.overallRating]);
+    // Don't call setFilters here to avoid infinite loop
+  }, [filters.sortBy, filters.sortOrder, filters.overallRating, filters.search]);
 
-  // Use accumulated reviews for display
+  // Reset page to 1 when filters change (separate effect to avoid infinite loop)
+  React.useEffect(() => {
+    if (isInitialMount.current) {
+      return;
+    }
+    
+    if (filters.page !== 1) {
+      setFilters(prev => ({ ...prev, page: 1 }));
+    }
+  }, [filters.sortBy, filters.sortOrder, filters.overallRating, filters.search]);
+
+  // Use all reviews for display (search is now handled by backend)
   const reviews = allReviews;
 
-  const ratingDistribution: RatingDistribution[] = useMemo(() => {
+    // Update rating distribution only if not already present
+  React.useEffect(() => {
+    if (ratingDistributionData.length > 0) {
+      return; // Don't update if already present
+    }
+
     try {
+
+      
+      // Fallback to reviewsResponse only if statsResponse is not available
       if (reviewsResponse?.meta?.productInfo?.ratingDistribution) {
-        return transformRatingDistribution(reviewsResponse.meta.productInfo.ratingDistribution);
-      }
-      if (statsResponse?.data?.ratingDistribution) {
-        return transformRatingDistribution(statsResponse.data.ratingDistribution);
+        const transformed = transformRatingDistribution(reviewsResponse.meta.productInfo.ratingDistribution);
+        setRatingDistributionData(transformed);
       }
     } catch (error) {
       console.error('Error transforming rating distribution:', error);
     }
-    return [];
-  }, [reviewsResponse, statsResponse]);
+  }, [statsResponse, reviewsResponse, ratingDistributionData.length]);
 
-  console.log('reviewsResponse', reviewsResponse)
+  const ratingDistribution = ratingDistributionData;
+
   const popularMentions = useMemo(() => {
     if (statsResponse?.data?.popularMentions && Array.isArray(statsResponse.data.popularMentions)) {
       // If popularMentions is an array of objects, extract the mention strings
@@ -204,8 +201,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     }
     return ['All Reviews'];
   }, [statsResponse]);
-
-
 
   // Get current stats
   const rating = Number(reviewsResponse?.meta?.productInfo?.avgRating || 
@@ -223,23 +218,33 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     navigate('/write-review');
   };
 
-  const handleSearch = (query: string) => {
-    // TODO: Implement search functionality with backend
-    console.log("Search query:", query);
-  };
+  // Memoize handleSearch to prevent infinite loops
+  const handleSearch = useCallback((query: string) => {
+    setFilters(prev => ({ ...prev, search: query, page: 1 }));
+  }, []);
 
-  const handleFilterChange = (stars: number) => {
+  const handleFilterChange = useCallback((stars: number) => {
     setFilters(prev => ({
       ...prev,
       overallRating: stars,
       page: 1 // Reset to first page when filtering
     }));
-  };
+  }, []);
 
-  // Show skeleton loading when data is loading (only for first page)
-  const shouldShowSkeleton = reviewsLoading && filters.page === 1 && reviews.length === 0;
+  // Show skeleton loading only for initial load (no search, no filters, no data loaded yet)
+  const showInitialSkeleton = !hasLoadedInitialData && 
+                              reviewsLoading && 
+                              filters.page === 1 && 
+                              filters.search === '' && 
+                              filters.overallRating === undefined;
 
-  if (shouldShowSkeleton) {
+  // Determine loading state for ReviewList
+  const isReviewListLoading = reviewsLoading && (
+    (filters.page === 1 && (filters.search !== '' || filters.overallRating !== undefined)) || // Search or filter loading
+    filters.page > 1 // Load more loading
+  );
+
+  if (showInitialSkeleton) {
     return (
       <div className="bg-[#F7F7F7] py-12">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -255,7 +260,40 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
           </div>
           
           <div className="mt-8">
-            <ReviewListSkeleton />
+            <div className="space-y-6">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="bg-white p-6 rounded-lg border border-gray-200 animate-pulse">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                      <div className="space-y-1">
+                        <div className="h-4 bg-gray-200 rounded w-32"></div>
+                        <div className="h-3 bg-gray-200 rounded w-24"></div>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      {[...Array(5)].map((_, j) => (
+                        <div key={j} className="w-4 h-4 bg-gray-200 rounded"></div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mb-4">
+                    <div className="h-4 bg-gray-200 rounded w-full"></div>
+                    <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+                    <div className="h-4 bg-gray-200 rounded w-3/5"></div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    <div className="flex space-x-2">
+                      <div className="h-8 bg-gray-200 rounded w-16"></div>
+                      <div className="h-8 bg-gray-200 rounded w-16"></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -302,8 +340,9 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
             reviews={reviews} 
             backendReviews={allBackendReviews}
             productSlug={product.slug}
-            isLoading={reviewsLoading}
+            isLoading={isReviewListLoading}
             pagination={reviewsResponse?.meta?.pagination}
+            searchQuery={filters.search || ''}
             onLoadMore={() => {
               if (reviewsResponse?.meta?.pagination?.hasNext) {
                 setFilters(prev => ({

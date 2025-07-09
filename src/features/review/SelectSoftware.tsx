@@ -38,7 +38,7 @@ const SoftwareCardSkeleton = () => (
 // Skeleton grid component
 const SoftwareSelectionSkeleton = () => (
   <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 gap-y-10 min-h-[200px] sm:min-h-[300px]">
-    {[...Array(12)].map((_, index) => (
+    {[...Array(6)].map((_, index) => (
       <SoftwareCardSkeleton key={index} />
     ))}
   </div>
@@ -129,6 +129,7 @@ const SelectSoftware = ({
             {/* No results state */}
       {(!isLoading || !isFetching) && products.length === 0  && (
         <div className=" flex flex-col justify-center items-center py-8 w-full text-center min-h-[200px] sm:min-h-[300px]">
+          <img src="/svg/no_data.svg" alt="No results" className="w-1/4 mb-4" />
           <p className="text-gray-500">No software found </p>
           <p className="text-sm text-gray-400 mt-2">Try searching with different keywords</p>
         </div>

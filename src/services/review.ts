@@ -170,6 +170,7 @@ export interface ProductReviewStatsResponse {
 export interface ProductReviewFilters {
   page?: number;
   limit?: number;
+  search?: string;
   overallRating?: number;
   isVerified?: boolean;
   sortBy?: 'submittedAt' | 'publishedAt' | 'overallRating' | 'helpfulVotes.count';

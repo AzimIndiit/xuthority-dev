@@ -55,7 +55,8 @@ export function useProductReviews(productId: string | undefined, filters?: Produ
       return getProductReviews(productId, filters);
     },
     enabled: !!productId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 0, // 5 minutes
+    gcTime:0
   });
 }
 
@@ -67,12 +68,13 @@ export function useProductReviewStats(productId: string | undefined) {
       return getProductReviewStats(productId);
     },
     enabled: !!productId,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
-}
+      staleTime: 0, // 10 minutes
+      gcTime:0
+    });
+  }
 
-export function useHelpfulVote() {
-  const { user } = useUserStore();
+  export function useHelpfulVote() {
+    const { user } = useUserStore();
 
   const voteMutation = useMutation({
     mutationFn: voteHelpful,

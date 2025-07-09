@@ -227,11 +227,11 @@ if(isLoading) {
           )}
           {/* Right Column: Step Content */}
            {/* Desktop Stepper */}
-           <div className="sm:col-span-4 sm:border-l  border-gray-200 sm:px-8 hidden sm:block">
+           <div className="sm:col-span-4 sm:border-l  border-gray-200 sm:px-8 hidden sm:block min-h-[60vh]">
             {renderCurrentStep()}
           </div>
           {/* Mobile Stepper */}
-         {!showStepper && <div className="sm:col-span-4 sm:border-l  border-gray-200 sm:px-8  block sm:hidden">
+         {!showStepper && <div className="sm:col-span-4 sm:border-l  border-gray-200 sm:px-8  block sm:hidden ">
             {renderCurrentStep()}
           </div>}
           

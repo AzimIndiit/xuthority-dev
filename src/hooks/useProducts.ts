@@ -53,6 +53,8 @@ export function useProductsByCategory(
     filters?.sortBy
   ];
 
+  
+
   return useQuery({
     queryKey,
     queryFn: () => fetchProductsByCategory(category, subCategory, searchQuery, page, limit, filters),

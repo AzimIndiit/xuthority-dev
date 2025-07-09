@@ -166,7 +166,8 @@ const DisputesPage = () => {
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Disputes</h1>
         {transformedDisputes.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 min-h-[60vh] flex flex-col justify-center items-center">
+            <img src="/svg/no_data.svg" alt="No results" className="w-1/4 mb-4" />
             <p>No disputes found.</p>
             <p className="text-sm mt-2">Disputes will appear here when you dispute reviews on your products.</p>
           </div>

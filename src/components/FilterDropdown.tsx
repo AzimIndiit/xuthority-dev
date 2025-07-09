@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -18,6 +18,7 @@ interface FilterDropdownProps {
   onFilterChange: (filters: any) => void;
   onApply?: () => void;
   onClear?: () => void;
+  isLoading?: boolean;
 }
 
 const FilterPill = ({ label, checked, onChange }: { label: string, checked: boolean, onChange: (checked: boolean) => void }) => (
@@ -36,7 +37,8 @@ const FilterPill = ({ label, checked, onChange }: { label: string, checked: bool
 );
 
 
-export default function FilterDropdown({ filters, onFilterChange, onApply, onClear }: FilterDropdownProps) {
+export default function FilterDropdown({ filters, onFilterChange, onApply, onClear, isLoading }: FilterDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false);
   const {
     data: softwareResultRaw = [] as any,
       isLoading: isSoftwareLoading = true,
@@ -78,10 +80,22 @@ export default function FilterDropdown({ filters, onFilterChange, onApply, onCle
     }
   };
 
+  const handleApply = () => {
+    if (onApply) {
+      onApply();
+    }
+    // Close dropdown after applying filters
+    setIsOpen(false);
+  };
+
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <PillButton icon={<SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} className="text-xs ">
+        <PillButton 
+          icon={<SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} 
+          className="text-xs"
+          disabled={isLoading}
+        >
           Filters
         </PillButton>
       </DropdownMenuTrigger>
@@ -90,63 +104,86 @@ export default function FilterDropdown({ filters, onFilterChange, onApply, onCle
         align="end"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Segments */}
-        <div className="mb-4">
-          <h4 className="font-bold text-base sm:text-lg mb-2">Segments</h4>
-          <div className="grid grid-cols-2 gap-2">
-            {marketSegmentOptions.map(({ value, label }: any) => (
-              <label key={value} className="flex items-center gap-2 cursor-pointer">
-                <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${filters.segment === value ? 'border-red-500' : 'border-gray-300'}`}>
-                  {filters.segment === value && <span className="w-2.5 h-2.5 rounded-full bg-red-500" />}
-                </span>
-                <span className="text-gray-800">{label}</span>
-                <input type="radio" name="segment" checked={filters.segment === value} onChange={() => handleSegmentChange(value)} className="hidden" />
-              </label>
-            ))}
-          </div>
-        </div>
-        {/* Categories */}
-        <div className="mb-4">
-          <h4 className="font-bold text-base sm:text-lg mb-2">Categories</h4>
-          <div className="flex flex-wrap gap-2">
-            {allCategories?.map((cat: any) => (
-              <FilterPill key={cat.id} label={cat.name} checked={filters.categories.includes(cat.id)} onChange={() => handleCategoryChange(cat.id)} />
-            ))}
-          </div>
-        </div>
-        {/* Industries */}
-        <div className="mb-4">
-          <h4 className="font-bold text-base sm:text-lg mb-2">Industries</h4>
-          <div className="flex flex-wrap gap-2">
-            {industryOptions.map(({label,value}: any) => (
-              <FilterPill key={value} label={label} checked={filters.industries.includes(value)} onChange={() => handleIndustryChange(value)} />
-            ))}
-          </div>
-        </div>
-        {/* Pricing */}
-        <div className="mb-4">
-            <div className="flex justify-between items-center mb-2">
-                <h4 className="font-bold text-base sm:text-lg">Pricing</h4>
-                <span className="text-gray-600 font-medium">
-                  ${filters.price ? filters.price[0] : 10} - ${filters.price ? filters.price[1] : 250}
-                </span>
+        {/* Overlay for loading state */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/80 backdrop-blur-sm rounded-xl flex items-center justify-center z-50">
+            <div className="flex items-center gap-2 text-blue-600">
+              <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-sm font-medium">Applying filters...</span>
             </div>
-            <Slider
-                min={0}
-                max={500}
-                step={10}
-                value={filters.price || [10, 250]}
-                onValueChange={handlePriceChange}
-                className="w-full"
-            />
+          </div>
+        )}
+        
+        <div className={`${isLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+          {/* Segments */}
+          <div className="mb-4">
+            <h4 className="font-bold text-base sm:text-lg mb-2">Segments</h4>
+            <div className="grid grid-cols-2 gap-2">
+              {marketSegmentOptions.map(({ value, label }: any) => (
+                <label key={value} className="flex items-center gap-2 cursor-pointer">
+                  <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${filters.segment === value ? 'border-red-500' : 'border-gray-300'}`}>
+                    {filters.segment === value && <span className="w-2.5 h-2.5 rounded-full bg-red-500" />}
+                  </span>
+                  <span className="text-gray-800">{label}</span>
+                  <input type="radio" name="segment" checked={filters.segment === value} onChange={() => handleSegmentChange(value)} className="hidden" />
+                </label>
+              ))}
+            </div>
+          </div>
+          {/* Categories */}
+          <div className="mb-4">
+            <h4 className="font-bold text-base sm:text-lg mb-2">Categories</h4>
+            <div className="flex flex-wrap gap-2">
+              {allCategories?.map((cat: any) => (
+                <FilterPill key={cat.id} label={cat.name} checked={filters.categories.includes(cat.id)} onChange={() => handleCategoryChange(cat.id)} />
+              ))}
+            </div>
+          </div>
+          {/* Industries */}
+          <div className="mb-4">
+            <h4 className="font-bold text-base sm:text-lg mb-2">Industries</h4>
+            <div className="flex flex-wrap gap-2">
+              {industryOptions.map(({label,value}: any) => (
+                <FilterPill key={value} label={label} checked={filters.industries.includes(value)} onChange={() => handleIndustryChange(value)} />
+              ))}
+            </div>
+          </div>
+          {/* Pricing */}
+          <div className="mb-4">
+              <div className="flex justify-between items-center mb-2">
+                  <h4 className="font-bold text-base sm:text-lg">Pricing</h4>
+                  <span className="text-gray-600 font-medium">
+                    ${filters.price ? filters.price[0] : 10} - ${filters.price ? filters.price[1] : 250}
+                  </span>
+              </div>
+              <Slider
+                  min={0}
+                  max={500}
+                  step={10}
+                  value={filters.price || [10, 250]}
+                  onValueChange={handlePriceChange}
+                  className="w-full"
+              />
+          </div>
         </div>
+        
         {/* Buttons */}
         <div className="flex items-center gap-2 mt-6 border-t pt-4">
-          <Button variant="outline" className="flex-1 rounded-full border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600" onClick={clearFilters}>
+          <Button 
+            variant="outline" 
+            className="flex-1 rounded-full border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600" 
+            onClick={clearFilters}
+            disabled={isLoading}
+          >
             Clear All Filters
           </Button>
-          <Button className="flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white" onClick={() => onApply && onApply()}>
-            Apply Filter
+          <Button 
+            className="flex-1 rounded-full bg-blue-600 hover:bg-blue-700 text-white" 
+            onClick={handleApply} 
+            disabled={isLoading} 
+            loading={isLoading}
+          >
+            {isLoading ? 'Applying...' : 'Apply Filter'}
           </Button>
         </div>
       </DropdownMenuContent>

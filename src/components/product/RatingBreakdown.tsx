@@ -27,6 +27,7 @@ const RatingBreakdown: React.FC<RatingBreakdownProps> = ({
   ratingDistribution,
   onFilterChange,
 }) => {
+  console.log('ratingDistribution', ratingDistribution)
   return (
     <div className=" px-6 py-8 rounded-lg flex flex-col lg:flex-row gap-6 items-center justify-between bg-white h-full">
     <div className='w-full lg:w-50'>

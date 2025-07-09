@@ -121,6 +121,7 @@ const SubCategoryPage = () => {
   const { subCategory, category } = useParams<{ subCategory: string, category: string }>();
   const [page, setPage] = useState(1);
   const [sortValue, setSortValue] = useState<string | null>("ratings-desc");
+  const [isApplyingFilters, setIsApplyingFilters] = useState(false);
   
   // Local filter state (for UI only)
   const [localFilters, setLocalFilters] = useState({
@@ -166,10 +167,18 @@ const SubCategoryPage = () => {
     setPage(1); // Reset to first page when sort changes
   };
 
-  const handleApplyFilters = () => {
-    // Apply local filters to API filters
-    setAppliedFilters(localFilters);
-    setPage(1);
+  const handleApplyFilters = async () => {
+    setIsApplyingFilters(true);
+    try {
+      // Apply local filters to API filters
+      setAppliedFilters(localFilters);
+      setPage(1);
+      
+      // Wait a brief moment to ensure the state update is processed
+      await new Promise(resolve => setTimeout(resolve, 100));
+    } finally {
+      setIsApplyingFilters(false);
+    }
   };
 
   const handleClearFilters = () => {
@@ -199,6 +208,13 @@ const SubCategoryPage = () => {
     apiPayload
   );
 
+  // Reset filter loading state when products finish loading
+  React.useEffect(() => {
+    if (!isLoading && isApplyingFilters) {
+      setIsApplyingFilters(false);
+    }
+  }, [isLoading, isApplyingFilters]);
+
   // Memoize pagination calculations
   const pagination: any = useMemo(() => {
     return productsResult?.meta?.pagination || {
@@ -222,7 +238,7 @@ const SubCategoryPage = () => {
 
   if (isError) {
     return (
-      <div className="text-center py-8 text-red-500">
+      <div className="text-center py-8 text-red-500 min-h-[60vh] flex justify-center items-center">
         Failed to load products. {error?.message}
       </div>
     );
@@ -240,7 +256,7 @@ const SubCategoryPage = () => {
         <div className="flex flex-col flex-wrap md:flex-row md:items-center sm:justify-between mb-6 gap-2">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
             {total} Listings in{" "}
-            {subCategory ? subCategory.replace(/-/g, " ") : "Category"}{" "}
+          <span className=" capitalize">{subCategory ? subCategory.replace(/-/g, " ") : "Category"}{" "}</span>
             Available
           </h2>
           <div className="flex gap-2 sm:gap-4 items-start sm:items-center">
@@ -250,57 +266,71 @@ const SubCategoryPage = () => {
               onFilterChange={handleFilterChange} 
               onApply={handleApplyFilters}
               onClear={handleClearFilters}
+              isLoading={isApplyingFilters}
             />
           </div>
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 gap-y-12">
-          {products?.map((product: any) => (
-            <SoftwareDetailCard
-              key={product._id}
-              name={product.name}
-              logo={product.logoUrl || "https://placehold.co/64x64?text=P"}
-              logoBackground={product.brandColors || "bg-blue-100"}
-               rating={Number(product.avgRating) || 0}
-              reviewCount={product.totalReviews || 0}
-              description={product.description || "No description available"}
-              users={product.whoCanUse?.map((user: any) => user.name).join(", ") || "All Users"}
-              industries={product.industries?.map((industry: any) => industry.name).join(", ") || "All Industries"}
-              marketSegment={product.marketSegment?.map((segment: any) => segment.name).join(", ") || "All Segments"}
-              entryPrice={product.pricing}
-              features={product.features}
-                             onWriteReview={() => {
-                 if (!isLoggedIn) {
-                   openAuthModal();
-                   return;
-                 }
-                 setSelectedSoftware({id:product._id,name:product.name,logoUrl:product.logoUrl});
-                 setCurrentStep(2);
-                 navigate("/write-review");
-               }}
-               websiteUrl={product.websiteUrl}
-               whoCanUse={product.whoCanUse}
-               id={product._id}
-               slug={product.slug}
-               industriesAll={product.industries}
-               marketSegmentAll={product.marketSegment}
-               whoCanUseAll={product.whoCanUse}
-            />
-          ))}
+        <div className="relative mt-12 min-h-[60vh]">
+          {/* Products Grid */}
+          {products && products.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2  gap-6 gap-y-10">
+              {products.map((product: any) => (
+                <div
+                  key={product._id}
+                  className="h-full flex flex-col"
+                >
+                  <SoftwareDetailCard
+                    name={product.name}
+                    logo={product.logoUrl || "https://placehold.co/64x64?text=P"}
+                    logoBackground={product.brandColors || "bg-blue-100"}
+                    rating={Number(product.avgRating) || 0}
+                    reviewCount={product.totalReviews || 0}
+                    description={product.description || "No description available"}
+                    users={product.whoCanUse?.map((user: any) => user.name).join(", ") || "All Users"}
+                    industries={product.industries?.map((industry: any) => industry.name).join(", ") || "All Industries"}
+                    marketSegment={product.marketSegment?.map((segment: any) => segment.name).join(", ") || "All Segments"}
+                    entryPrice={product.pricing}
+                    features={product.features}
+                    onWriteReview={() => {
+                      if (!isLoggedIn) {
+                        openAuthModal();
+                        return;
+                      }
+                      setSelectedSoftware({
+                        id: product._id,
+                        name: product.name,
+                        logoUrl: product.logoUrl,
+                      });
+                      setCurrentStep(2);
+                      navigate("/write-review");
+                    }}
+                    websiteUrl={product.websiteUrl}
+                    whoCanUse={product.whoCanUse}
+                    id={product._id}
+                    slug={product.slug}
+                    industriesAll={product.industries}
+                    marketSegmentAll={product.marketSegment}
+                    whoCanUseAll={product.whoCanUse}
+                  />
+                </div>
+              ))}
+            </div>
+          ) : !isLoading ? (
+            <div className="flex flex-col justify-center items-center w-full py-16 min-h-[60vh]">
+              <img src="/svg/no_data.svg" alt="No results" className="w-32 h-32 mb-6" />
+              <h3 className="text-lg font-semibold text-gray-600 mb-2">
+                No products found
+              </h3>
+              <p className="text-gray-500">
+                There are no products available in this category yet.
+              </p>
+            </div>
+          ) : null}
         </div>
 
-        {/* No products message */}
-        {products?.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <h3 className="text-lg font-semibold text-gray-600 mb-2">
-              No products found
-            </h3>
-            <p className="text-gray-500">
-              There are no products available in this category yet.
-            </p>
-          </div>
-        )}
+        
 
         {/* Pagination and showing text */}
         {total > 0 && (

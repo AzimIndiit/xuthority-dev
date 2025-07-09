@@ -173,11 +173,9 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
 
       {/* Notifications List */}
       {isError ? (
-        <div className='w-full min-h-[60vh] flex items-center justify-center'>
+        <div className='w-full min-h-[60vh] flex items-center justify-center min-h-[50vh]'>
           <div className="p-8 flex flex-col items-center justify-center">
-            <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <Bell className="w-6 h-6 text-red-500" />
-            </div>
+ 
             <p className="text-gray-500 text-center">
               Failed to load notifications. Please try again later.
             </p>
@@ -187,10 +185,9 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
       ) : (
         <div className="divide-y divide-gray-100">
           {allNotifications.length === 0 && !isLoading ? (
-            <div className="p-8 flex flex-col items-center justify-center min-h-[40vh]">
-              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Bell className="w-6 h-6 text-gray-400" />
-              </div>
+            <div className="flex flex-col items-center justify-center min-h-[50vh]">
+             
+              <img src="/svg/no_data.svg" alt="no-notifications" className="w-1/4 mb-4" />
               <p className="text-gray-500 text-center">No notifications yet</p>
               <p className="text-sm text-gray-400 mt-2">
                 When you have notifications, they'll appear here.

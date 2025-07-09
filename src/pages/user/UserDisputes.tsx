@@ -202,7 +202,8 @@ const UserDisputes = () => {
         </div>
        
         {transformedDisputes.length === 0 ? (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-gray-500 flex flex-col items-center justify-center min-h-[50vh]">
+            <img src="/svg/no_data.svg" alt="dispute" className="w-1/4 mb-4 " />
             <p>No disputes found.</p>
             <p className="text-sm mt-2">Disputes will appear here when you dispute reviews on your products.</p>
           </div>

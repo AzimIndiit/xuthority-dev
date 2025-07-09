@@ -54,7 +54,7 @@ const ReviewSearch: React.FC<ReviewSearchProps> = ({ popularMentions, onSearch }
             <button
               key={mention}
               onClick={() => handleMentionClick(mention)}
-              className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer ${
+              className={`px-4 py-2 rounded-lg text-xs font-medium transition-colors cursor-pointer capitalize ${
                 isActive
                   ? 'bg-red-600 text-white'
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'

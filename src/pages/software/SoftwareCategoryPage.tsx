@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Loader2 } from "lucide-react";
@@ -50,6 +50,13 @@ const SoftwareCategoryPage = () => {
   const page = 1;
   const limit = viewAll ? 1000 : 12; // Load all if viewAll is true
   
+  // Validate category parameter and redirect if invalid
+  useEffect(() => {
+    if (category && !['software', 'solutions'].includes(category.toLowerCase())) {
+      navigate('/', { replace: true });
+    }
+  }, [category, navigate]);
+
   let subCategories: { name: string; slug: string; id: string }[] = [];
   let isSoftwareLoading = false;
   let isSoftwareError = false;

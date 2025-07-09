@@ -4,6 +4,10 @@ export interface Answer {
     name: string;
     avatarUrl: string;
     isVendor: boolean;
+    slug: string;
+    _id: string;
+  isOwnAnswer?: boolean;
+
   };
   date: string;
   content: string;

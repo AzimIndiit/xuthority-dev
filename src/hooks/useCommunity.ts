@@ -16,10 +16,10 @@ const QUERY_KEYS = {
 };
 
 // Questions hooks
-export const useQuestions = (params?: communityService.GetQuestionsParams) => {
+export const useQuestions = (params?: communityService.GetQuestionsParams, productSlug?: string) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.questions, params],
-    queryFn: () => communityService.getQuestions(params),
+    queryKey: [QUERY_KEYS.questions, params, productSlug],
+    queryFn: () => communityService.getQuestions(params, productSlug),
     select: (response) => response.data.data,
   });
 };
@@ -33,12 +33,12 @@ export const useQuestion = (id: string) => {
   });
 };
 
-export const useCreateQuestion = () => {
+export const useCreateQuestion = (productSlug?: string) => {
   const queryClient = useQueryClient();
   const { success, error   } = useToast();
 
   return useMutation({
-    mutationFn: communityService.createQuestion,
+    mutationFn: (data: communityService.CreateQuestionData) => communityService.createQuestion(data, productSlug),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.questions] });
       success('Question posted successfully');
@@ -184,15 +184,15 @@ export const useUserQuestions = (userId: string, params?: communityService.GetQu
 };
 
 // Custom hook to get user's answers by fetching questions and filtering answers
-export const useUserAnswers = (userId: string) => {
+export const useUserAnswers = (userId: string, productSlug?: string) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.userAnswers, userId],
+    queryKey: [QUERY_KEYS.userAnswers, userId, productSlug],
     queryFn: async () => {
       if (!userId) return [];
 
       try {
         // First get all questions
-        const questionsResponse = await communityService.getAllAnswersWithQuestions({ limit: 50 });
+        const questionsResponse = await communityService.getAllAnswersWithQuestions({ limit: 50 }, productSlug);
         const questions = questionsResponse.data.data.questions || [];
         
         const allUserAnswers: any[] = [];
@@ -216,7 +216,8 @@ export const useUserAnswers = (userId: string) => {
                 questionDate: question.createdAt,
                 answerContent: answer.content,
                 answerId: answer._id,
-                questionId: question._id
+                questionId: question._id,
+                isOwnAnswer: userId === answer?.author?._id
               });
             });
           } catch (error) {

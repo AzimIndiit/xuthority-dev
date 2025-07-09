@@ -11,19 +11,18 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useCreateQuestion } from '@/hooks/useCommunity';
-import { useParams } from 'react-router-dom';
 import useUIStore from '@/store/useUIStore';
 import useUserStore from '@/store/useUserStore';
 
 interface AskQuestionModalProps {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  productSlug?: string;
 }
 
-const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChange }) => {
+const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChange, productSlug }) => {
   const [question, setQuestion] = useState('');
-  const { productSlug } = useParams();
-  const createQuestionMutation = useCreateQuestion();
+  const createQuestionMutation = useCreateQuestion(productSlug);
   const { isLoggedIn } = useUserStore();
   const { openAuthModal } = useUIStore();
 
@@ -40,7 +39,6 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChang
     try {
       await createQuestionMutation.mutateAsync({
         title: question.trim(),
-        // product: productId // TODO: Get product ID from slug if needed
       });
       
       // Reset form and close modal on success
@@ -85,6 +83,7 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChang
               size="lg" 
               className="w-full bg-blue-600 hover:bg-blue-700 rounded-full h-12"
               disabled={!question.trim() || createQuestionMutation.isPending}
+              loading={createQuestionMutation.isPending}
             >
               {createQuestionMutation.isPending ? 'Submitting...' : 'Submit'}
             </Button>

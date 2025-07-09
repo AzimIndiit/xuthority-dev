@@ -31,6 +31,98 @@ import MyBadgesPage from './MyBadgesPage';
 import MySubscriptionPage from './MySubscriptionPage';
 import useUserStore from '@/store/useUserStore';
 
+// Skeleton component for the profile sidebar
+const ProfileSidebarSkeleton = () => (
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+    {/* Profile Header Skeleton */}
+    <div className="flex flex-col items-center mb-6">
+      <div className="w-20 h-20 bg-gray-300 rounded-full mb-4"></div>
+      <div className="h-6 bg-gray-300 rounded w-32 mb-2"></div>
+      <div className="h-4 bg-gray-300 rounded w-24 mb-4"></div>
+      <div className="flex space-x-4">
+        <div className="text-center">
+          <div className="h-6 bg-gray-300 rounded w-8 mb-1"></div>
+          <div className="h-4 bg-gray-300 rounded w-12"></div>
+        </div>
+        <div className="text-center">
+          <div className="h-6 bg-gray-300 rounded w-8 mb-1"></div>
+          <div className="h-4 bg-gray-300 rounded w-12"></div>
+        </div>
+      </div>
+    </div>
+
+    {/* Navigation Menu Skeleton */}
+    <div className="space-y-2">
+      {Array.from({ length: 6 }).map((_, index) => (
+        <div key={index} className="flex items-center space-x-3 p-3 rounded-lg">
+          <div className="w-5 h-5 bg-gray-300 rounded"></div>
+          <div className="h-4 bg-gray-300 rounded flex-1"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Skeleton component for the main content area
+const ProfileContentSkeleton = () => (
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+    {/* Content Header Skeleton */}
+    <div className="mb-6">
+      <div className="h-8 bg-gray-300 rounded w-48 mb-4"></div>
+      <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+      <div className="h-4 bg-gray-300 rounded w-3/4 mb-2"></div>
+      <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+    </div>
+
+    {/* Form-like Content Skeleton */}
+    <div className="space-y-6">
+      {/* Section 1 */}
+      <div className="space-y-4">
+        <div className="h-6 bg-gray-300 rounded w-32"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-12 bg-gray-300 rounded"></div>
+          <div className="h-12 bg-gray-300 rounded"></div>
+        </div>
+      </div>
+
+      {/* Section 2 */}
+      <div className="space-y-4">
+        <div className="h-6 bg-gray-300 rounded w-40"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="h-12 bg-gray-300 rounded"></div>
+          <div className="h-12 bg-gray-300 rounded"></div>
+        </div>
+        <div className="h-24 bg-gray-300 rounded"></div>
+      </div>
+
+      {/* Action Buttons Skeleton */}
+      <div className="flex justify-end space-x-4 pt-6">
+        <div className="h-10 bg-gray-300 rounded w-24"></div>
+        <div className="h-10 bg-gray-300 rounded w-32"></div>
+      </div>
+    </div>
+  </div>
+);
+
+// Complete profile page skeleton
+const ProfilePageSkeleton = () => (
+  <div className="min-h-screen bg-gray-50">
+    <div className="w-full lg:max-w-screen-xl mx-auto px-4 lg:px-6 py-4 sm:py-8">
+      <div className="grid grid-cols-1 sm:grid-cols-4">
+        {/* Left Sidebar Skeleton */}
+        <div className="lg:col-span-1 hidden lg:block">
+          <ProfileSidebarSkeleton />
+        </div>
+
+        {/* Right Content Skeleton */}
+        <div className="col-span-4 lg:col-span-3 lg:px-8">
+          <ProfileContentSkeleton />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const ProfilePage: React.FC = () => {
   const { tab, subTab } = useParams<{ tab?: string, subTab?: string }>();
   const  {user:loggedInUser} = useUserStore()
@@ -64,15 +156,42 @@ const ProfilePage: React.FC = () => {
   // Use the useProfile hook to trigger React Query
   const { data: user, isLoading, error } = useProfile();
 
+  // Validate tab and subTab parameters and redirect if invalid
+  useEffect(() => {
+    if (!user || !tab) return; // Only validate if user is loaded and tab exists
+
+    const validTabs = user.role === 'vendor' 
+      ? ['profile-details', 'products', 'my-subscription', 'dispute-management', 'my-badges', 'notifications', 'logout', 'followers', 'following']
+      : ['profile-details', 'my-reviews', 'my-favourites', 'notifications', 'logout', 'followers', 'following'];
+
+    // Check if tab is valid for the user's role
+    if (!validTabs.includes(tab)) {
+      navigate('/', { replace: true });
+      return;
+    }
+
+    // Validate subTab if it exists
+    if (subTab) {
+      const validSubTabs: { [key: string]: string[] } = {
+        'products': ['add-product', 'edit-product']
+      };
+
+      if (validSubTabs[tab] && !validSubTabs[tab].includes(subTab)) {
+        navigate('/', { replace: true });
+        return;
+      }
+
+      // If subTab exists but the tab doesn't support subTabs, redirect
+      if (!validSubTabs[tab]) {
+        navigate('/', { replace: true });
+        return;
+      }
+    }
+  }, [user, tab, subTab, navigate]);
+
+  // Show comprehensive skeleton while loading
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
-          <p className="text-gray-600">Loading profile...</p>
-        </div>
-      </div>
-    );
+    return <ProfilePageSkeleton />;
   }
 
   if (error) {
@@ -377,6 +496,7 @@ const ProfilePage: React.FC = () => {
         onFollowersClick={handleFollowersClick}
         onFollowingClick={handleFollowingClick}
       >
+        
         {renderContent()}
       </ProfileLayout>
       <ConfirmationModal

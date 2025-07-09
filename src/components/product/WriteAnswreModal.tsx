@@ -111,8 +111,9 @@ const WriteAnswreModal: React.FC<WriteAnswreModalProps> = ({
               size="lg" 
               className="w-full bg-blue-600 hover:bg-blue-700 rounded-full h-12"
               disabled={!answer.trim() || isPending}
+              loading={isPending}
             >
-              {isPending ? (isEditMode ? 'Updating...' : 'Submitting...') : (isEditMode ? 'Update' : 'Submit')}
+              {isEditMode ? 'Update' : 'Submit'}
             </Button>
           </DialogFooter>
         </form>

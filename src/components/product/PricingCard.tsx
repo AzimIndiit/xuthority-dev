@@ -2,6 +2,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatCurrency } from '@/utils/formatCurrency';
 
 interface PricingCardProps {
   name: string;
@@ -27,7 +28,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
   return (
     <div
       className={cn(
-        'relative flex h-full flex-col rounded-2xl p-8 shadow-lg',
+        'relative flex h-full flex-col rounded-2xl p-8 shadow-lg border border-gray-200',
         isPopular ? 'bg-blue-600 text-white' : 'bg-white text-gray-900'
       )}
     >
@@ -58,7 +59,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
 
       <div className="mt-6 flex items-baseline gap-1">
         <span className="text-5xl font-bold tracking-tight">
-            {price}
+            {formatCurrency(Number(price))}
         </span>
         {price !== 'Free' && <span className={cn(isPopular ? 'text-blue-200' : 'text-gray-500')}>{priceInterval}</span>}
       </div>
@@ -77,7 +78,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
       <div className="mt-auto pt-8">
         <Button
           className={cn(
-            'w-full rounded-lg py-3 text-base font-semibold transition-transform duration-200 hover:scale-105',
+            'w-full rounded-full py-3 text-base font-semibold transition-transform duration-200 hover:scale-105',
             isPopular
               ? 'bg-white text-blue-600 hover:bg-gray-100'
               : 'bg-blue-600 text-white hover:bg-blue-700'

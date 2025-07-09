@@ -105,6 +105,9 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [allLists, setAllLists] = useState<any[]>([]);
   const [hasLoadedInitial, setHasLoadedInitial] = useState(false);
+  
+  // State to track expanded lists
+  const [expandedLists, setExpandedLists] = useState<Set<string>>(new Set());
 
   const ITEMS_PER_PAGE = 10;
 
@@ -183,6 +186,19 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
 
   const handleLoadMore = () => {
     setCurrentPage(prev => prev + 1);
+  };
+
+  // Toggle expanded state for a list
+  const toggleListExpansion = (listName: string) => {
+    setExpandedLists(prev => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(listName)) {
+        newExpanded.delete(listName);
+      } else {
+        newExpanded.add(listName);
+      }
+      return newExpanded;
+    });
   };
 
   // Check if there are more lists to load
@@ -295,7 +311,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
                     </div>
                   ) : (
                     <div className="grid grid-cols-3 gap-4 ">
-                      {list.products.slice(0, 3).map((product) => (
+                      {(expandedLists.has(list.listName) ? list.products : list.products.slice(0, 3)).map((product) => (
                         <div key={product.productId} className="flex flex-col items-center">
                           {/* Product Icon with soft background */}
                           <div className=" cursor-pointer" >
@@ -312,18 +328,18 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
                     </div>
                   )}
 
-                  {/* View All Link */}
-                  {list.products.length > 3 && (
+                  {/* View All/View Less Link */}
+                  {list.totalProducts > 3 && (
                     <div className="text-center mt-2 mb-1">
-                      <button
-                        className="text-blue-600 hover:text-blue-700 font-medium text-base underline underline-offset-2"
+                      <Button
+                        className="text-red-500 border border-red-500 bg-white hover:bg-red-50 hover:text-red-600 font-medium rounded-full !text-sm px-4 py-2 h-10 mt-2"
                         onClick={(e) => {
                           e.stopPropagation();
-                        //   handleListClick(list);
+                          toggleListExpansion(list.listName);
                         }}
                       >
-                        View All
-                      </button>
+                        {expandedLists.has(list.listName) ? 'View Less' : 'View All'}
+                      </Button>
                     </div>
                   )}
                 </CardContent>

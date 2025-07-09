@@ -35,10 +35,10 @@ const CommunityPage = () => {
     sortBy,
     sortOrder,
     status: 'approved'
-  });
+  }, productSlug);
 
   // Fetch user's answers
-  const { data: userAnswersData, isLoading: userAnswersLoading } = useUserAnswers(user?.id || '');
+  const { data: userAnswersData, isLoading: userAnswersLoading } = useUserAnswers(user?.id || '', productSlug);
 
   // Transform API data to match the existing UI structure
   const questions: Question[] = useMemo(() => {
@@ -64,7 +64,8 @@ const CommunityPage = () => {
       questionDate: formatDate(answer.questionDate),
       answerContent: answer.answerContent,
       answerId: answer.answerId,
-      questionId: answer.questionId
+      questionId: answer.questionId,
+      isOwnAnswer: answer.isOwnAnswer
     }));
   }, [userAnswersData]);
 
@@ -139,8 +140,9 @@ const CommunityPage = () => {
                   ))}
                 </>
               ) : questions.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  No questions have been asked yet. Be the first to ask!
+                <div className="text-center py-12 text-gray-500 flex flex-col items-center justify-center min-h-[50vh]">
+                  <img src="/svg/no_data.svg" alt="no-questions" className="w-1/4 mb-4" />
+                  <p>No questions have been asked yet!</p>
                 </div>
               ) : (
                 questions.map((question) => (
@@ -159,8 +161,9 @@ const CommunityPage = () => {
                   ))}
                 </>
               ) : myAnswers.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                  You haven't answered any questions yet.
+                <div className="text-center py-12 text-gray-500 flex flex-col items-center justify-center min-h-[50vh]">
+                  <img src="/svg/no_data.svg" alt="no-answers" className="w-1/4 mb-4" />
+                  <p>You haven't answered any questions yet!</p>
                 </div>
               ) : (
                 myAnswers.map((answer) => (
@@ -170,7 +173,7 @@ const CommunityPage = () => {
             </div>
           </TabsContent>
         </Tabs>
-        <AskQuestionModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} />
+        <AskQuestionModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} productSlug={productSlug} />
       </main>
     </div>
   );

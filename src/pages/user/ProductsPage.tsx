@@ -178,15 +178,11 @@ const ProductsPage: React.FC = () => {
       </div>
 
       {products?.length === 0 ? (
-        <div className="text-center text-gray-500 py-12">
+        <div className="text-center text-gray-500 flex flex-col items-center justify-center min-h-[50vh]">
+          <img src="/svg/no_data.svg" alt="no-products" className="w-1/4 mb-4" />
           <div className="text-lg font-semibold mb-2">No products found</div>
           <p className="text-gray-600">You haven't added any products yet.</p>
-          <Button
-            className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-full"
-            onClick={() => navigate('/profile/products/add-product')}
-          >
-            Add Your First Product
-          </Button>
+        
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 mt-12 gap-y-12">

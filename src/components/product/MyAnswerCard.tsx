@@ -90,12 +90,11 @@ const MyAnswerCard: React.FC<MyAnswerCardProps> = ({ myAnswer }) => {
                     className="rounded-full px-4 py-2 !text-xs  text-white flex items-center h-8 w-8 sm:w-fit"
                     onClick={() => setIsDeleteModalOpen(true)}
                     disabled={deleteAnswerMutation.isPending}
+                    title="Delete Answer"
+                    loading={deleteAnswerMutation.isPending}
                   >
-                    {deleteAnswerMutation.isPending ? (
-                      <Loader2 className="w-2 h-2 animate-spin" />
-                    ) : (
+                   
                       <Trash2 className="w-2 h-2" />
-                    )}
                   </Button>
                 </div>
               </div>
@@ -113,12 +112,12 @@ const MyAnswerCard: React.FC<MyAnswerCardProps> = ({ myAnswer }) => {
                   className="rounded-full px-4 py-2 !text-xs  text-white flex items-center h-8 w-8 sm:w-fit"
                   onClick={() => setIsDeleteModalOpen(true)}
                   disabled={deleteAnswerMutation.isPending}
+                  title="Delete Answer"
+                  loading={deleteAnswerMutation.isPending}
                 >
-                  {deleteAnswerMutation.isPending ? (
-                    <Loader2 className="w-2 h-2 sm:mr-1 animate-spin" />
-                  ) : (
+                 
                     <Trash2 className="w-2 h-2 sm:mr-1" />
-                  )}
+                 
                   <span className="hidden sm:block">
                     {deleteAnswerMutation.isPending ? 'Deleting...' : 'Delete Answer'}
                   </span>

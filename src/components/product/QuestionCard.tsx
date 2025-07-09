@@ -127,7 +127,10 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
     author: {
       name: getUserDisplayName(answer.author),
       avatarUrl: answer.author.avatar || `https://ui-avatars.com/api/?name=${getUserDisplayName(answer.author)}`,
-      isVendor: false // Role is not populated in the answer response, would need backend update
+      isVendor: false, // Role is not populated in the answer response, would need backend update
+      slug: answer.author.slug,
+      _id: answer.author._id,
+      isOwnAnswer: answer.author._id === user?._id
     },
     date: formatDate(answer.createdAt),
     content: answer.content

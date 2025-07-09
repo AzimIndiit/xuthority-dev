@@ -70,6 +70,7 @@ export default function Navbar() {
   
   const handleLogout = async () => {
     try {
+      
       await logoutMutation.mutateAsync();
       window.location.reload();
       localStorage.clear();

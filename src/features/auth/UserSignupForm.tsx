@@ -12,8 +12,8 @@ import { useRegisterUser, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
 
 const signupSchema = z.object({
-  firstName: z.string().min(1, { message: "First name is required" }).max(50, { message: "First name must be less than 50 characters" }),
-  lastName: z.string().min(1, { message: "Last name is required" }).max(50, { message: "Last name must be less than 50 characters" }),
+  firstName: z.string().min(1, { message: "First name is required" }).trim().max(50, { message: "First name must be less than 50 characters" }).nonempty({ message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }).trim().max(50, { message: "Last name must be less than 50 characters" }).nonempty({ message: "Last name is required" }),
   email: z.string().email({ message: "Invalid email address" }),
   password: z
     .string()

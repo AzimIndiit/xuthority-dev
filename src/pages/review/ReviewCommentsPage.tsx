@@ -181,7 +181,7 @@ const ReviewCommentsPage: React.FC = () => {
   // Pagination state
   const [page, setPage] = useState(1);
   const [allReplies, setAllReplies] = useState<any[]>([]);
-  const [hasMoreReplies, setHasMoreReplies] = useState(true);
+  const [hasMoreReplies, setHasMoreReplies] = useState(false);
   const [totalComments, setTotalComments] = useState(0);
   const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set());
 
@@ -467,6 +467,7 @@ console.log(allReplies,'allReplies');
                         navigate(`/profile`)
                       }}}>
                         <AvatarImage 
+                        className='object-cover'
                           src={reply.author.avatar || reply.author.profilePicture} 
                           alt={getUserDisplayName(reply.author)} 
                         />

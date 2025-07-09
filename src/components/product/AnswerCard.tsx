@@ -1,17 +1,21 @@
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Answer } from '@/types/community';
+import { useNavigate } from 'react-router-dom';
 
 interface AnswerCardProps {
   answer: Answer;
 }
 
 const AnswerCard: React.FC<AnswerCardProps> = ({ answer }) => {
+  const navigate = useNavigate();
   return (
     <div className=" mb-4">
      <div className='flex items-center gap-4'>
-     <Avatar className="h-10 w-10">
-        <AvatarImage src={answer.author.avatarUrl} alt={answer.author.name} />
+     <Avatar className="h-10 w-10 cursor-pointer" onClick={()=>{
+      navigate( answer.author.isOwnAnswer ? `/profile` : `/public-profile/${answer.author.slug}`);
+     }}>
+        <AvatarImage className='object-cover' src={answer.author.avatarUrl} alt={answer.author.name} />
         <AvatarFallback>{answer.author.name.charAt(0)}</AvatarFallback>
       </Avatar>
       <div className="flex-1">

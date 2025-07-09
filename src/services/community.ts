@@ -46,6 +46,7 @@ export interface GetQuestionsParams {
   sortOrder?: 'asc' | 'desc';
   status?: string;
   product?: string;
+  productSlug?: string;
   author?: string;
   search?: string;
 }
@@ -61,6 +62,7 @@ export interface GetAnswersParams {
 export interface CreateQuestionData {
   title: string;
   product?: string;
+  productSlug?: string;
 }
 
 export interface CreateAnswerData {
@@ -76,16 +78,24 @@ export interface UpdateAnswerData {
 }
 
 // Question APIs
-export const getQuestions = (params?: GetQuestionsParams) => {
-  return api.get('/community/questions', { params });
+export const getQuestions = (params?: GetQuestionsParams, productSlug?: string) => {
+  const queryParams = { ...params };
+  if (productSlug) {
+    queryParams.productSlug = productSlug;
+  }
+  return api.get('/community/questions', { params: queryParams });
 };
 
 export const getQuestion = (id: string) => {
   return api.get(`/community/questions/${id}`);
 };
 
-export const createQuestion = (data: CreateQuestionData) => {
-  return api.post('/community/questions', data);
+export const createQuestion = (data: CreateQuestionData, productSlug?: string) => {
+  const requestData = { ...data };
+  if (productSlug) {
+    requestData.productSlug = productSlug;
+  }
+  return api.post('/community/questions', requestData);
 };
 
 export const updateQuestion = (id: string, data: UpdateQuestionData) => {
@@ -133,13 +143,17 @@ export const getUserQuestions = (userId: string, params?: GetQuestionsParams) =>
 };
 
 // Get all answers with populated questions for My Answers tab
-export const getAllAnswersWithQuestions = (params?: { page?: number; limit?: number }) => {
+export const getAllAnswersWithQuestions = (params?: { page?: number; limit?: number }, productSlug?: string) => {
   // Fetch all questions with their answers populated
+  const queryParams = { 
+    ...params,
+    status: 'approved',
+    limit: params?.limit || 50
+  };
+  if (productSlug) {
+    queryParams.productSlug = productSlug;
+  }
   return api.get('/community/questions', { 
-    params: { 
-      ...params,
-      status: 'approved',
-      limit: params?.limit || 50
-    } 
+    params: queryParams 
   });
 }; 

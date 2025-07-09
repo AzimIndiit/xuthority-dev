@@ -114,8 +114,12 @@ const deleteMutation = useDeleteProduct();
   const { success, error, info } = useToast();
   
   // Check if product is already in favorites
-  const { data: favoriteStatus } = useFavoriteStatus(id);
-  const isInFavorites = favoriteStatus?.isFavorite || false;
+  let favoriteStatus, isInFavorites = false;
+  if (user?.role !== 'vendor') {
+    const favoriteStatusQuery = useFavoriteStatus(id);
+    favoriteStatus = favoriteStatusQuery.data;
+    isInFavorites = favoriteStatus?.isFavorite || false;
+  }
   
   const isInCompare = isProductInCompare(id);
 
@@ -181,7 +185,7 @@ const deleteMutation = useDeleteProduct();
         onClick={viewProductPage}
       >
         <div
-          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg flex items-center justify-center  border border-white`} style={{backgroundColor: logoBackground}}
+          className={`w-16 h-16 sm:w-20 sm:h-20 rounded-lg flex items-center justify-center  border-2 border-white`} style={{backgroundColor: logoBackground}}
         >
           <img
             src={logo}
@@ -190,7 +194,7 @@ const deleteMutation = useDeleteProduct();
           />
         </div>
       </div>
-      <Card className="relative bg-white rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
+      <Card className="relative l bg-[#F7F7F7] rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
         {/* Logo space is handled above */}
         {/* Logo and Compare */}
        {(user?.role !== 'vendor' && location.pathname !== '/public-profile' && location.pathname !== '/profile/products') && <div className="flex items-start gap-4 ">
@@ -214,7 +218,7 @@ const deleteMutation = useDeleteProduct();
           </div>
         </div>}
         {/* Name, Rating, Review, Write Review */}
-        <div className="flex sm:flex-row flex-col sm:items-start justify-between gap-4 mt-3">
+        <div className={`flex sm:flex-row flex-col sm:items-start justify-between gap-4 ${user?.role==='vendor'? 'mt-8': 'mt-3'}`}>
           <div>
             <div
               onClick={viewProductPage}
@@ -302,22 +306,22 @@ const deleteMutation = useDeleteProduct();
         </div>
         {/* Bottom Actions */}
        {location.pathname !== '/profile/products' && <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4 ">
-          <button
+         { <button
             onClick={() => setShowAddToListModal(true)}
-            className={`flex items-center gap-1 !text-[11px] xl:!text-[12px] font-medium sm:px-2 py-1 rounded transition cursor-pointer ${
+            className={`${user?.role==='vendor' ? 'invisible': 'flex'} items-center gap-1 !text-[11px] xl:!text-[12px] font-medium sm:px-2 py-1 rounded transition cursor-pointer ${
               isInFavorites 
                 ? 'text-red-500' 
                 : 'text-gray-500 hover:text-red-500'
             }`}
           >
             <Heart className={`w-5 h-5 ${isInFavorites ? 'fill-red-500' : ''}`} /> Save to My List
-          </button>
+          </button>}
           <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
-            <Button className="bg-white border hover:bg-white borderr-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 sm:ml-2">
+            <Button className="bg-white border hover:bg-white borderr-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px]  h-10 xl:h-12 sm:ml-2">
               Entry Level Price: {formatCurrency(minPrice || 0)}
             </Button>
             <Button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 sm:ml-2"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px]  h-10  xl:h-12 sm:ml-2"
               onClick={onTry}
             >
               Try For Free

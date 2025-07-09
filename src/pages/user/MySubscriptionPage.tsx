@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, CreditCard, ExternalLink } from 'lucide-react';
+import { ArrowLeftIcon, Check, CreditCard, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,13 +14,105 @@ import {
   useCreateBillingPortalSession,
   type SubscriptionPlan 
 } from '@/hooks/useSubscription';
+import { useNavigate } from 'react-router-dom';
+
+// Skeleton for the page header
+const HeaderSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="flex items-center gap-2">
+      <span className="block lg:hidden">
+        <div className="w-6 h-6 bg-gray-200 rounded" />
+      </span>
+      <div>
+        <div className="h-8 bg-gray-200 rounded w-48 mb-2" />
+        <div className="h-5 bg-gray-200 rounded w-80" />
+      </div>
+    </div>
+  </div>
+);
+
+// Skeleton for individual subscription plan cards
+const SubscriptionCardSkeleton = () => (
+  <Card className="border border-gray-200 bg-white animate-pulse">
+    <CardHeader className="pb-4">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-gray-200 rounded-lg" />
+          <div className="h-6 bg-gray-200 rounded w-24" />
+        </div>
+      </div>
+      <div className="h-4 bg-gray-200 rounded w-full mt-2" />
+    </CardHeader>
+
+    <CardContent className="pt-0">
+      {/* Pricing Skeleton */}
+      <div className="mb-6">
+        <div className="flex items-baseline gap-2">
+          <div className="h-10 bg-gray-200 rounded w-20" />
+          <div className="h-6 bg-gray-200 rounded w-16" />
+        </div>
+      </div>
+
+      {/* Features Skeleton */}
+      <div className="mb-6">
+        <div className="h-5 bg-gray-200 rounded w-32 mb-3" />
+        <ul className="space-y-3">
+          {[...Array(4)].map((_, index) => (
+            <li key={index} className="flex items-center gap-3">
+              <div className="w-5 h-5 bg-gray-200 rounded-full flex-shrink-0" />
+              <div className="h-4 bg-gray-200 rounded w-full" />
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Action Button Skeleton */}
+      <div className="space-y-3">
+        <div className="h-10 bg-gray-200 rounded-full w-full" />
+        <div className="text-center space-y-1">
+          <div className="h-4 bg-gray-200 rounded w-32 mx-auto" />
+          <div className="h-3 bg-gray-200 rounded w-40 mx-auto" />
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+);
+
+// Skeleton for billing management actions
+const BillingActionsSkeleton = () => (
+  <div className="flex justify-center gap-4 animate-pulse">
+    <div className="h-10 bg-gray-200 rounded-full w-32" />
+    <div className="h-10 bg-gray-200 rounded-full w-40" />
+  </div>
+);
+
+// Complete page skeleton
+const MySubscriptionPageSkeleton = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="space-y-8">
+      <HeaderSkeleton />
+      
+      {/* Subscription Plans Grid Skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SubscriptionCardSkeleton />
+        <SubscriptionCardSkeleton />
+      </div>
+      
+      {/* Billing Actions Skeleton */}
+      <BillingActionsSkeleton />
+    </div>
+  );
+};
 
 const MySubscriptionPage: React.FC = () => {
+  const navigate = useNavigate();
   const [showCancelModal, setShowCancelModal] = useState(false);
   
   // API hooks
-  const { data: subscriptionPlans, isLoading: plansLoading } = useSubscriptionPlans();
-  const { data: currentSubscription, isLoading: subscriptionLoading } = useCurrentSubscription();
+  const { data: subscriptionPlans, isLoading: plansLoading ,error: plansError} = useSubscriptionPlans();
+  const { data: currentSubscription, isLoading: subscriptionLoading ,error: subscriptionError} = useCurrentSubscription();
   const createCheckoutSession = useCreateCheckoutSession();
   const cancelSubscription = useCancelSubscription();
   const resumeSubscription = useResumeSubscription();
@@ -136,34 +228,33 @@ const MySubscriptionPage: React.FC = () => {
     }
   };
 
-  // Show loading state
+  // Show skeleton when loading
   if (plansLoading || subscriptionLoading) {
-    return (
-      <div className="space-y-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">My Subscription</h1>
-            <p className="text-gray-600">
-              Manage your subscription plans and billing preferences
-            </p>
-          </div>
-        </div>
-        <div className="flex justify-center py-8">
-          <SecondaryLoader />
-        </div>
-      </div>
-    );
+    return <MySubscriptionPageSkeleton />;
+  }
+
+  if(plansError || subscriptionError) {
+    return <div>
+      <h1 className='text-center text-xl font-bold text-red-500'  > Error loading subscription plans</h1>
+      <p className='text-center text-gray-600'>Please try again later</p>
+    </div>
   }
 
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">My Subscription</h1>
+      <div className="">
+        <div className="flex items-center gap-2">
+        <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span> 
+         <div>
+         <h1 className="text-2xl font-bold text-gray-900 mb-2">My Subscription</h1>
           <p className="text-gray-600">
             Manage your subscription plans and billing preferences
           </p>
+         </div>
         </div>
       </div>
 
@@ -208,7 +299,7 @@ const MySubscriptionPage: React.FC = () => {
                     }`}></div>
                   </div>
                   <CardTitle className={`text-xl font-semibold ${
-                    isActivePlan ? 'text-blue-900' : 'text-gray-900'
+                    isActivePlan? 'text-blue-900' : 'text-gray-900'
                   }`}>
                     {plan.name}
                   </CardTitle>

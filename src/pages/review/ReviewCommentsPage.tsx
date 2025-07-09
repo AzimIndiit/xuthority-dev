@@ -37,20 +37,37 @@ const ReviewCommentsPageSkeleton: React.FC = () => {
           </div>
         </div>
 
-        {/* Review Card skeleton */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        {/* Enhanced Review Card skeleton */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-gray-200 rounded-full animate-pulse" />
+            <div className="w-12 h-12 bg-gray-200 rounded-full" />
             <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="h-5 w-32 bg-gray-200 rounded animate-pulse" />
-                <div className="h-5 w-20 bg-gray-200 rounded animate-pulse" />
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <div className="h-5 w-32 bg-gray-200 rounded" />
+                  <div className="h-4 w-4 bg-gray-200 rounded" />
+                </div>
+                <div className="flex items-center space-x-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="w-4 h-4 bg-gray-200 rounded" />
+                  ))}
+                </div>
               </div>
-              <div className="h-4 w-24 bg-gray-200 rounded mb-3 animate-pulse" />
-              <div className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
-                <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
-                <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+              
+              <div className="h-4 w-48 bg-gray-200 rounded mb-2" />
+              <div className="h-6 w-40 bg-gray-200 rounded mb-4" />
+              
+              <div className="space-y-2 mb-4">
+                <div className="h-4 bg-gray-200 rounded w-full" />
+                <div className="h-4 bg-gray-200 rounded w-5/6" />
+                <div className="h-4 bg-gray-200 rounded w-4/5" />
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+              </div>
+              
+              <div className="flex items-center gap-4 mt-4">
+                <div className="h-8 w-20 bg-gray-200 rounded" />
+                <div className="h-8 w-16 bg-gray-200 rounded" />
+                <div className="h-8 w-14 bg-gray-200 rounded" />
               </div>
             </div>
           </div>
@@ -73,7 +90,7 @@ const ReviewCommentsPageSkeleton: React.FC = () => {
           {/* Comments List skeleton */}
           <div className="p-6">
             <div className="space-y-6">
-              {[1, 2, 3].map((index) => (
+              {[1, 2, 3, 4, 5].map((index) => (
                 <CommentSkeleton key={index} />
               ))}
             </div>
@@ -84,25 +101,61 @@ const ReviewCommentsPageSkeleton: React.FC = () => {
   );
 };
 
-// Skeleton component for individual comments
+// Enhanced skeleton component for individual comments
 const CommentSkeleton: React.FC = () => {
   return (
-    <div className="flex items-start gap-3">
-      <div className="w-10 h-10 bg-gray-200 rounded-full animate-pulse" />
+    <div className="flex items-start gap-3 animate-pulse">
+      <div className="w-10 h-10 bg-gray-200 rounded-full" />
       <div className="flex-1">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
-            <div className="h-4 w-16 bg-gray-200 rounded animate-pulse" />
+            <div className="h-4 w-24 bg-gray-200 rounded" />
+            <div className="h-4 w-16 bg-gray-200 rounded" />
+            <div className="h-4 w-12 bg-gray-200 rounded" />
           </div>
-          <div className="h-4 w-4 bg-gray-200 rounded animate-pulse" />
+          <div className="h-4 w-4 bg-gray-200 rounded" />
         </div>
-        <div className="space-y-2">
-          <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded w-4/5 animate-pulse" />
+        <div className="space-y-2 mb-3">
+          <div className="h-4 bg-gray-200 rounded w-full" />
+          <div className="h-4 bg-gray-200 rounded w-4/5" />
+          <div className="h-4 bg-gray-200 rounded w-3/5" />
         </div>
-        <div className="mt-3">
-          <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+        <div className="flex items-center gap-2">
+          <div className="h-4 w-4 bg-gray-200 rounded" />
+          <div className="h-4 w-20 bg-gray-200 rounded" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// New skeleton for load more comments
+const LoadMoreCommentsSkeleton: React.FC = () => {
+  return (
+    <div className="space-y-6">
+      {[1, 2, 3].map((index) => (
+        <CommentSkeleton key={index} />
+      ))}
+    </div>
+  );
+};
+
+// New skeleton for comment being posted
+const CommentPostingSkeleton: React.FC = () => {
+  return (
+    <div className="flex items-start gap-3 animate-pulse bg-blue-50 p-4 rounded-lg border border-blue-200">
+      <div className="w-10 h-10 bg-blue-200 rounded-full" />
+      <div className="flex-1">
+        <div className="flex items-center gap-2 mb-2">
+          <div className="h-4 w-24 bg-blue-200 rounded" />
+          <div className="h-4 w-12 bg-blue-200 rounded" />
+        </div>
+        <div className="space-y-2 mb-3">
+          <div className="h-4 bg-blue-200 rounded w-full" />
+          <div className="h-4 bg-blue-200 rounded w-3/4" />
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="h-3 w-16 bg-blue-200 rounded" />
         </div>
       </div>
     </div>
@@ -385,8 +438,15 @@ console.log(allReplies,'allReplies');
 
           {/* Comments List */}
           <div className="p-6">
+            {/* Show comment being posted */}
+            {createReplyMutation.isPending && (
+              <div className="mb-6">
+                <CommentPostingSkeleton />
+              </div>
+            )}
+
             {isLoadingInitial ? (
-              // Show comment skeletons while loading
+              // Show comment skeletons while loading initial comments
               <div className="space-y-6">
                 {[1, 2, 3, 4, 5].map((index) => (
                   <CommentSkeleton key={index} />
@@ -457,6 +517,7 @@ console.log(allReplies,'allReplies');
                               value={editingContent}
                               onChange={(e) => setEditingContent(e.target.value)}
                               className="w-full mb-2 min-h-[80px]"
+                              disabled={updateReplyMutation.isPending}
                             />
                             <div className="flex gap-2">
                               <Button
@@ -474,6 +535,7 @@ console.log(allReplies,'allReplies');
                                   setEditingReplyId(null);
                                   setEditingContent('');
                                 }}
+                                disabled={updateReplyMutation.isPending}
                               >
                                 Cancel
                               </Button>
@@ -503,6 +565,13 @@ console.log(allReplies,'allReplies');
                   ))}
                 </div>
 
+                {/* Show loading skeleton when loading more comments */}
+                {isLoadingMore && (
+                  <div className="mt-6">
+                    <LoadMoreCommentsSkeleton />
+                  </div>
+                )}
+
                 {/* Load More Button */}
                 {hasMoreReplies && (
                   <div className="flex justify-center mt-8">
@@ -511,16 +580,9 @@ console.log(allReplies,'allReplies');
                       variant="outline"
                       size="lg"
                       disabled={isLoadingMore}
-                      className='border-red-600  text-red-600 text-xs rounded-full hover:text-red-500'
+                      className='border-red-600 text-red-600 text-xs rounded-full hover:text-red-500'
                     >
-                      {isLoadingMore ? (
-                        <>
-                          <LottieLoader size="small" />
-                          <span className="ml-2">Loading...</span>
-                        </>
-                      ) : (
-                        'Load More Comments'
-                      )}
+                      {isLoadingMore ? 'Loading...' : 'Load More Comments'}
                     </Button>
                   </div>
                 )}

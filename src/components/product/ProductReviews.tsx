@@ -14,6 +14,99 @@ import { Product } from '@/services/product';
 import { ProductReviewFilters } from '@/services/review';
 import LottieLoader from '../LottieLoader';
 
+// Skeleton loader for the header section
+const HeaderSkeleton = () => (
+  <div className="flex flex-col md:flex-row justify-between md:items-start mb-8 animate-pulse">
+    <div className="flex-1">
+      <div className="h-8 bg-gray-200 rounded w-64 mb-3"></div>
+      <div className="flex items-center mt-2">
+        <div className="flex space-x-1">
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="w-5 h-5 bg-gray-200 rounded"></div>
+          ))}
+        </div>
+        <div className="ml-2 h-6 bg-gray-200 rounded w-32"></div>
+      </div>
+    </div>
+    <div className="h-12 bg-gray-200 rounded w-40 mt-4 md:mt-0"></div>
+  </div>
+);
+
+// Skeleton loader for the rating breakdown section
+const RatingBreakdownSkeleton = () => (
+  <div className="bg-white p-6 rounded-lg animate-pulse">
+    <div className="h-6 bg-gray-200 rounded w-32 mb-4"></div>
+    <div className="space-y-3">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="flex items-center">
+          <div className="w-4 h-4 bg-gray-200 rounded mr-2"></div>
+          <div className="flex-1 h-2 bg-gray-200 rounded mx-2"></div>
+          <div className="w-8 h-4 bg-gray-200 rounded"></div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// Skeleton loader for the search section
+const SearchSkeleton = () => (
+  <div className="bg-white p-6 rounded-lg animate-pulse">
+    <div className="h-6 bg-gray-200 rounded w-24 mb-4"></div>
+    <div className="h-10 bg-gray-200 rounded w-full mb-4"></div>
+    <div className="space-y-2">
+      <div className="h-4 bg-gray-200 rounded w-20"></div>
+      <div className="flex flex-wrap gap-2">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-6 bg-gray-200 rounded w-16"></div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// Skeleton loader for individual review items
+const ReviewItemSkeleton = () => (
+  <div className="bg-white p-6 rounded-lg border border-gray-200 animate-pulse">
+    <div className="flex items-start justify-between mb-4">
+      <div className="flex items-center space-x-3">
+        <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+        <div className="space-y-1">
+          <div className="h-4 bg-gray-200 rounded w-32"></div>
+          <div className="h-3 bg-gray-200 rounded w-24"></div>
+        </div>
+      </div>
+      <div className="flex items-center space-x-1">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
+        ))}
+      </div>
+    </div>
+    
+    <div className="space-y-2 mb-4">
+      <div className="h-4 bg-gray-200 rounded w-full"></div>
+      <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+      <div className="h-4 bg-gray-200 rounded w-3/5"></div>
+    </div>
+    
+    <div className="flex items-center justify-between">
+      <div className="h-4 bg-gray-200 rounded w-20"></div>
+      <div className="flex space-x-2">
+        <div className="h-8 bg-gray-200 rounded w-16"></div>
+        <div className="h-8 bg-gray-200 rounded w-16"></div>
+      </div>
+    </div>
+  </div>
+);
+
+// Skeleton loader for the review list section
+const ReviewListSkeleton = () => (
+  <div className="space-y-6">
+    {[...Array(5)].map((_, i) => (
+      <ReviewItemSkeleton key={i} />
+    ))}
+  </div>
+);
+
 interface ProductReviewsProps {
   product: Product;
 }
@@ -100,12 +193,24 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
     }));
   };
 
+  // Show skeleton loading when data is loading
   if (reviewsLoading && !reviewsResponse) {
     return (
       <div className="bg-[#F7F7F7] py-12">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
-          <div className="flex justify-center items-center py-20">
-            <LottieLoader size="large" />
+          <HeaderSkeleton />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
+            <div className="lg:col-span-4">
+              <RatingBreakdownSkeleton />
+            </div>
+            <div className="lg:col-span-3">
+              <SearchSkeleton />
+            </div>
+          </div>
+          
+          <div className="mt-8">
+            <ReviewListSkeleton />
           </div>
         </div>
       </div>

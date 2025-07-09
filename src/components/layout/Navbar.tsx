@@ -163,12 +163,13 @@ export default function Navbar() {
                         <ChevronDown className="h-4 w-4 text-blue-600" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="w-56" align="end">
-                      <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <DropdownMenuContent className="w-46" align="end">
+                      <DropdownMenuItem className="cursor-pointer" onClick={() => navigate("/profile")}>
                         Profile
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem 
+                        className="cursor-pointer"
                         onClick={handleLogoutClick}
                         disabled={logoutMutation.isPending}
                       >

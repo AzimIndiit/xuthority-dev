@@ -29,10 +29,11 @@ import { NotificationsList } from '@/components/notifications';
 import UserDisputes from './UserDisputes';
 import MyBadgesPage from './MyBadgesPage';
 import MySubscriptionPage from './MySubscriptionPage';
-import SecondaryLoader from '@/components/ui/SecondaryLoader';
+import useUserStore from '@/store/useUserStore';
 
 const ProfilePage: React.FC = () => {
   const { tab, subTab } = useParams<{ tab?: string, subTab?: string }>();
+  const  {user:loggedInUser} = useUserStore()
   const navigate = useNavigate();
   const logoutMutation = useLogout();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -63,9 +64,43 @@ const ProfilePage: React.FC = () => {
   // Use the useProfile hook to trigger React Query
   const { data: user, isLoading, error } = useProfile();
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mb-4"></div>
+          <p className="text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
-    return <div>Error loading profile or user not authenticated</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <UserIcon className="w-8 h-8 text-red-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Error Loading Profile</h3>
+          <p className="text-gray-600">Unable to load profile or user not authenticated</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <UserIcon className="w-8 h-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">User Not Found</h3>
+          <p className="text-gray-600">The user profile could not be found</p>
+        </div>
+      </div>
+    );
   }
 
   const userForProfile = {
@@ -112,7 +147,7 @@ const ProfilePage: React.FC = () => {
   };
 
   // Sidebar items based on user role (no hooks inside)
-  const sidebarItems = user?.role === 'vendor'
+  const sidebarItems = loggedInUser?.role === 'vendor'
     ? [
       {
         id: 'profile-details',
@@ -271,7 +306,7 @@ const ProfilePage: React.FC = () => {
 
     switch (activeTab) {
       case 'profile-details':
-        return user?.role === 'vendor' ? <ProfileDetailsFormVendor initialData={initialProfileVendorData} /> : <ProfileDetailsForm initialData={initialProfileData} />;
+        return user?.role === 'vendor' ? <ProfileDetailsFormVendor isLoading={isLoading} initialData={initialProfileVendorData} /> : <ProfileDetailsForm isLoading={isLoading} initialData={initialProfileData} />;
       case 'followers':
         return (
           <FollowersFollowing

@@ -11,6 +11,72 @@ import { useToast } from '@/hooks/useToast';
 import { Input } from '../ui/input';
 import { useNavigate } from 'react-router-dom';
 
+// Skeleton component for individual user cards
+const UserCardSkeleton = () => (
+  <div className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 animate-pulse">
+    <div className="flex items-center space-x-4">
+      <div className="w-12 h-12 bg-gray-200 rounded-full" />
+      <div className="space-y-2">
+        <div className="h-4 bg-gray-200 rounded w-32" />
+        <div className="h-3 bg-gray-200 rounded w-24" />
+      </div>
+    </div>
+    <div className="h-10 bg-gray-200 rounded-full w-20" />
+  </div>
+);
+
+// Skeleton component for the header
+const HeaderSkeleton = () => (
+  <div className="flex items-center gap-2 mb-6 animate-pulse">
+    <div className="block lg:hidden w-6 h-6 bg-gray-200 rounded" />
+    <div className="h-7 bg-gray-200 rounded w-24" />
+  </div>
+);
+
+// Skeleton component for the search bar
+const SearchSkeleton = () => (
+  <div className="relative mb-6 animate-pulse">
+    <div className="w-full h-14 bg-gray-200 rounded-full" />
+  </div>
+);
+
+// Skeleton component for tabs
+const TabsSkeleton = () => (
+  <div className="mb-6 animate-pulse">
+    <div className="bg-gray-100 p-0 h-12 w-fit rounded-lg flex">
+      <div className="h-12 bg-gray-200 rounded w-32 mr-1" />
+      <div className="h-12 bg-gray-200 rounded w-32" />
+    </div>
+  </div>
+);
+
+// Skeleton component for user list
+const UserListSkeleton = () => (
+  <div className="space-y-4">
+    {[...Array(8)].map((_, index) => (
+      <UserCardSkeleton key={index} />
+    ))}
+  </div>
+);
+
+// Skeleton component for load more button
+const LoadMoreSkeleton = () => (
+  <div className="text-center pt-4 animate-pulse">
+    <div className="h-10 bg-gray-200 rounded w-32 mx-auto" />
+  </div>
+);
+
+// Complete skeleton for FollowersFollowing page
+const FollowersFollowingSkeleton = () => (
+  <div className="">
+    <HeaderSkeleton />
+    <SearchSkeleton />
+    <TabsSkeleton />
+    <UserListSkeleton />
+    <LoadMoreSkeleton />
+  </div>
+);
+
 interface FollowersFollowingProps {
   userId: string;
   currentUserId?: string;
@@ -160,10 +226,7 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
         {/* Followers Tab Content */}
         <TabsContent value="followers" className="mt-0">
           {followersLoading && followersPage === 1 ? (
-            <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-gray-600">Loading followers...</p>
-            </div>
+            <UserListSkeleton />
           ) : followersError ? (
             <div className="text-center py-8">
               <p className="text-red-600">Error loading followers</p>
@@ -229,10 +292,7 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
         {/* Following Tab Content */}
         <TabsContent value="following" className="mt-0">
           {followingLoading && followingPage === 1 ? (
-            <div className="text-center py-8">
-              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <p className="mt-2 text-gray-600">Loading following...</p>
-            </div>
+            <UserListSkeleton />
           ) : followingError ? (
             <div className="text-center py-8">
               <p className="text-red-600">Error loading following</p>

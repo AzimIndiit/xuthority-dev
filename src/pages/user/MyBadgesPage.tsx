@@ -7,6 +7,61 @@ import { Navigate } from 'react-router-dom';
 import { ArrowLeft, ArrowLeftIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+// Skeleton component for the header
+const HeaderSkeleton = () => (
+  <div className="animate-pulse">
+    <div className="mb-8 flex items-center justify-between">
+      <div className='flex items-center gap-2'>
+        <span className="block lg:hidden">
+          <div className="w-6 h-6 bg-gray-200 rounded" />
+        </span>
+        <div className="h-8 bg-gray-200 rounded w-32" />
+      </div>
+    </div>
+    <div className="space-y-2">
+      <div className="h-5 bg-gray-200 rounded w-full max-w-4xl" />
+      <div className="h-5 bg-gray-200 rounded w-3/4 max-w-4xl" />
+    </div>
+  </div>
+);
+
+// Skeleton component for individual badge cards
+const BadgeCardSkeleton = () => (
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 animate-pulse">
+    <div className="flex flex-col items-center text-center space-y-3">
+      {/* Badge icon placeholder */}
+      <div className="w-12 h-12 bg-gray-200 rounded-full" />
+      
+      {/* Badge title placeholder */}
+      <div className="h-4 bg-gray-200 rounded w-20" />
+      
+      {/* Status button placeholder */}
+      <div className="h-8 bg-gray-200 rounded-full w-24" />
+    </div>
+  </div>
+);
+
+// Skeleton component for the badges grid
+const BadgesGridSkeleton = () => (
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 space-y-12 mt-20">
+    {[...Array(12)].map((_, index) => (
+      <BadgeCardSkeleton key={index} />
+    ))}
+  </div>
+);
+
+// Complete page skeleton
+const MyBadgesPageSkeleton = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="">
+      <HeaderSkeleton />
+      <BadgesGridSkeleton />
+    </div>
+  );
+};
+
 const MyBadgesPage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -18,9 +73,9 @@ const MyBadgesPage: React.FC = () => {
     return <Navigate to="/profile" replace />;
   }
 
-  // Use page loader hook to manage loading state
+  // Show skeleton when loading
   if (isLoadingAll || isLoadingUser) {
-    return <SecondaryLoader text="Loading badges..." containerClasses='min-h-[60vh]' />;
+    return <MyBadgesPageSkeleton />;
   }
 
   const badges = Array.isArray(allBadges?.data) ? allBadges.data : [];
@@ -28,7 +83,6 @@ const MyBadgesPage: React.FC = () => {
   const userBadgesData = Array.isArray(userBadges.data) ? userBadges.data : [];
 
   console.log(userBadgesData,'userBadgesData');
-
 
   return (
     <div className="">

@@ -91,6 +91,20 @@ function ProductSkeleton() {
   );
 }
 
+
+
+// Skeleton component for the software grid
+const SoftwareGridSkeleton = () => (
+   
+   <div className="flex-1 w-full">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 !gap-y-12">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <ProductSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+);
+
 export default function SoftwareGrid() {
   const {options:softwareOptions,isLoading:softwareLoading}=useSoftwareOptions(1,10)
   const navigate = useNavigate();
@@ -237,11 +251,9 @@ export default function SoftwareGrid() {
 
           {/* Software Cards Grid */}
           <div className="flex-1 w-full min-h-[30vh] sm:min-h-[40vh] mt-10">
-            {/* Show loader when products are loading or fetching */}
+            {/* Show skeleton when products are loading or fetching */}
             {isLoading || isFetching ? (
-              <div className="flex justify-center items-center min-h-[400px]">
-                <SecondaryLoader />
-              </div>
+              <SoftwareGridSkeleton />
             ) : products.length === 0 ? (
               <div className="flex flex-col items-center justify-center min-h-[400px]">
                 <img src="/svg/no_data.svg" alt="No products" className="w-32 h-32 sm:w-64 sm:h-64 mb-4" />

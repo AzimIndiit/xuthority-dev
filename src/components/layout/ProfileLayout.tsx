@@ -53,7 +53,7 @@ const ProfileLayout: React.FC<ProfileLayoutProps> = ({
 
           {/* Right Content */}
           <div className="col-span-4 lg:col-span-3  lg:px-8">
-            {isLoading? <SecondaryLoader text="Loading profile..." containerClasses='min-h-[60vh]' /> : children}
+            { children}
           </div>
         </div>
       </div>

@@ -21,6 +21,110 @@ import { useUpdateProfileWithImage } from "@/hooks/useAuth";
 import { getUserDisplayName, getUserInitials } from "@/utils/userHelpers";
 import useUserStore from "@/store/useUserStore";
 
+// Skeleton component for form sections
+const FormSectionSkeleton = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <div className="animate-pulse">
+    <div className="h-6 bg-gray-200 rounded w-40 mb-6"></div>
+    {children}
+  </div>
+);
+
+// Skeleton component for avatar section
+const AvatarSectionSkeleton = () => (
+  <div className="flex items-center mb-6">
+    <div className="relative">
+      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-200 rounded-full"></div>
+      <div className="absolute -bottom-1 -right-1">
+        <div className="w-6 h-6 bg-gray-300 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+);
+
+// Skeleton component for form input fields
+const FormInputSkeleton = ({ isFullWidth = false }: { isFullWidth?: boolean }) => (
+  <div className={`space-y-2 ${isFullWidth ? 'col-span-full' : ''}`}>
+    <div className="h-4 bg-gray-200 rounded w-24"></div>
+    <div className="h-10 bg-gray-200 rounded w-full"></div>
+  </div>
+);
+
+// Skeleton component for textarea fields
+const FormTextareaSkeleton = () => (
+  <div className="space-y-2">
+    <div className="h-4 bg-gray-200 rounded w-32"></div>
+    <div className="h-32 sm:h-40 bg-gray-200 rounded w-full"></div>
+  </div>
+);
+
+// Skeleton component for form grid
+const FormGridSkeleton = ({ children }: { children: React.ReactNode }) => (
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+    {children}
+  </div>
+);
+
+// Skeleton component for action buttons
+const ActionButtonsSkeleton = () => (
+  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pt-4 sm:pt-6 border-t border-gray-200 gap-4 sm:gap-0 animate-pulse">
+    <div className="h-4 bg-gray-200 rounded w-48 order-2 sm:order-1"></div>
+    <div className="h-10 bg-gray-200 rounded w-full sm:w-24 order-1 sm:order-2"></div>
+  </div>
+);
+
+// Main skeleton component for the entire form
+const ProfileDetailsFormSkeleton = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div className="animate-pulse">
+      <div className="flex items-center gap-2 mb-6 sm:mb-8">
+        <span className="block lg:hidden" onClick={() => navigate(-1)}>
+          <ArrowLeftIcon className="w-6 h-6" />
+        </span>
+        <div className="h-8 bg-gray-200 rounded w-40"></div>
+      </div>
+
+      <div className="space-y-6 sm:space-y-8">
+        {/* Personal Details Skeleton */}
+        <FormSectionSkeleton title="Personal details">
+          <AvatarSectionSkeleton />
+          <FormGridSkeleton>
+            <FormInputSkeleton />
+            <FormInputSkeleton />
+            <FormInputSkeleton />
+            <FormInputSkeleton />
+          </FormGridSkeleton>
+          <div className="mt-4 sm:mt-6">
+            <FormTextareaSkeleton />
+          </div>
+        </FormSectionSkeleton>
+
+        {/* Professional Details Skeleton */}
+        <FormSectionSkeleton title="Professional Details">
+          <FormGridSkeleton>
+            <FormInputSkeleton />
+            <FormInputSkeleton />
+            <FormInputSkeleton />
+            <FormInputSkeleton />
+          </FormGridSkeleton>
+        </FormSectionSkeleton>
+
+        {/* Social Links Skeleton */}
+        <FormSectionSkeleton title="Social Links">
+          <FormGridSkeleton>
+            <FormInputSkeleton />
+            <FormInputSkeleton />
+          </FormGridSkeleton>
+        </FormSectionSkeleton>
+
+        {/* Action Buttons Skeleton */}
+        <ActionButtonsSkeleton />
+      </div>
+    </div>
+  );
+};
+
 // Zod schema for profile validation, exported for reuse
 export const profileSchema = z.object({
   avatar: z.string().optional(),
@@ -53,13 +157,15 @@ export const profileSchema = z.object({
 export type ProfileFormData = z.infer<typeof profileSchema>;
 
 interface ProfileDetailsFormProps {
-  initialData: ProfileFormData;
+  initialData?: ProfileFormData;
   onSubmit?: (data: ProfileFormData) => void;
+  isLoading?: boolean;
 }
 
 const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   initialData,
   onSubmit,
+  isLoading = false,
 }) => {
   const navigate = useNavigate();
   const { user } = useUserStore();
@@ -77,12 +183,20 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
   const formMethods = useForm<ProfileFormData>({
     mode: "onChange",
     resolver: zodResolver(profileSchema),
-    defaultValues: initialData,
+    defaultValues: initialData || {},
   });
+
   //set default values
   useEffect(() => {
-    formMethods.reset(initialData);
-  }, [initialData]);
+    if (initialData) {
+      formMethods.reset(initialData);
+    }
+  }, [initialData, formMethods]);
+
+  // Show skeleton when loading or no initial data
+  if (isLoading || !initialData) {
+    return <ProfileDetailsFormSkeleton />;
+  }
 
   const handleImageSelect = (file: File) => {
     // Validate file

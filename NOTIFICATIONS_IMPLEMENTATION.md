@@ -147,7 +147,7 @@ await createNotification({
   type: 'WELCOME',
   title: 'Welcome to XUTHORITY!',
   message: 'Start exploring and sharing your reviews today.',
-  actionUrl: '/dashboard'
+  actionUrl: '/'
 });
 ```
 

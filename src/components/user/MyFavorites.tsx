@@ -13,6 +13,76 @@ import {
 } from '@/components/ui';
 import ConfirmationModal from '../ui/ConfirmationModal';
 
+// Skeleton component for individual product items
+const ProductItemSkeleton = () => (
+  <div className="flex flex-col items-center animate-pulse">
+    <div className="w-14 h-14 bg-gray-200 rounded-md mb-2" />
+    <div className="h-3 bg-gray-200 rounded w-16" />
+    <div className="h-3 bg-gray-200 rounded w-12 mt-1" />
+  </div>
+);
+
+// Skeleton component for individual favorite list cards
+const FavoriteListCardSkeleton = () => (
+  <Card className="bg-white border border-gray-200 rounded-lg shadow-sm animate-pulse">
+    {/* Header with background */}
+    <div className="bg-gray-100 rounded-t-lg p-4 flex items-center justify-between">
+      <div className="h-5 bg-gray-200 rounded w-32" />
+      <div className="w-6 h-6 bg-gray-200 rounded" />
+    </div>
+    
+    <CardContent className="p-4">
+      {/* Product Grid */}
+      <div className="grid grid-cols-3 gap-4">
+        {[...Array(3)].map((_, index) => (
+          <ProductItemSkeleton key={index} />
+        ))}
+      </div>
+      
+      {/* View All Link */}
+      <div className="text-center mt-2 mb-1">
+        <div className="h-4 bg-gray-200 rounded w-16 mx-auto" />
+      </div>
+    </CardContent>
+  </Card>
+);
+
+// Skeleton component for the header
+const HeaderSkeleton = () => (
+  <div className="flex items-center justify-between mb-8 animate-pulse">
+    <div className="flex items-center gap-2">
+      <div className="block lg:hidden w-6 h-6 bg-gray-200 rounded" />
+      <div className="h-7 bg-gray-200 rounded w-32" />
+    </div>
+    <div className="h-10 bg-gray-200 rounded-full w-36" />
+  </div>
+);
+
+// Skeleton component for the favorites grid
+const FavoritesGridSkeleton = () => (
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    {[...Array(6)].map((_, index) => (
+      <FavoriteListCardSkeleton key={index} />
+    ))}
+  </div>
+);
+
+// Skeleton component for load more button
+const LoadMoreSkeleton = () => (
+  <div className="text-center mt-8 animate-pulse">
+    <div className="h-12 bg-gray-200 rounded-full w-40 mx-auto" />
+  </div>
+);
+
+// Complete skeleton for MyFavorites page
+const MyFavoritesSkeleton = () => (
+  <div className="max-w-7xl mx-auto">
+    <HeaderSkeleton />
+    <FavoritesGridSkeleton />
+    <LoadMoreSkeleton />
+  </div>
+);
+
 interface MyFavoritesProps {
   className?: string;
 }
@@ -118,21 +188,41 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   // Check if there are more lists to load
   const hasMoreLists = favoritesData?.pagination?.currentPage < favoritesData?.pagination?.totalPages;
 
-
-
-
   if (isLoading && !hasLoadedInitial) {
     return (
-      <div className={cn("flex items-center justify-center py-20", className)}>
-        <LottieLoader size="large" />
+      <div className={cn("", className)}>
+        <MyFavoritesSkeleton />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className={cn("text-center py-20", className)}>
-        <p className="text-lg text-gray-500">Failed to load favorites. Please try again.</p>
+      <div className={cn("max-w-7xl mx-auto", className)}>
+        <div className="flex items-center justify-between mb-8">
+          <div className='flex items-center gap-2'> 
+            <span className="block lg:hidden" onClick={() => navigate(-1)}>
+              <ArrowLeftIcon className="w-6 h-6" />
+            </span>
+            <h1 className="sm:text-2xl text-xl font-bold text-gray-900">My Favorites</h1>
+          </div>
+        </div>
+        
+        <div className="flex flex-col items-center justify-center min-h-[400px] py-12">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Star className="w-8 h-8 text-red-500" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">Failed to Load Favorites</h3>
+          <p className="text-gray-600 mb-4 text-center max-w-md">
+            Something went wrong while loading your favorites. Please try again.
+          </p>
+          <button
+            onClick={() => handleRefetch()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }

@@ -233,11 +233,13 @@ const deleteMutation = useDeleteProduct();
         <div className="flex items-center gap-2 absolute top-4 right-4">
         <Button
       leftIcon={Edit}
-       className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
+      title="Edit"
+       className="bg-gray-200 hover:bg-gray-300 rounded-full text-gray-900 font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
        onClick={onEdit}
      >
      </Button>
      <Button
+      title="Delete"
       leftIcon={Trash}
        className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
        onClick={onDelete}
@@ -300,7 +302,7 @@ const deleteMutation = useDeleteProduct();
             <Heart className="w-5 h-5" /> Save to My List
           </button>
           <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
-            <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 sm:ml-2">
+            <Button className="bg-white border hover:bg-white borderr-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 sm:ml-2">
               Entry Level Price: {formatCurrency(minPrice || 0)}
             </Button>
             <Button

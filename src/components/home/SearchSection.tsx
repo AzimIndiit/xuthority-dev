@@ -18,6 +18,35 @@ const icons = {
   ),
 };
 
+// Skeleton component for search result items
+const SearchResultItemSkeleton = () => (
+  <div className="flex items-center gap-2 px-2 py-1 rounded animate-pulse">
+    <div className="w-4 h-4 bg-gray-200 rounded" />
+    <div className="h-3 bg-gray-200 rounded w-24" />
+  </div>
+);
+
+// Skeleton component for search result sections
+const SearchResultSectionSkeleton = ({ title, itemCount = 3 }: { title: string; itemCount?: number }) => (
+  <div className="animate-pulse">
+    <div className="h-4 bg-gray-200 rounded w-16 mb-1 mt-3 first:mt-0" />
+    <div className="space-y-1">
+      {[...Array(itemCount)].map((_, index) => (
+        <SearchResultItemSkeleton key={index} />
+      ))}
+    </div>
+  </div>
+);
+
+// Complete skeleton for search dropdown
+const SearchDropdownSkeleton = () => (
+  <div className="space-y-1">
+    <SearchResultSectionSkeleton title="Software" itemCount={3} />
+    <SearchResultSectionSkeleton title="Solutions" itemCount={2} />
+    <SearchResultSectionSkeleton title="Products" itemCount={4} />
+  </div>
+);
+
 export default function SearchSection() {
   const navigate=useNavigate()
   const [input, setInput] = useState("");
@@ -104,7 +133,7 @@ export default function SearchSection() {
           {showDropdown && (
               <div ref={dropdownRef} className="absolute left-0 top-14 mt-2 w-full bg-white rounded-2xl shadow-xl border z-30 p-2 sm:p-4 min-w-[320px] max-h-[70vh] min-h-[30px] sm:min-h-[50px]  overflow-y-auto">
                 {isLoading || isFetching ? (
-                  <div className=" items-left  ">Searching...</div>
+                  <SearchDropdownSkeleton />
                 ) : results && (results.softwares?.length > 0 || results.solutions?.length > 0 || results.products?.length > 0) ? (
                   <>
                     {renderSection('Software', results.softwares, 'software')}

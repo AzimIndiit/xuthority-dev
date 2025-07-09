@@ -15,6 +15,101 @@ import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
 import SecondaryLoader from "@/components/ui/SecondaryLoader";
 
+// Skeleton for the header section
+const HeaderSkeleton = () => (
+  <div className="flex flex-col flex-wrap md:flex-row md:items-center sm:justify-between mb-6 gap-2 animate-pulse">
+    <div className="h-8 bg-gray-200 rounded w-64"></div>
+    <div className="flex gap-2 sm:gap-4 items-start sm:items-center">
+      <div className="h-10 bg-gray-200 rounded w-32"></div>
+      <div className="h-10 bg-gray-200 rounded w-28"></div>
+    </div>
+  </div>
+);
+
+// Skeleton for individual software cards
+const SoftwareCardSkeleton = () => (
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 animate-pulse">
+    <div className="flex items-start gap-4 mb-4">
+      <div className="w-16 h-16 bg-gray-200 rounded-lg"></div>
+      <div className="flex-1">
+        <div className="h-6 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="flex items-center gap-2 mb-2">
+          <div className="flex space-x-1">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="w-4 h-4 bg-gray-200 rounded"></div>
+            ))}
+          </div>
+          <div className="h-4 bg-gray-200 rounded w-20"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div className="space-y-2 mb-4">
+      <div className="h-4 bg-gray-200 rounded w-full"></div>
+      <div className="h-4 bg-gray-200 rounded w-4/5"></div>
+      <div className="h-4 bg-gray-200 rounded w-3/5"></div>
+    </div>
+    
+    <div className="space-y-3 mb-4">
+      <div className="flex items-center gap-2">
+        <div className="h-4 bg-gray-200 rounded w-16"></div>
+        <div className="h-4 bg-gray-200 rounded w-32"></div>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-4 bg-gray-200 rounded w-20"></div>
+        <div className="h-4 bg-gray-200 rounded w-28"></div>
+      </div>
+      <div className="flex items-center gap-2">
+        <div className="h-4 bg-gray-200 rounded w-24"></div>
+        <div className="h-4 bg-gray-200 rounded w-36"></div>
+      </div>
+    </div>
+    
+    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+      <div className="h-6 bg-gray-200 rounded w-24"></div>
+      <div className="flex gap-2">
+        <div className="h-9 bg-gray-200 rounded w-28"></div>
+        <div className="h-9 bg-gray-200 rounded w-24"></div>
+      </div>
+    </div>
+  </div>
+);
+
+// Skeleton for the grid of software cards
+const SoftwareGridSkeleton = () => (
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-12 gap-y-12">
+    {[...Array(8)].map((_, index) => (
+      <SoftwareCardSkeleton key={index} />
+    ))}
+  </div>
+);
+
+// Skeleton for pagination
+const PaginationSkeleton = () => (
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-8 gap-2 animate-pulse">
+    <div className="h-4 bg-gray-200 rounded w-32"></div>
+    <div className="flex gap-1 items-center">
+      <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+      {[...Array(3)].map((_, i) => (
+        <div key={i} className="h-8 w-8 bg-gray-200 rounded-full"></div>
+      ))}
+      <div className="h-4 bg-gray-200 rounded w-6"></div>
+      <div className="h-10 w-10 bg-gray-200 rounded-full"></div>
+    </div>
+  </div>
+);
+
+// Complete page skeleton
+const SubCategoryPageSkeleton = () => (
+  <section className="flex justify-center items-center py-8">
+    <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+      <HeaderSkeleton />
+      <SoftwareGridSkeleton />
+      <PaginationSkeleton />
+    </div>
+  </section>
+);
+
 const PAGE_SIZE = 10;
 
 const SubCategoryPage = () => {
@@ -132,13 +227,13 @@ const SubCategoryPage = () => {
     );
   }
 
+  // Show skeleton when loading
+  if (isLoading) {
+    return <SubCategoryPageSkeleton />;
+  }
+
   return (
     <section className="flex justify-center items-center py-8">
-        {isLoading ?(
-          <div className="flex justify-center items-center py-8">
-            <SecondaryLoader />
-          </div>
-        ):(
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         {/* Heading and controls */}
         <div className="flex flex-col flex-wrap md:flex-row md:items-center sm:justify-between mb-6 gap-2">
@@ -247,7 +342,6 @@ const SubCategoryPage = () => {
           </div>
         )}
       </div>
-        )}
     </section>
   );
 };

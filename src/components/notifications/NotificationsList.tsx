@@ -10,6 +10,65 @@ import LottieLoader from '@/components/LottieLoader';
 import SecondaryLoader from '../ui/SecondaryLoader';
 import { useNavigate } from 'react-router-dom';
 
+// Skeleton component for the header
+const HeaderSkeleton = () => (
+  <div className="flex items-center justify-between mb-6 animate-pulse">
+    <div className='flex items-center gap-2'>
+      <span className="block lg:hidden">
+        <div className="w-6 h-6 bg-gray-200 rounded" />
+      </span>
+      <div className="h-8 bg-gray-200 rounded w-40" />
+    </div>
+    <div className="flex items-center gap-2">
+      <div className="h-8 bg-gray-200 rounded w-24" />
+      <div className="h-8 w-8 bg-gray-200 rounded" />
+    </div>
+  </div>
+);
+
+// Skeleton component for individual notification items
+const NotificationItemSkeleton = () => (
+  <div className="p-4 animate-pulse">
+    <div className="flex items-start gap-3">
+      <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="flex items-start justify-between">
+          <div className="space-y-1 flex-1">
+            <div className="h-4 bg-gray-200 rounded w-3/4" />
+            <div className="h-3 bg-gray-200 rounded w-full" />
+            <div className="h-3 bg-gray-200 rounded w-2/3" />
+          </div>
+          <div className="ml-4 flex flex-col items-end space-y-1">
+            <div className="h-3 bg-gray-200 rounded w-12" />
+            <div className="w-2 h-2 bg-gray-200 rounded-full" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
+// Skeleton component for the notifications list
+const NotificationsListSkeleton = () => (
+  <div className="divide-y divide-gray-100">
+    {[...Array(8)].map((_, index) => (
+      <NotificationItemSkeleton key={index} />
+    ))}
+  </div>
+);
+
+// Complete page skeleton
+const NotificationsPageSkeleton = () => {
+  const navigate = useNavigate();
+  
+  return (
+    <div className='w-full'>
+      <HeaderSkeleton />
+      <NotificationsListSkeleton />
+    </div>
+  );
+};
+
 interface NotificationsListProps {
   className?: string;
   onNotificationClick?: () => void;
@@ -81,6 +140,11 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
 
   const unreadCount = allNotifications.filter(n => !n.isRead).length || 0;
 
+  // Show skeleton when loading initial page
+  if (isLoading && params.page === 1) {
+    return <NotificationsPageSkeleton />;
+  }
+
   return (
     <div className='w-full'>
       {/* Header */}
@@ -108,9 +172,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
       </div>
 
       {/* Notifications List */}
-      {isLoading && params.page === 1 ? (
-        <SecondaryLoader text="Loading notifications..." containerClasses='min-h-[60vh]' />
-      ) : isError ? (
+      {isError ? (
         <div className='w-full min-h-[60vh] flex items-center justify-center'>
           <div className="p-8 flex flex-col items-center justify-center">
             <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
@@ -175,23 +237,13 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
               {isLoadingMore && (
                 <div className="divide-y divide-gray-100">
                   {[...Array(3)].map((_, i) => (
-                    <div key={`skeleton-${i}`} className="p-4 animate-pulse">
-                      <div className="flex items-start gap-3">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full flex-shrink-0"></div>
-                        <div className="flex-1 space-y-2">
-                          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                          <div className="h-3 bg-gray-200 rounded w-1/4"></div>
-                        </div>
-                        <div className="w-6 h-6 bg-gray-200 rounded"></div>
-                      </div>
-                    </div>
+                    <NotificationItemSkeleton key={`skeleton-${i}`} />
                   ))}
                 </div>
               )}
 
               {/* End of list indicator */}
-              {!hasMoreData && allNotifications.length > 0 && (
+              {!hasMoreData && allNotifications.length > 10 && (
                 <div className="p-4 text-center">
                   <p className="text-sm text-gray-500">You've reached the end of your notifications</p>
                 </div>

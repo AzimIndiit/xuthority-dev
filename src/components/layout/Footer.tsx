@@ -1,8 +1,14 @@
-  import { useSoftwareOptions } from "@/hooks/useSoftwareOptions";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
-  const {options:softwareOptions,isLoading:softwareLoading}=useSoftwareOptions(1,5)
+  // Static top categories to avoid unnecessary API calls
+  const topCategories = [
+    { label: "CRM Software", slug: "crm-software" },
+    { label: "Project Management", slug: "project-management" },
+    { label: "Marketing Automation", slug: "marketing-automation" },
+    { label: "HR Management", slug: "hr-management" },
+    { label: "E-commerce", slug: "e-commerce" }
+  ];
   return (
     <footer className="bg-[#111] text-white border-t border-neutral-800">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-10 md:gap-0">
@@ -106,14 +112,13 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-3">Top Categories</h4>
             <ul className="space-y-2 text-gray-200">
-              {softwareOptions.map((option,index)=>(
+              {topCategories.map((category, index) => (
                 <li key={index}>
-                  <Link to={`/software/${option.slug}`} className="hover:text-white transition-colors">
-                    {option.label}
+                  <Link to={`/software/${category.slug}`} className="hover:text-white transition-colors">
+                    {category.label}
                   </Link>
                 </li>
               ))}
-              
             </ul>
           </div>
           <div>

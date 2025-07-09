@@ -1,13 +1,52 @@
 import React, { useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Loader2 } from "lucide-react";
 import { useSoftwareCategories, useSolutionCategories } from "@/hooks/useCategoryOptions";
-import SecondaryLoader from "@/components/ui/SecondaryLoader";
+
+// Skeleton loader component for category cards
+const CategorySkeleton = ({ index }: { index: number }) => {
+  // Vary the width of skeleton text for more realistic appearance
+  const widthVariants = ['w-3/4', 'w-2/3', 'w-4/5', 'w-1/2', 'w-5/6'];
+  const widthClass = widthVariants[index % widthVariants.length];
+  
+  return (
+    <div 
+      className="group flex items-center justify-between rounded-lg bg-gray-100 p-4 animate-pulse"
+      style={{ animationDelay: `${index * 50}ms` }}
+    >
+      <div className={`h-4 bg-gray-300 rounded ${widthClass}`}></div>
+      <div className="h-5 w-5 bg-gray-300 rounded"></div>
+    </div>
+  );
+};
+
+// Skeleton loader for the entire page
+const PageSkeleton = () => {
+  return (
+    <section className="flex justify-center items-center py-8">
+      <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+        <div>
+          <div className="h-8 bg-gray-300 rounded w-48 animate-pulse"></div>
+        </div>
+        <div className="sm:min-h-[48vh]">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <CategorySkeleton key={index} index={index} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 const SoftwareCategoryPage = () => {
   const { category } = useParams<{ category: string }>();
+  const navigate = useNavigate();
   const [viewAll, setViewAll] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
+  const [isViewAllLoading, setIsViewAllLoading] = useState(false);
   const page = 1;
   const limit = viewAll ? 1000 : 12; // Load all if viewAll is true
   
@@ -16,6 +55,8 @@ const SoftwareCategoryPage = () => {
   let isSoftwareError = false;
   let isSolutionLoading = false;
   let isSolutionError = false;
+  let pagination: any = null;
+  
   if (category.toLowerCase() === "software") {
     const {
       data: softwareResultRaw = [] as any,
@@ -24,6 +65,7 @@ const SoftwareCategoryPage = () => {
     } = useSoftwareCategories(page, limit);
     // Get unique categories from software list
     const softwareResult = softwareResultRaw as { data: string[]; pagination: any } | undefined 
+    pagination = softwareResult?.pagination;
 
     const allCategories = (softwareResult?.data || [])
       .map((item: any) => ({ name: item.name, slug: item.slug ,id: item.id }))
@@ -38,6 +80,7 @@ const SoftwareCategoryPage = () => {
     } = useSolutionCategories(page, limit);
     // Get unique categories from solution list
     const solutionResult = solutionResultRaw as { data: string[]; pagination: any } | undefined;
+    pagination = solutionResult?.pagination;
     console.log('subCategories', solutionResult)
     const allCategories = (solutionResult?.data || [])
       .map((item: any) => ({ name: item.name, slug: item.slug ,id: item.id }))
@@ -49,12 +92,33 @@ const SoftwareCategoryPage = () => {
     return text.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
   };
 
-  if (isSoftwareLoading || isSolutionLoading) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <SecondaryLoader />
-      </div>
-    );
+  // Check if there are more items to load based on pagination
+  const hasMoreItems = () => {
+    if (!pagination) return false;
+    console.log('Pagination data:', pagination);
+    console.log('Current limit:', limit);
+    console.log('ViewAll state:', viewAll);
+    
+    return pagination.hasNextPage === true || 
+           (pagination.totalItems > pagination.itemsPerPage && !viewAll);
+  };
+
+  const handleCategorySelect = (e: React.MouseEvent, categoryId: string, categorySlug: string) => {
+    e.preventDefault(); // Prevent immediate navigation
+    setSelectedCategoryId(categoryId);
+      navigate(`/${category}/${categorySlug}`);
+  };
+
+  const handleViewAllClick = () => {
+    setIsViewAllLoading(true);
+    // Add a longer delay to show the loader before state changes
+    setTimeout(() => {
+      setViewAll(true);
+      setIsViewAllLoading(false);
+    }, 1000);
+  };
+  if (subCategories.length === 0) {
+    return <PageSkeleton />;
   }
   if (isSoftwareError || isSolutionError) {
     return <div className="text-center py-8 text-red-500">Failed to load categories.</div>;
@@ -71,30 +135,44 @@ const SoftwareCategoryPage = () => {
         </div>
 
 <div className="sm:min-h-[48vh]">
-<div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3  ">
+        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3  ">
           {subCategories.map((subCategory: any) => {
             console.log('subCategory', subCategory)
-          return (
+            const isSelected = selectedCategoryId === subCategory.id;
+            return (
               <Link
                 key={subCategory.id}
                 to={`/${category}/${subCategory.slug}`}
-                className="group flex items-center justify-between rounded-lg bg-blue-50 p-4 transition-all hover:bg-blue-100 hover:shadow-md"
+                onClick={(e) => handleCategorySelect(e, subCategory.id, subCategory.slug)}
+                className={`group flex items-center justify-between rounded-lg bg-blue-50 p-4 transition-all hover:bg-blue-100 hover:shadow-md ${
+                  isSelected ? 'opacity-70 cursor-wait' : ''
+                }`}
               >
                 <span className="font-semibold text-gray-800">{subCategory.name}</span>
-                <ChevronRight className="h-5 w-5 text-gray-500 transition-transform group-hover:translate-x-1" />
+               
+                  <ChevronRight className="h-5 w-5 text-gray-500 transition-transform group-hover:translate-x-1" />
+                
               </Link>
             )
           })}
         </div>
 
-        {subCategories.length > 0 && !viewAll && (
+        {subCategories.length > 0 && hasMoreItems() && (
           <div className="mt-12 flex justify-center">
             <Button
               variant="outline"
               className="rounded-full border-red-400 px-8 py-2 text-base font-semibold text-red-500 hover:bg-red-50 hover:text-red-600"
-              onClick={() => setViewAll(true)}
+              onClick={handleViewAllClick}
+              disabled={isViewAllLoading}
             >
-              View All Categories
+              {isViewAllLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Loading...
+                </>
+              ) : (
+                'View All Categories'
+              )}
             </Button>
           </div>
         )}

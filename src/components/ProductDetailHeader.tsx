@@ -128,10 +128,30 @@ export default function ProductDetailHeader({
                   </button>}
 
                   <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
-                    <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 ml-2">
+                    <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 ml-2" 
+                    onClick={() => {
+                      // scroll to pricing section
+                      const pricingSection = document.getElementById('pricing');
+                      if (pricingSection) {
+                        pricingSection.scrollIntoView({
+                          behavior: "smooth",
+                        });
+                      }
+                     
+                    }}
+                    >
                       Entry Level Price: {product.entryPrice}
                     </Button>
                     <Button
+                    onClick={() => {
+                      // scroll to pricing section
+                      const pricingSection = document.getElementById('pricing');
+                      if (pricingSection) {
+                        pricingSection.scrollIntoView({
+                          behavior: "smooth",
+                        });
+                      }
+                    }}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 ml-2"
                     >
                       Try For Free

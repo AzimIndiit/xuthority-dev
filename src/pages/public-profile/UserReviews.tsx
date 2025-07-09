@@ -127,11 +127,8 @@ const UserReviews = ({publicProfile}) => {
                             ))}
                         </div>
                     ) : (
-                        <div className="text-center py-12">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <StarIcon className="w-8 h-8 text-gray-400" />
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Reviews Yet</h3>
+                        <div className="text-center  flex flex-col items-center justify-center min-h-[50vh]">
+                            <img src="/svg/no_data.svg" alt="no-reviews" className="w-1/4 mb-4" />
                             <p className="text-gray-600">This user hasn't written any reviews yet.</p>
                         </div>
                     )}

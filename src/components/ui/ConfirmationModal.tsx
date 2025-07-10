@@ -49,8 +49,15 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               {cancelText}
             </Button>
           </DialogClose>
-          <Button type="button" disabled={isLoading} className='rounded-full bg-blue-600 text-white hover:bg-blue-700' variant={confirmVariant} onClick={onConfirm} > 
-            {isLoading ? <Loader2 className="w-2 h-2 animate-spin" /> : confirmText}
+          <Button 
+            type="button" 
+            disabled={isLoading} 
+            className='rounded-full bg-blue-600 text-white hover:bg-blue-700' 
+            variant={confirmVariant} 
+            onClick={onConfirm}
+            loading={isLoading}
+          > 
+            {confirmText}
           </Button>
         </DialogFooter>
       </DialogContent>

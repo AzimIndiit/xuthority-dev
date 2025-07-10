@@ -32,51 +32,13 @@ const VerificationRequiredModal: React.FC<VerificationRequiredModalProps> = ({
         <DialogHeader className="text-center">
           <div className="flex justify-center mb-6">
             {/* Illustration of person leaving through door */}
-            <div className="w-64 h-48 bg-gradient-to-br from-orange-100 to-yellow-100 rounded-2xl flex items-center justify-center relative overflow-hidden">
               {/* Background elements */}
-              <div className="absolute bottom-0 left-4">
-                <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                  <path d="M8 32V16L16 8L24 16V32H20V24H12V32H8Z" fill="#4ADE80" />
-                  <ellipse cx="20" cy="12" rx="3" ry="2" fill="#22C55E" />
-                  <ellipse cx="12" cy="16" rx="2" ry="1.5" fill="#22C55E" />
-                </svg>
-              </div>
-              
-              {/* Door */}
-              <div className="absolute right-8 top-4 w-16 h-32 bg-orange-300 rounded-lg">
-                <div className="w-full h-full bg-orange-400 rounded-lg relative">
-                  <div className="absolute right-2 top-16 w-2 h-2 bg-orange-600 rounded-full"></div>
-                  <div className="absolute inset-1 border-2 border-orange-500 rounded"></div>
-                </div>
-              </div>
-              
-              {/* Person */}
-              <div className="relative z-10">
-                <svg width="80" height="100" viewBox="0 0 80 100" fill="none">
-                  {/* Body */}
-                  <ellipse cx="40" cy="85" rx="15" ry="10" fill="#1E40AF" opacity="0.3" />
-                  <rect x="30" y="50" width="20" height="35" rx="10" fill="#1E40AF" />
-                  
-                  {/* Arms */}
-                  <ellipse cx="20" cy="60" rx="8" ry="15" fill="#1E40AF" transform="rotate(-20 20 60)" />
-                  <ellipse cx="60" cy="65" rx="8" ry="15" fill="#1E40AF" transform="rotate(30 60 65)" />
-                  
-                  {/* Head */}
-                  <circle cx="40" cy="35" r="12" fill="#FCA5A5" />
-                  <path d="M35 32L37 34L45 30" stroke="#1E40AF" strokeWidth="2" fill="none" />
-                  
-                  {/* Hair */}
-                  <path d="M28 30C28 22 33 18 40 18C47 18 52 22 52 30" fill="#1E40AF" />
-                  
-                  {/* Legs */}
-                  <rect x="32" y="85" width="6" height="15" rx="3" fill="#1E40AF" />
-                  <rect x="42" y="85" width="6" height="15" rx="3" fill="#1E40AF" />
-                </svg>
-              </div>
-            </div>
+               <img src="/svg/review/leave.svg" alt="verification-required" className="w-52 h-52" />
+             
+         
           </div>
           
-          <DialogTitle className="text-2xl font-bold text-gray-900 mb-2 text-center ">
+          <DialogTitle className="text-xl font-bold text-gray-900 mb-2 text-center ">
             It's sad to see you leave.
           </DialogTitle>
           <DialogDescription className="text-gray-500 text-base text-center">

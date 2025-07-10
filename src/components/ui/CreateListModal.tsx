@@ -265,12 +265,10 @@ console.log('existingProductIds', existingProductIds)
               <Button
                 type="submit"
                 disabled={!isValid || selectedProductIds.length === 0 || isFormSubmitting || productsLoading}
+                loading={isFormSubmitting}
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-8 disabled:opacity-50"
               >
-                {isFormSubmitting 
-                  ? (mode === 'edit' ? 'Updating...' : 'Creating...') 
-                  : (mode === 'edit' ? 'Update List' : 'Continue')
-                }
+                {mode === 'edit' ? 'Update' : 'Continue'}
               </Button>
             </form>
           </FormProvider>

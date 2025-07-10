@@ -209,12 +209,9 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
             className="rounded-full px-4 py-2 !text-xs font-semibold flex items-center h-10"
             onClick={() => setIsDeleteModalOpen(true)}
             disabled={deleteReviewMutation.isPending}
+            loading={deleteReviewMutation.isPending}
           >
-            {deleteReviewMutation.isPending ? (
-              <Loader2 className="w-2 h-2 animate-spin" />
-            ) : (
-              <Trash2 className="w-2 h-2" />
-            )}
+            <Trash2 className="w-2 h-2" />
             <span className="hidden sm:block text-xs"> Delete Review</span>
           </Button>
 

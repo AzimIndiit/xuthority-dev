@@ -29,6 +29,10 @@ export interface ApiResponse<T = any> {
       totalItems: number;
       itemsPerPage: number;
       hasNext: boolean;
+      page?: number;
+      pages?: number;
+      total?: number;
+      limit?: number;
       hasPrev: boolean;
     };
     total?: number;
@@ -91,9 +95,14 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = tokenStorage.getToken();
-    console.log("token", token);
+    console.log("Request to:", config.url);
+    console.log("Token from storage:", token);
+    
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
+      console.log("Authorization header set:", config.headers.Authorization);
+    } else if (!token) {
+      console.log("No token found in storage");
     }
     
     // Don't set Content-Type for FormData (let browser set it with boundary)

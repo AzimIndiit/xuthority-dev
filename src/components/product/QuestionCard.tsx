@@ -158,10 +158,11 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
             className="rounded-full self-end sm:self-auto px-4 py-2 text-sm font-semibold h-8 w-8 sm:w-fit"
             onClick={() => setIsDeleteModalOpen(true)}
             disabled={deleteQuestionMutation.isPending}
+            loading={deleteQuestionMutation.isPending}
           >
             <Trash2 className="w-2 h-2 " />
             <span className='hidden sm:block text-xs'>
-              {deleteQuestionMutation.isPending ? 'Deleting...' : 'Delete Question'}
+              Delete Question
             </span>
           </Button>
         )}
@@ -238,8 +239,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({ question }) => {
         onConfirm={handleDeleteQuestion}
         title="Delete Question"
         description="Are you sure you want to delete this question? All answers will also be deleted. This action cannot be undone."
-        confirmText={deleteQuestionMutation.isPending ? "Deleting..." : "Delete"}
+        confirmText="Delete"
         confirmVariant="destructive"
+        isLoading={deleteQuestionMutation.isPending}
       />
     </div>
   );

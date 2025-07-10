@@ -272,17 +272,9 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
       {/* Favorite Lists */}
       {sortedLists.length === 0 && hasLoadedInitial ? (
         <div className="text-center py-20">
-          <div className="w-32 h-32 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-            <Star className="w-16 h-16 text-gray-400" />
-          </div>
-          <h3 className="text-xl font-semibold text-gray-700 mb-2">No favorites yet</h3>
-          <p className="text-gray-500 mb-6">Start saving products you love to organize them in lists</p>
-          <Button 
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-            onClick={() => navigate('/software')}
-          >
-            Browse Products
-          </Button>
+           <img src="/svg/no_data.svg" alt="no-favorites" className="w-1/4 mx-auto mb-6" />
+          <p className="text-lg font-semibold text-gray-500 mb-2">No favorites yet</p>
+   
         </div>
       ) : (
         <>
@@ -353,9 +345,10 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
               <Button
                 onClick={handleLoadMore}
                 disabled={isFetching}
+                loading={isFetching}
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-3"
               >
-                {isFetching ? 'Loading...' : 'Load More Lists'}
+                Load More Lists
               </Button>
             </div>
           )}
@@ -387,8 +380,9 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
             onConfirm={handleDeleteSuccess}
             title="Delete List"
             description="Are you sure you want to delete this list? This action cannot be undone."
-            confirmText={deleteListMutation.isPending ? "Deleting..." : "Delete"}
+            confirmText="Delete"
             cancelText="Cancel"
+            isLoading={deleteListMutation.isPending}
           />
         </>
       )}

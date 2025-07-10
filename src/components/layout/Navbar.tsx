@@ -27,11 +27,12 @@ const navLinks = [
   { label: "Resources", href: "/resources" },
   { label: "For Vendors", href: "/for-vendors" },
   { label: "About Us", href: "/about-us" },
-  { label: "Reviews", href: "#" },
-  { label: "Favourites", href: "#" },
-  { label: "Notifications", href: "#" },
-  { label: "Privacy Policy", href: "#" },
-  { label: "Return  Policy", href: "#" },
+  { label: "Reviews", href: "/profile/my-reviews" },
+  { label: "Favourites", href: "/profile/my-favourites" },
+  { label: "Notifications", href: "/profile/notifications" },
+  { label: "Terms of Service", href: "/terms" },
+  { label: "Privacy Policy", href: "/policy" },
+  { label: "Refund Policy", href: "/refund" },
   // Log Out handled separately
 ];
 
@@ -147,7 +148,7 @@ export default function Navbar() {
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="outline"
-                        className="flex items-center space-x-2 border-blue-600 rounded-full pl-2 pr-3 py-1.5 h-auto max-w-40"
+                        className="flex items-center space-x-2 border-blue-600 rounded-full px-4 py-1.5 h-auto max-w-42"
                         disabled={logoutMutation.isPending}
                       >
                         <Avatar className="h-8 w-8 ">
@@ -159,7 +160,7 @@ export default function Navbar() {
                           <AvatarFallback className="text-xs">{getUserInitials(user)}</AvatarFallback>
                         </Avatar>
                         <span className="font-semibold text-blue-600 truncate max-w-24">
-                          {getTruncatedDisplayName(user, 20)}
+                          {getTruncatedDisplayName(user, 15)}
                         </span>
                         <ChevronDown className="h-4 w-4 text-blue-600" />
                       </Button>
@@ -174,7 +175,7 @@ export default function Navbar() {
                         onClick={handleLogoutClick}
                         disabled={logoutMutation.isPending}
                       >
-                        {logoutMutation.isPending ? "Logging out..." : "Log out"}
+                        Log out
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -425,12 +426,11 @@ export default function Navbar() {
       <ConfirmationModal
         isOpen={showLogoutModal}
         onOpenChange={setShowLogoutModal}
-        onConfirm={handleLogoutConfirm}
-        title="Logout?"
-        description="Are you sure, You want to logout?"
-        confirmText={logoutMutation.isPending ? "Logging out..." : "Yes I'm Sure"}
-        cancelText="Cancel"
-        confirmVariant="default"
+        onConfirm={handleLogout}
+        title="Logout"
+        description="Are you sure you want to logout?"
+        confirmText="Yes I'm Sure"
+        isLoading={logoutMutation.isPending}
       />
     </>
   );

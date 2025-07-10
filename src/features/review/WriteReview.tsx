@@ -465,11 +465,9 @@ console.log('userReview', userReview)
               type="submit"
               disabled={createMutation.isPending || updateMutation.isPending}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold min-w-32"
+              loading={createMutation.isPending || updateMutation.isPending}
             >
-              {(createMutation.isPending || updateMutation.isPending) 
-                ? (isEditMode ? "Updating..." : "Submitting...") 
-                : (isEditMode ? "Update Review" : "Submit Review")
-              }
+              {isEditMode ? "Update" : "Submit"}
             </Button>
           </div>
         </form>

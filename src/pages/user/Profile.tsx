@@ -10,6 +10,7 @@ import {
   HelpCircle,
   Grid,
   CreditCard,
+  Award,
 } from 'lucide-react';
 import ProfileLayout from '@/components/layout/ProfileLayout';
 import ProfileDetailsForm, {
@@ -292,7 +293,7 @@ const ProfilePage: React.FC = () => {
         {
           id: 'my-badges',
           label: 'My Badges',
-          icon: <Badge className="w-5 h-5" />,
+          icon: <Award className="w-5 h-5" />,
         },
         {
           id: 'notifications',
@@ -505,9 +506,10 @@ const ProfilePage: React.FC = () => {
         onConfirm={handleLogoutConfirm}
         title="Logout?"
         description="Are you sure, You want to logout?"
-        confirmText={logoutMutation.isPending ? "Logging out..." : "Yes I'm Sure"}
+        confirmText="Yes I'm Sure"
         cancelText="Cancel"
         confirmVariant="default"
+        isLoading={logoutMutation.isPending}
       />
     </>
   );

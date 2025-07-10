@@ -149,7 +149,7 @@ const SelectSoftware = ({
           }}
         >
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-6 gap-y-10">
-            {products.map((software) => (
+            {products.slice(0, 6).map((software) => (
               <label key={software._id} htmlFor={software._id} className="h-full">
                 <SoftwareSelectionCard
                   id={software._id}

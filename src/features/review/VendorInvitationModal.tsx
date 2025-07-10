@@ -113,8 +113,9 @@ const VendorInvitationModal: React.FC<VendorInvitationModalProps> = ({
             className="w-full rounded-full py-4 text-lg font-semibold mt-8 bg-blue-600 hover:bg-blue-700 text-white h-12"
             size="lg"
             disabled={ isSubmitting}
+            loading={isSubmitting}
           >
-            {isSubmitting ? "Processing..." : "Continue"}
+            Continue
           </Button>
         </form>
         

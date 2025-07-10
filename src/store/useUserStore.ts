@@ -3,6 +3,7 @@ import { persist } from "zustand/middleware";
 import toast from "react-hot-toast";
 import { AuthService, LoginRequest, User, UserRegisterRequest, VendorRegisterRequest } from "../services/auth";
 import { queryClient } from "@/lib/queryClient";
+import { queryKeys } from "@/hooks/useAuth";
 
 interface UserState {
   token: string | null;
@@ -90,9 +91,17 @@ const useUserStore = create<UserState>()(
               ...response.data.user
             };
             
+            // Extract accessToken from user object
+            const token = response.data.user.accessToken || response.data.token;
+            
+            // Set the token in storage immediately
+            if (token) {
+              AuthService.tokenStorage.setToken(token);
+            }
+            
             set({
               user: userInfo,
-              token: response.data.token,
+              token: token,
               isLoggedIn: true,
               isLoading: false,
               error: null,
@@ -160,14 +169,35 @@ const useUserStore = create<UserState>()(
               ...response.data.user
           
             };
+            // Extract accessToken from user object
+            const token = response.data.user.accessToken || response.data.token;
             
+            // Set the token in storage immediately
+            if (token) {
+              AuthService.tokenStorage.setToken(token);
+            }
+       
             set({
               user: userInfo,
-              token: response.data.token,
+              token: token,
               isLoggedIn: true,
               isLoading: false,
               error: null,
             });
+
+            queryClient.removeQueries();
+            queryClient.clear();
+            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+    
+              // Fetch fresh profile data after successful login
+            // await getProfileWithAPI();
+            
+            // Set fresh query data with updated profile
+            const user = useUserStore.getState().user;
+            if (user) {
+              queryClient.setQueryData(queryKeys.user, user);
+              queryClient.setQueryData(queryKeys.profile, user);
+            }
             toast.success('Registration successful!');
             return true;
           } else {
@@ -202,9 +232,17 @@ const useUserStore = create<UserState>()(
               ...response.data.user
             };
             
+            // Extract accessToken from user object
+            const token = response.data.user.accessToken || response.data.token;
+            
+            // Set the token in storage immediately
+            if (token) {
+              AuthService.tokenStorage.setToken(token);
+            }
+            
             set({
               user: userInfo,
-              token: response.data.token,
+              token: token,
               isLoggedIn: true,
               isLoading: false,
               error: null,

@@ -338,9 +338,10 @@ const deleteMutation = useDeleteProduct();
         }}
         title="Delete Product?"
         description="Are you sure, You want to delete this product?"
-        confirmText={deleteMutation.isPending ? "Deleting..." : "Yes I'm Sure"}
+        confirmText="Yes I'm Sure"
         cancelText="Cancel"
         confirmVariant="default"
+        isLoading={deleteMutation.isPending}
       />
       
       <AddToListModal

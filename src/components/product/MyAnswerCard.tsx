@@ -140,8 +140,9 @@ const MyAnswerCard: React.FC<MyAnswerCardProps> = ({ myAnswer }) => {
         onConfirm={handleDelete}
         title="Delete Answer"
         description="Are you sure you want to delete this answer? This action cannot be undone."
-        confirmText={deleteAnswerMutation.isPending ? "Deleting..." : "Delete"}
+        confirmText="Delete"
         confirmVariant="destructive"
+        isLoading={deleteAnswerMutation.isPending}
       />
       
       <WriteAnswreModal

@@ -599,7 +599,7 @@ const EditProductPage: React.FC = () => {
           </div>
           
           <div className="flex sm:justify-end w-full">
-            <Button type="submit" disabled={isSubmitting || addProductMutation.isPending} className="w-full sm:w-40 h-12 rounded-full bg-blue-600 text-white text-lg font-semibold" loading={addProductMutation.isPending}>Save</Button>
+            <Button type="submit" disabled={isSubmitting || addProductMutation.isPending} className="w-full sm:w-40 h-12 rounded-full bg-blue-600 text-white text-lg font-semibold" loading={addProductMutation.isPending}>Update</Button>
           </div>
         </form>
       </FormProvider>

@@ -273,7 +273,7 @@ const ReviewCommentsPage: React.FC = () => {
         setComment('');
         
         // If we're adding the first comment on a new page, update hasMoreReplies
-        if (totalComments % 10 === 0) {
+        if (allReplies.length % 10 === 0) {
           setHasMoreReplies(true);
         }
       }
@@ -376,6 +376,7 @@ const ReviewCommentsPage: React.FC = () => {
       setAllReplies(prev => prev.map(r => r._id === reply._id ? reply : r));
     }
   };
+  
 
   const handleLoadMore = () => {
     setPage(prev => prev + 1);
@@ -388,7 +389,7 @@ const ReviewCommentsPage: React.FC = () => {
 
   const isLoadingInitial = repliesLoading && page === 1 && allReplies.length === 0;
   const isLoadingMore = repliesLoading && page > 1;
-console.log(allReplies,'allReplies');
+console.log(hasMoreReplies,'allReplies');
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -576,16 +577,17 @@ console.log(allReplies,'allReplies');
                 )}
 
                 {/* Load More Button */}
-                {hasMoreReplies && (
+                {hasMoreReplies && allReplies.length > 0 && totalComments > allReplies.length && (
                   <div className="flex justify-center mt-8">
                     <Button
                       onClick={handleLoadMore}
                       variant="outline"
                       size="lg"
                       disabled={isLoadingMore}
+                      loading={isLoadingMore}
                       className='border-red-600 text-red-600 text-xs rounded-full hover:text-red-500'
                     >
-                      {isLoadingMore ? 'Loading...' : 'Load More Comments'}
+                      Load More
                     </Button>
                   </div>
                 )}

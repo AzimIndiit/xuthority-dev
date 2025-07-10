@@ -276,8 +276,12 @@ export function useMyProducts(options?: {
     queryKey: ['myProducts', options],
     queryFn: async () => {
       const response = await getMyProducts(options);
-      if (response.success && response.data) {
-        return response.data;
+      if (response.success) {
+        // The API returns data array at root level, and meta separately
+        return {
+          data: response.data,
+          meta: (response as any).meta
+        };
       }
       throw new Error(response.error?.message || 'Failed to fetch my products');
     },

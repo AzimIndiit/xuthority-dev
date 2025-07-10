@@ -234,8 +234,9 @@ const UploadScreenshotModal: React.FC<UploadScreenshotModalProps> = ({
             className="w-full rounded-full py-4 text-lg font-semibold mt-2 bg-blue-600 hover:bg-blue-700 text-white h-12"
             size="lg"
             disabled={isSubmitting || !fileValue}
+            loading={isSubmitting}
           >
-            {isSubmitting ? "Uploading..." : "Continue"}
+            Continue
           </Button>
         </form>
         <DialogFooter className="flex flex-col items-center mt-2 w-full  text-center">

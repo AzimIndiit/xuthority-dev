@@ -39,6 +39,8 @@ export interface Product {
 
 }
 
+
+
 export interface PaginatedProducts {
   data: Product[];
   pagination: {
@@ -180,18 +182,7 @@ export async function getMyProducts(options?: {
   sortOrder?: 'asc' | 'desc';
   status?: string;
   search?: string;
-}): Promise<ApiResponse<{
-  products: Product[];
-  pagination: {
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-    itemsPerPage: number;
-    hasNext: boolean;
-    hasPrev: boolean;
-  };
-  total: number;
-}>> {
+}): Promise<ApiResponse<Product[]>> {
   const params = new URLSearchParams();
   if (options?.page) params.append('page', options.page.toString());
   if (options?.limit) params.append('limit', options.limit.toString());

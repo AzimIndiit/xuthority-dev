@@ -80,12 +80,11 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChang
           <DialogFooter>
             <Button 
               type="submit" 
-              size="lg" 
-              className="w-full bg-blue-600 hover:bg-blue-700 rounded-full h-12"
               disabled={!question.trim() || createQuestionMutation.isPending}
               loading={createQuestionMutation.isPending}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full"
             >
-              {createQuestionMutation.isPending ? 'Submitting...' : 'Submit'}
+              Submit Question
             </Button>
           </DialogFooter>
         </form>

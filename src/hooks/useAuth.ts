@@ -5,6 +5,7 @@ import { AuthService, LoginRequest, UserRegisterRequest, VendorRegisterRequest, 
 import { FileUploadService } from '../services/fileUpload';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
+import useToast from './useToast';
 
 
 
@@ -168,8 +169,11 @@ export const useLogin = () => {
         queryClient.clear();
         localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
 
-          // Fetch fresh profile data after successful login
-        // await getProfileWithAPI();
+        // Wait a bit to ensure token is properly set in headers
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Fetch fresh profile data after successful login
+        await getProfileWithAPI();
         
         // Set fresh query data with updated profile
         const user = useUserStore.getState().user;
@@ -203,6 +207,9 @@ export const useRegisterUser = () => {
         queryClient.removeQueries();
         queryClient.clear();
         localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        
+        // Wait a bit to ensure token is properly set in headers
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         // Fetch fresh profile data after successful registration
         await getProfileWithAPI();
@@ -241,6 +248,9 @@ export const useRegisterVendor = () => {
         queryClient.removeQueries();
         queryClient.clear();
         localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        
+        // Wait a bit to ensure token is properly set in headers
+        await new Promise(resolve => setTimeout(resolve, 100));
         
         // Fetch fresh profile data after successful registration
         await getProfileWithAPI();
@@ -395,6 +405,7 @@ export const useUpdateProfileWithImage = () => {
 
 // Hook for change password mutation
 export const useChangePassword = () => {
+  const {success, error} = useToast();
   return useMutation({
     mutationFn: async (data: ChangePasswordRequest) => {
       const response = await AuthService.changePassword(data);
@@ -404,17 +415,18 @@ export const useChangePassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Password changed successfully');
+      success('Password changed successfully');
     },
-    onError: (error: any) => {
-      console.error('Password change error:', error);
-      toast.error(error.message || 'Failed to change password');
+    onError: (err: any) => {
+      console.log('Password change error:', err.response.error.message);
+      error(err.response.error.message || 'Failed to change password');
     },
   });
 };
 
 // Hook for forgot password mutation
 export const useForgotPassword = () => {
+  const {success, error} = useToast();
   return useMutation({
     mutationFn: async (data: { email: string }) => {
       const response = await AuthService.forgotPassword(data);
@@ -424,17 +436,18 @@ export const useForgotPassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.success('Reset email sent successfully');
+      success('Reset email sent successfully');
     },
-    onError: (error: any) => {
-      console.error('Forgot password error:', error);
-      toast.error(error.message || 'Failed to send reset email');
+    onError: (err: any) => {
+      console.error('Forgot password error:', err);
+      error(err.message || 'Failed to send reset email');
     },
   });
 };
 
 // Hook for verifying reset token
 export const useVerifyResetToken = () => {
+  const {success, error} = useToast();
   return useMutation({
     mutationFn: async (data: { token: string }) => {
       const response = await AuthService.verifyResetToken(data);
@@ -445,14 +458,14 @@ export const useVerifyResetToken = () => {
     },
     onError: (error: any) => {
       console.error('Verify reset token error:', error);
-      toast.dismiss()
-      toast.error(error.response.data.message || 'Invalid or expired reset token');
+      error(error.response.data.message || 'Invalid or expired reset token');
     },
   });
 };
 
 // Hook for reset password mutation
 export const useResetPassword = () => {
+  const {success, error} = useToast();
   const navigate = useNavigate();
 
   return useMutation({
@@ -464,13 +477,12 @@ export const useResetPassword = () => {
       return response.data;
     },
     onSuccess: () => {
-      toast.dismiss()
-      toast.success('Password reset successfully');
+      success('Password reset successfully');
       navigate('/');
     },
-    onError: (error: any) => {
-      console.error('Reset password error:', error);
-      toast.error(error.message || 'Failed to reset password');
+    onError: (err: any) => {
+      console.error('Reset password error:', err);
+      error(err.message || 'Failed to reset password');
     },
   });
 };

@@ -262,10 +262,11 @@ const AddToListModal: React.FC<AddToListModalProps> = ({
             {/* Submit Button */}
             <Button
               type="submit"
+              loading={isFormSubmitting}
               disabled={!isValid || isFormSubmitting || listsLoading}
-              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full mt-6 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isFormSubmitting ? 'Adding...' : 'Add'}
+              Add
             </Button>
           </form>
         </div>

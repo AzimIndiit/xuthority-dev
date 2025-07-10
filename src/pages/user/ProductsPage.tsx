@@ -119,9 +119,11 @@ const ProductsPage: React.FC = () => {
   });
   
   const navigate = useNavigate();
-  const products = Array.isArray(productsData) ? productsData : [];
-  console.log(productsData,"productsData");
-  const totalPages = productsData?.pagination?.totalPages || 1;
+  
+  // Handle the response structure correctly
+  const products = productsData?.data || [];
+  const totalPages = productsData?.meta?.pagination?.pages || 1;
+  const totalItems = productsData?.meta?.pagination?.total || 0;
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -214,7 +216,7 @@ const ProductsPage: React.FC = () => {
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={handlePageChange}
-            totalItems={productsData?.pagination?.totalItems || 0}
+            totalItems={totalItems}
             itemsPerPage={itemsPerPage}
             showInfo={true}
           />

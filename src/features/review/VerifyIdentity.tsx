@@ -16,67 +16,34 @@ interface VerifyIdentityProps {
 const options = [
   {
     label: "Provide your Company name and email",
-    bg: "bg-red-50",
-    border: "border-red-100",
+    bg: "bg-[#F7D4D1]",
+    border: "border-[#F7D4D1]",
     icon: (
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="64" height="64" rx="12" fill="#FDE8EA"/>
-        <g>
-          <rect x="12" y="20" width="40" height="24" rx="4" fill="#fff"/>
-          <path d="M16 24L32 36L48 24" stroke="#3B82F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <rect x="24" y="28" width="16" height="8" rx="2" fill="#3B82F6" fillOpacity="0.1"/>
-          <text x="32" y="38" textAnchor="middle" fontSize="18" fontWeight="bold" fill="#F43F5E">@</text>
-        </g>
-      </svg>
+      <img src="/svg/review/company_email.svg" alt="company-email" className="w-16 h-16" />
     ),
   },
   {
     label: "Connect your LinkedIn Profile",
-    bg: "bg-purple-50",
-    border: "border-purple-100",
+    bg: "bg-[#EFE0FE]",
+    border: "border-[#EFE0FE]",
     icon: (
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="64" height="64" rx="12" fill="#F3E8FF"/>
-        <g>
-          <rect x="16" y="24" width="32" height="16" rx="3" fill="#fff"/>
-          <circle cx="44" cy="32" r="8" fill="#6366F1"/>
-          <rect x="40" y="28" width="8" height="8" rx="2" fill="#fff"/>
-          <text x="44" y="34" textAnchor="middle" fontSize="14" fontWeight="bold" fill="#2563EB">in</text>
-        </g>
-      </svg>
+      <img src="/svg/review/linkedin.svg" alt="linkedin" className="w-16 h-16" />
     ),
   },
   {
     label: "Continue with unique vendor invitation link",
-    bg: "bg-blue-50",
-    border: "border-blue-100",
+    bg: "bg-[#CCDAFA]",
+    border: "border-[#CCDAFA]",
     icon: (
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="64" height="64" rx="12" fill="#EFF6FF"/>
-        <g>
-          <path d="M24 32h16" stroke="#2563EB" strokeWidth="2" strokeLinecap="round"/>
-          <path d="M32 24l8 8-8 8" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          <circle cx="32" cy="32" r="24" stroke="#3B82F6" strokeWidth="2"/>
-        </g>
-      </svg>
+      <img src="/svg/review/link.svg" alt="vendor-invitation" className="w-16 h-16" />
     ),
   },
   {
     label: "Upload a screenshot of your software",
-    bg: "bg-yellow-50",
-    border: "border-yellow-100",
+    bg: "bg-[#FFF5D4]",
+    border: "border-[#FFF5D4]",
     icon: (
-      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect width="64" height="64" rx="12" fill="#FEF9C3"/>
-        <g>
-          <rect x="16" y="28" width="32" height="16" rx="3" fill="#fff"/>
-          <rect x="24" y="36" width="16" height="4" rx="2" fill="#FACC15"/>
-          <circle cx="24" cy="36" r="2" fill="#34D399"/>
-          <polygon points="32,32 36,36 28,36" fill="#60A5FA"/>
-          <circle cx="44" cy="32" r="2" fill="#F59E42"/>
-          <path d="M32 28v-4m0 0l-4 4m4-4l4 4" stroke="#6366F1" strokeWidth="2" strokeLinecap="round"/>
-        </g>
-      </svg>
+      <img src="/svg/review/image.svg" alt="screenshot" className="w-16 h-16" />
     ),
   },
 ];
@@ -229,7 +196,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
       </div>
       <div className="flex justify-center">
         <button
-          className="text-blue-600 underline text-base hover:text-blue-800"
+          className="text-blue-600 underline text-base hover:text-blue-800 cursor-pointer"
           onClick={handleSkipVerification}
         >
           I don't want to provide this information

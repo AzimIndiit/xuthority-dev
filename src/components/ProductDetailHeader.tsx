@@ -113,6 +113,7 @@ export default function ProductDetailHeader({
                         className={`hidden lg:block ${isFollowing ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
                         size="lg"
                         onClick={handleFollowToggle}
+                        loading={toggleFollowMutation.isPending}
                       >
                         {isFollowing ? "Unfollow" : "Follow"}
                       </Button>}
@@ -129,6 +130,7 @@ export default function ProductDetailHeader({
                       className={`hidden sm:block lg:hidden ${isFollowing ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
                       size="lg"
                       onClick={handleFollowToggle}
+                      loading={toggleFollowMutation.isPending}
                     >
                       {isFollowing ? "Unfollow" : "Follow"}
                     </Button>}
@@ -146,7 +148,7 @@ export default function ProductDetailHeader({
                 <div className={` flex-wrap items-center ${user?.role !== 'vendor' ? 'justify-between' : 'justify-end'} gap-4  w-full hidden sm:flex`}>
                 {user?.role !== 'vendor' &&  <button 
                     onClick={handleSaveToList}
-                    className={`flex items-center gap-2 text-xs sm:text-sm transition-colors ${
+                    className={`flex items-center gap-2 text-xs sm:text-sm transition-colors cursor-pointer ${
                       isInFavorites 
                         ? 'text-red-500' 
                         : 'text-gray-600 hover:text-red-500'
@@ -194,7 +196,7 @@ export default function ProductDetailHeader({
         <div className={`flex items-center ${user?.role !== 'vendor' ? 'justify-between' : 'justify-end'} gap-4  w-full mt-8 sm:hidden`}>
         {user?.role !== 'vendor' &&  <button 
             onClick={handleSaveToList}
-            className={`flex items-center gap-2 text-xs sm:text-sm transition-colors ${
+            className={`flex items-center gap-2 text-xs sm:text-sm transition-colors cursor-pointer ${
               isInFavorites 
                 ? 'text-red-500' 
                 : 'text-gray-600 hover:text-red-500'
@@ -208,6 +210,7 @@ export default function ProductDetailHeader({
               className={`${isFollowing ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
               size="sm"
               onClick={handleFollowToggle}
+              loading={toggleFollowMutation.isPending}
             >
               {isFollowing ? "Unfollow" : "Follow"} 
             </Button>}

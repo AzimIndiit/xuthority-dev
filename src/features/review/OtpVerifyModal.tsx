@@ -176,23 +176,22 @@ const OtpVerifyModal: React.FC<OtpVerifyModalProps> = ({ open, onClose, onResend
         </form>
         
         <div className="flex justify-center mt-6">
-          <button
+          <Button
             type="button"
             className={`text-base underline transition-colors ${
               isResendDisabled || resendOTP.isPending
                 ? 'text-gray-400 cursor-not-allowed'
                 : 'text-blue-600 hover:text-blue-800'
-            }`}
+            } bg-transparent hover:bg-transparent`}
             onClick={handleResendClick}
+          
             disabled={isResendDisabled || resendOTP.isPending}
           >
-            {resendOTP.isPending 
-              ? 'Resending...' 
-              : isResendDisabled 
+            {resendOTP.isPending? 'Resending...' : isResendDisabled 
                 ? `Resend OTP (${formatTime(countdown)})` 
                 : 'Resend OTP'
             }
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

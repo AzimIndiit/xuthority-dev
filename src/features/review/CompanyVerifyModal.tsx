@@ -93,11 +93,11 @@ const createOTP = useCreateOTP();
           </div>
           <Button
             type="submit"
-            className="w-full rounded-full py-4 text-lg font-semibold mt-2 bg-blue-600 hover:bg-blue-700 text-white h-12"
-            size="lg"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-full"
             disabled={createOTP.isPending}
+            loading={createOTP.isPending}
           >
-            {createOTP.isPending ? 'Sending OTP...' : 'Continue'}
+            Verify
           </Button>
         </form>
         <DialogFooter className="flex flex-col items-center mt-2 w-full  text-center">

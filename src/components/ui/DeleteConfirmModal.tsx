@@ -94,9 +94,10 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
+              loading={isDeleting}
               className="flex-1 h-12 bg-red-600 hover:bg-red-700 text-white rounded-full disabled:opacity-50"
             >
-              {isDeleting ? 'Deleting...' : 'Delete List'}
+              Delete
             </Button>
           </div>
         </div>

@@ -90,15 +90,16 @@ const ProductOverview = ({product}: {product: any}) => {
               </p>
              
             </DetailItem>
-          </div>
-          {/* Right Column */}
-          <div>
             <DetailItem icon={Users}>
               <p>
                 <span className="font-semibold">Users</span> (
                 {productDetails.users})
               </p>
             </DetailItem>
+          </div>
+          {/* Right Column */}
+          <div>
+          
             <DetailItem icon={Building2}>
               <p>
                 <span className="font-semibold">Industries</span> (

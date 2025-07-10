@@ -444,7 +444,7 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
               <button
                 type="button"
                 onClick={() => setIsChangePasswordModalOpen(true)}
-                className="text-red-600 hover:text-red-700 font-medium text-sm order-2 sm:order-1"
+                className="text-red-600 hover:text-red-700 font-medium text-sm order-2 sm:order-1 cursor-pointer"
                 disabled={updateProfileMutation.isPending}
               >
                 Looking to change your password?
@@ -453,9 +453,10 @@ const ProfileDetailsForm: React.FC<ProfileDetailsFormProps> = ({
               <Button
                 type="submit"
                 disabled={updateProfileMutation.isPending}
-                className="w-full sm:w-auto px-6 sm:px-8 rounded-full bg-blue-500 text-white hover:bg-blue-600 order-1 sm:order-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                loading={updateProfileMutation.isPending}
+                className="w-full sm:w-40 h-12 rounded-full bg-blue-600 text-white text-lg font-semibold"
               >
-                {updateProfileMutation.isPending ? "Saving..." : "Save"}
+                Save
               </Button>
             </div>
           

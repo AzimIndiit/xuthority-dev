@@ -460,10 +460,11 @@ const MySubscriptionPage: React.FC = () => {
         onOpenChange={setShowCancelModal}
         onConfirm={handleCancelSubscription}
         title="Cancel Subscription"
-        description="Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your current billing period."
-        confirmText={cancelSubscription.isPending ? "Cancelling..." : "Yes, Cancel"}
+        description="Are you sure you want to cancel your subscription? You'll lose access to premium features at the end of your current billing period."
+        confirmText="Yes, Cancel"
         cancelText="Keep Subscription"
         confirmVariant="destructive"
+        isLoading={cancelSubscription.isPending}
       />
     </div>
   );

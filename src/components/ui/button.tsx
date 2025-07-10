@@ -64,11 +64,12 @@ function Button({
       disabled={loading || props.disabled}
       {...props}
     >
-      
       {!loading && LeftIcon && <LeftIcon />}
-      {children}
+      <span className="flex items-center gap-2">
+        {children}
+        {loading && <Loader2 className="animate-spin" />}
+      </span>
       {!loading && RightIcon && <RightIcon />}
-      {loading && <Loader2 className="animate-spin" />}
     </Comp>
   )
 }

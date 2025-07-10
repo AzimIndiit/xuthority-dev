@@ -4,6 +4,7 @@ import { ApiService, ApiResponse, tokenStorage } from './api';
 export interface User {
   id: string;
   _id?: string;
+  accessToken?: string;
   displayName?: string;
   firstName: string;
   lastName: string;
@@ -43,7 +44,7 @@ export interface User {
 // Auth response interface
 export interface AuthResponse {
   user: User;
-  token: string;
+  token?: string; // Make token optional as it might be in user.accessToken
 }
 
 // Login request interface
@@ -133,7 +134,11 @@ export class AuthService {
   static async registerUser(data: UserRegisterRequest): Promise<ApiResponse<AuthResponse>> {
     const response = await ApiService.post<AuthResponse>('/auth/register', data);
     if (response.success && response.data) {
-      tokenStorage.setToken(response.data.token);
+      // Extract token from user object or response
+      const token = response.data.user?.accessToken || response.data.token;
+      if (token) {
+        tokenStorage.setToken(token);
+      }
     }
     return response;
   }
@@ -142,7 +147,11 @@ export class AuthService {
   static async registerVendor(data: VendorRegisterRequest): Promise<ApiResponse<AuthResponse>> {
     const response = await ApiService.post<AuthResponse>('/auth/register-vendor', data);
     if (response.success && response.data) {
-      tokenStorage.setToken(response.data.token);
+      // Extract token from user object or response
+      const token = response.data.user?.accessToken || response.data.token;
+      if (token) {
+        tokenStorage.setToken(token);
+      }
     }
     return response;
   }
@@ -151,7 +160,11 @@ export class AuthService {
   static async login(data: LoginRequest): Promise<ApiResponse<AuthResponse>> {
     const response = await ApiService.post<AuthResponse>('/auth/login', data);
     if (response.success && response.data) {
-      tokenStorage.setToken(response.data.token);
+      // Extract token from user object or response
+      const token = response.data.user?.accessToken || response.data.token;
+      if (token) {
+        tokenStorage.setToken(token);
+      }
     }
     return response;
   }

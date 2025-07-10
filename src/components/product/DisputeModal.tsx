@@ -214,8 +214,9 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
                 type="submit" 
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-full text-base font-medium"
                 disabled={!reason || !description.trim() || description.trim().length < 10 || (isEdit && !status) || createDisputeMutation.isPending || updateDisputeMutation.isPending}
+                loading={createDisputeMutation.isPending || updateDisputeMutation.isPending}
               >
-                {createDisputeMutation.isPending || updateDisputeMutation.isPending ? 'Submitting...' : 'Submit'}
+                Submit
               </Button>
             </div>
           </form>

@@ -83,7 +83,7 @@ export default function ProductDetailHeader({
                 </div>
 
                 <div className=" flex-wrap items-center justify-between gap-4  w-full hidden sm:flex">
-                  <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
+                  <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm cursor-pointer">
                     <Heart className="w-5 h-5" />
                     <span>Save to My List</span>
                   </button>
@@ -104,7 +104,7 @@ export default function ProductDetailHeader({
           </div>
         </div>
         <div className="flex items-center justify-between gap-4  w-full mt-6 sm:hidden">
-          <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm">
+          <button className="flex items-center gap-2 text-gray-600 hover:text-red-500 text-xs sm:text-sm cursor-pointer">
             <Heart className="w-5 h-5" />
             <span>Save to My List</span>
           </button>

@@ -60,10 +60,11 @@ export function ForgotPasswordForm() {
       <div className="flex flex-col gap-4 mt-2">
         <Button
           type="submit"
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 h-14 rounded-full"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
           disabled={forgotPasswordMutation.isPending}
+          loading={forgotPasswordMutation.isPending}
         >
-          {forgotPasswordMutation.isPending ? "Sending..." : "Send Reset Link"}
+          Send Reset Link
         </Button>
         
 

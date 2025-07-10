@@ -265,9 +265,10 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
                     <Button
                       onClick={() => handleRemoveFollower(follower._id)}
                       disabled={removeFollowerMutation.isPending}
+                      loading={removeFollowerMutation.isPending}
                       className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-full font-semibold transition-colors duration-200"
                     >
-                      {removeFollowerMutation.isPending ? 'Removing...' : 'Remove'}
+                      Remove
                     </Button>
                   )}
                 </div>
@@ -280,8 +281,9 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
                     disabled={followersLoading}
                     variant="outline"
                     className="px-8 py-2"
+                    loading={followersLoading}
                   >
-                    {followersLoading ? 'Loading...' : 'Load More'}
+                    Load More
                   </Button>
                 </div>
               )}
@@ -331,9 +333,10 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
                     <Button
                       onClick={() => handleUnfollow(following._id)}
                       disabled={toggleFollowMutation.isPending}
+                      loading={toggleFollowMutation.isPending}
                       className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold transition-colors duration-200"
                     >
-                      {toggleFollowMutation.isPending ? 'Unfollowing...' : 'Unfollow'}
+                      Unfollow
                     </Button>
                   )}
                 </div>
@@ -346,8 +349,9 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
                     disabled={followingLoading}
                     variant="outline"
                     className="px-8 py-2"
+                    loading={followingLoading}
                   >
-                    {followingLoading ? 'Loading...' : 'Load More'}
+                    Load More
                   </Button>
                 </div>
               )}

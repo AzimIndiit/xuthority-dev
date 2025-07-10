@@ -70,11 +70,11 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
       />
       <div className="relative z-10 lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-6">
-          <img
+         {companyData.logoUrl && <img
             src={companyData.logoUrl}
             alt="Company Logo"
             className="h-16 w-16 rounded-full border-4 border-white shadow-md"
-          />
+          />}
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl ">
             {companyData.name} Company Info
           </h2>
@@ -88,23 +88,23 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
           <h3 className="text-xl font-bold text-gray-900">Seller Details</h3>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 md:gap-x-12">
             <div className="max-w-md">
-              <DetailItem icon={User} label="Seller">
+              {companyData.seller && <DetailItem icon={User} label="Seller">
                 (<a href={`/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
-              </DetailItem>
-              <DetailItem icon={Globe} label="Company Website">
+              </DetailItem>}
+              {companyData.website && <DetailItem icon={Globe} label="Company Website">
                 (<a href={companyData.website} className="text-blue-600 hover:underline">{companyData.website}</a>)
-              </DetailItem>
-              <DetailItem icon={Calendar} label="Year Founded">({companyData.founded})</DetailItem>
-              <DetailItem icon={MapPin} label="HQ Location">({companyData.hq})</DetailItem>
+              </DetailItem>}
+              {companyData.founded && <DetailItem icon={Calendar} label="Year Founded">({companyData.founded})</DetailItem>}
+            {companyData.hq && <DetailItem icon={MapPin} label="HQ Location">({companyData.hq})</DetailItem>}
             </div>
             <div>
-              <DetailItem icon={XIcon} label="Twitter">
+              {companyData.twitter && <DetailItem icon={XIcon} label="Twitter">
                 (<a href="#" className="text-blue-600 hover:underline">{companyData.twitter}</a>, {companyData.twitterFollowers} Twitter followers)
-              </DetailItem>
-              <DetailItem icon={Linkedin} label="LinkedIn Page">
+              </DetailItem>}
+              {companyData.linkedin && <DetailItem icon={Linkedin} label="LinkedIn Page">
                 (<a href="#" className="text-blue-600 hover:underline">{companyData.linkedin}</a>, {companyData.linkedinEmployees} employees on LinkedIn®)
-              </DetailItem>
-              <DetailItem icon={UserCheck} label="Ownership">({companyData.ownership})</DetailItem>
+              </DetailItem>}
+              {companyData.ownership && <DetailItem icon={UserCheck} label="Ownership">({companyData.ownership})</DetailItem>}
             </div>
           </div>
         </div>

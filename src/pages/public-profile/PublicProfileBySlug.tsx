@@ -229,7 +229,7 @@ const PublicProfileBySlugPage: React.FC = () => {
               <Button
                 size="sm"
                 onClick={handleFollowToggle}
-               
+                loading={toggleFollowMutation.isPending}
                 className={`flex items-center ${isFollowing ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} text-white font-semibold rounded-full px-4 py-1.5 text-sm mt-1 hover:bg-blue-700 transition-colors`}
               >
                 {isFollowing ? "Unfollow" : "Follow"}

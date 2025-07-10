@@ -123,8 +123,9 @@ export function LoginForm() {
           type="submit"
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
           disabled={loginMutation.isPending}
+          loading={loginMutation.isPending}
         >
-          {loginMutation.isPending ? "Logging in..." : "Login"}
+          Login
         </Button>
         
         {/* Social Login Buttons */}

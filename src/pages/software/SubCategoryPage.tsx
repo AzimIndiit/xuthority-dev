@@ -15,6 +15,7 @@ import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
 import SecondaryLoader from "@/components/ui/SecondaryLoader";
 import CompareButton from "@/components/CompareButton";
+import Pagination from "@/components/ui/pagination";
 
 // Skeleton for the header section
 const HeaderSkeleton = () => (
@@ -236,6 +237,12 @@ const SubCategoryPage = () => {
   const start = (page - 1) * PAGE_SIZE + 1;
   const end = Math.min(page * PAGE_SIZE, total);
 
+  const handlePageChange = (page: number) => {
+    setPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (isError) {
     return (
       <div className="text-center py-8 text-red-500 min-h-[60vh] flex justify-center items-center">
@@ -334,43 +341,14 @@ const SubCategoryPage = () => {
 
         {/* Pagination and showing text */}
         {total > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-8 gap-2">
-            <div className="text-sm text-gray-600">
-              Showing {start} to {end} of {total}
-            </div>
-            <div className="flex gap-1 items-center">
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full border-gray-300"
-                disabled={page === 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <Button
-                  key={i}
-                  variant={page === i + 1 ? "default" : "outline"}
-                  size="icon"
-                  className="rounded-full border-gray-300 w-8 h-8"
-                  onClick={() => setPage(i + 1)}
-                >
-                  {i + 1}
-                </Button>
-              )).slice(0, 3)}
-              {totalPages > 3 && <span className="px-2 text-gray-400">...</span>}
-              <Button
-                variant="outline"
-                size="icon"
-                className="rounded-full border-gray-300"
-                disabled={page === totalPages}
-                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              >
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
+       <Pagination
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          totalItems={total}
+          itemsPerPage={PAGE_SIZE}
+          showInfo={true}
+        />
         )}
       </div>
       <CompareButton />

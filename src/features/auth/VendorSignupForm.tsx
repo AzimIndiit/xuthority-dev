@@ -276,7 +276,7 @@ export function VendorSignupForm() {
         {/* Dynamic Password Requirements Checker */}
         <PasswordRequirementsChecker password={password} />
       </div>
-      <div className="space-y-3 pt-2">
+     <div className="space-y-3 pt-2">
         <div className="flex items-start space-x-2">
           <Checkbox
             id="terms"
@@ -289,14 +289,14 @@ export function VendorSignupForm() {
           <div className="grid gap-1.5 leading-none">
             <label
               htmlFor="terms"
-              className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
               To continue, please agree to our{" "}
-              <a href="#" className="font-semibold text-red-500 hover:underline">
+              <a href="/terms" target="_blank" className="font-semibold text-red-500 hover:underline">
                 Terms & Conditions
               </a>{" "}
               and{" "}
-              <a href="#" className="font-semibold text-red-500 hover:underline">
+              <a href="/privacy" target="_blank" className="font-semibold text-red-500 hover:underline">
                 Privacy Policy
               </a>
               .
@@ -316,20 +316,20 @@ export function VendorSignupForm() {
           />
           <label
             htmlFor="updates"
-            className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
           >
             I would like to receive updates about products, solutions, and
             special offers from XUTHORITY.
           </label>
         </div>
       </div>
-
       <Button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 h-14 rounded-full text-base"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
         disabled={registerMutation.isPending}
+        loading={registerMutation.isPending}
       >
-        {registerMutation.isPending ? "Creating Account..." : "Sign Up as Vendor"}
+        Sign Up as Vendor
       </Button>
 
       {/* Social Signup Buttons */}

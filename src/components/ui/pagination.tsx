@@ -1,6 +1,7 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, MoreHorizontal } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from './button';
 
 interface PaginationProps {
   currentPage: number;
@@ -21,34 +22,6 @@ const Pagination: React.FC<PaginationProps> = ({
   showInfo = true,
   className
 }) => {
-  const getVisiblePages = () => {
-    const delta = 2;
-    const range = [];
-    const rangeWithDots = [];
-
-    for (let i = Math.max(2, currentPage - delta); i <= Math.min(totalPages - 1, currentPage + delta); i++) {
-      range.push(i);
-    }
-
-    if (currentPage - delta > 2) {
-      rangeWithDots.push(1, '...');
-    } else {
-      rangeWithDots.push(1);
-    }
-
-    rangeWithDots.push(...range);
-
-    if (currentPage + delta < totalPages - 1) {
-      rangeWithDots.push('...', totalPages);
-    } else {
-      rangeWithDots.push(totalPages);
-    }
-
-    return rangeWithDots;
-  };
-
-  const visiblePages = getVisiblePages();
-
   const handlePrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -61,88 +34,84 @@ const Pagination: React.FC<PaginationProps> = ({
     }
   };
 
-  const handlePageClick = (page: number | string) => {
-    if (typeof page === 'number') {
-      onPageChange(page);
-    }
-  };
-
   if (totalPages <= 1) return null;
 
   const startItem = (currentPage - 1) * (itemsPerPage || 10) + 1;
   const endItem = Math.min(currentPage * (itemsPerPage || 10), totalItems || 0);
 
+  // Generate page numbers to display
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 3;
+    
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is less than or equal to maxVisiblePages
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always show first 3 pages
+      for (let i = 1; i <= maxVisiblePages; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
+  };
+
+  const pageNumbers = getPageNumbers();
+
   return (
-    <div className={cn('flex flex-col sm:flex-row items-center justify-between gap-4', className)}>
+    <div className={cn('flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mt-4', className)}>
       {/* Info section */}
       {showInfo && totalItems && itemsPerPage && (
-        <div className="text-sm text-gray-700 order-2 sm:order-1">
-          Showing <span className="font-medium">{startItem}</span> to{' '}
-          <span className="font-medium">{endItem}</span> of{' '}
-          <span className="font-medium">{totalItems}</span> results
+        <div className="text-sm text-gray-600">
+          Showing {startItem} to {endItem} of {totalItems}
         </div>
       )}
 
       {/* Pagination controls */}
-      <div className="flex items-center space-x-1 order-1 sm:order-2">
+      <div className="flex gap-1 items-center">
         {/* Previous button */}
-        <button
-          onClick={handlePrevious}
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full border-gray-300"
           disabled={currentPage === 1}
-          className={cn(
-            'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-            currentPage === 1
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-          )}
-          aria-label="Previous page"
+          onClick={handlePrevious}
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
-          Previous
-        </button>
+          <ChevronLeft className="w-4 h-4" />
+        </Button>
 
         {/* Page numbers */}
-        <div className="flex items-center space-x-1">
-          {visiblePages.map((page, index) => (
-            <React.Fragment key={index}>
-              {page === '...' ? (
-                <span className="flex items-center justify-center w-10 h-10 text-gray-400">
-                  <MoreHorizontal className="w-4 h-4" />
-                </span>
-              ) : (
-                <button
-                  onClick={() => handlePageClick(page)}
-                  className={cn(
-                    'flex items-center justify-center w-10 h-10 text-sm font-medium rounded-md transition-colors',
-                    page === currentPage
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-                  )}
-                  aria-label={`Go to page ${page}`}
-                  aria-current={page === currentPage ? 'page' : undefined}
-                >
-                  {page}
-                </button>
-              )}
-            </React.Fragment>
-          ))}
-        </div>
+        {pageNumbers.map((pageNum) => (
+          <Button
+            key={pageNum}
+            variant={currentPage === pageNum ? "default" : "outline"}
+            size="icon"
+            className={cn(
+              "rounded-full border-gray-300 w-8 h-8",
+              currentPage === pageNum && "bg-red-500 hover:bg-red-600 border-red-500"
+            )}
+            onClick={() => onPageChange(pageNum)}
+          >
+            {pageNum}
+          </Button>
+        ))}
+        
+        {/* Ellipsis if there are more pages */}
+        {totalPages > 3 && <span className="px-2 text-gray-400">...</span>}
 
         {/* Next button */}
-        <button
-          onClick={handleNext}
+        <Button
+          variant="outline"
+          size="icon"
+          className="rounded-full border-gray-300"
           disabled={currentPage === totalPages}
-          className={cn(
-            'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-            currentPage === totalPages
-              ? 'text-gray-400 cursor-not-allowed'
-              : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
-          )}
-          aria-label="Next page"
+          onClick={handleNext}
         >
-          Next
-          <ChevronRight className="w-4 h-4 ml-1" />
-        </button>
+          <ChevronRight className="w-4 h-4" />
+        </Button>
       </div>
     </div>
   );

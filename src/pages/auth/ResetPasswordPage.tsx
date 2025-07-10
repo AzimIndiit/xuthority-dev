@@ -291,10 +291,11 @@ export default function ResetPasswordPage() {
             <div className="pt-4">
               <Button
                 type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
                 disabled={resetPasswordMutation.isPending}
-                className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full h-12 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                loading={resetPasswordMutation.isPending}
               >
-                {resetPasswordMutation.isPending ? 'Resetting...' : 'Continue'}
+                Reset Password
               </Button>
             </div>
 

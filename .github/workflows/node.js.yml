@@ -55,7 +55,7 @@ jobs:
       run: |
         cat > .env.production << EOF
         VITE_APP_ENV=production
-        VITE_API_BASE_URL=http://${{ secrets.SERVER_HOST }}/api/v1
+        VITE_API_BASE_URL=https://${{ secrets.SERVER_HOST }}/api/v1
         VITE_APP_NAME=Xuthority
         VITE_APP_VERSION=${{ github.sha }}
         EOF

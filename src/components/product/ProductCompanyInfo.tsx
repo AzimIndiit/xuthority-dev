@@ -8,6 +8,7 @@ import {
   UserCheck,
 } from "lucide-react";
 import { getUserDisplayName } from "@/utils/userHelpers";
+import useUserStore from "@/store/useUserStore";
 
 // A custom X/Twitter Icon
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -40,6 +41,7 @@ const DetailItem = ({
 );
 
 const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => {
+  const {user} = useUserStore();
   const companyData = {
     name: companyDescription.companyName,
     logoUrl: companyDescription.companyAvatar,
@@ -54,6 +56,7 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
     linkedinEmployees: companyDescription.linkedinEmployees,
     ownership:getUserDisplayName(companyDescription),
     slug: companyDescription.slug,
+    sellerId: companyDescription._id,
   };
 
   return (
@@ -89,7 +92,7 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 md:gap-x-12">
             <div className="max-w-md">
               {companyData.seller && <DetailItem icon={User} label="Seller">
-                (<a href={`/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
+                (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
               </DetailItem>}
               {companyData.website && <DetailItem icon={Globe} label="Company Website">
                 (<a href={companyData.website} className="text-blue-600 hover:underline">{companyData.website}</a>)

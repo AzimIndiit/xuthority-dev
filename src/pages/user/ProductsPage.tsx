@@ -211,7 +211,7 @@ const ProductsPage: React.FC = () => {
 
       {/* Pagination */}
       {products?.length > 0 && totalPages > 1 && (
-        <div className="mt-8">
+        <div className="">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

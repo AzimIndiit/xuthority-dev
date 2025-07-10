@@ -72,6 +72,13 @@ export function useProductsByCategory(
 export function useAddProduct() {
   return useMutation({
     mutationFn: async (product: Product): Promise<{ product: Product }> => {
+      // Show upload started notification
+      const hasFiles = (product.logoUrl && typeof product.logoUrl !== "string") || 
+                       product.mediaUrls.some(item => typeof item !== "string");
+      
+      if (hasFiles) {
+        toast.loading("Uploading files...", { id: 'upload-progress' });
+      }
       let logoUrl: File | string = product.logoUrl;
       let mediaUrls: (string | File)[] = product.mediaUrls;
 
@@ -90,13 +97,18 @@ export function useAddProduct() {
 
       // Upload media files if any are File instances
       const uploadedMediaUrls: string[] = await Promise.all(
-        mediaUrls.map(async (item) => {
+        mediaUrls.map(async (item, index) => {
           if (typeof item === "string") return item;
-          const validation = FileUploadService.validateImageFile(item);
+          const validation = FileUploadService.validateMediaFile(item);
           if (!validation.isValid) {
             throw new Error(validation.error);
           }
-          const res = await FileUploadService.uploadProfileImage(item);
+          
+          // Show progress for each file
+          const res = await FileUploadService.uploadMediaFile(item, (progress) => {
+            console.log(`Upload progress for file ${index + 1}: ${progress}%`);
+          });
+          
           if (!res.success) {
             throw new Error(res.error?.message || "Failed to upload media");
           }
@@ -116,6 +128,7 @@ export function useAddProduct() {
     },
 
     onSuccess: (data) => {
+      toast.dismiss('upload-progress');
       toast.success("Product added successfully");
       queryClient.setQueryData(queryKeys.products, data.product);
       // Invalidate all product-related queries
@@ -125,8 +138,9 @@ export function useAddProduct() {
     },
 
     onError: (error: any) => {
+      toast.dismiss('upload-progress');
       console.error("Product add error:", error);
-      toast.error(error.response.data.message || "Failed to add product");
+      toast.error(error.response?.data?.message || error.message || "Failed to add product");
     },
   });
 }
@@ -149,6 +163,13 @@ export function useFetchProductById(id: string) {
 export function useUpdateProduct() {
   return useMutation({
     mutationFn: async ({id,product}: {id: string, product: Product}): Promise<{ product: Product }> => {
+      // Show upload started notification
+      const hasFiles = (product.logoUrl && typeof product.logoUrl !== "string") || 
+                       product.mediaUrls.some(item => typeof item !== "string");
+      
+      if (hasFiles) {
+        toast.loading("Uploading files...", { id: 'upload-progress' });
+      }
       let logoUrl: File | string = product.logoUrl;
       let mediaUrls: (string | File)[] = product.mediaUrls;
 
@@ -167,13 +188,18 @@ export function useUpdateProduct() {
 
       // Upload media files if any are File instances
       const uploadedMediaUrls: string[] = await Promise.all(
-        mediaUrls.map(async (item) => {
+        mediaUrls.map(async (item, index) => {
           if (typeof item === "string") return item;
-          const validation = FileUploadService.validateImageFile(item);
+          const validation = FileUploadService.validateMediaFile(item);
           if (!validation.isValid) {
             throw new Error(validation.error);
           }
-          const res = await FileUploadService.uploadProfileImage(item);
+          
+          // Show progress for each file
+          const res = await FileUploadService.uploadMediaFile(item, (progress) => {
+            console.log(`Upload progress for file ${index + 1}: ${progress}%`);
+          });
+          
           if (!res.success) {
             throw new Error(res.error?.message || "Failed to upload media");
           }
@@ -193,6 +219,7 @@ export function useUpdateProduct() {
     },
 
     onSuccess: (data) => {
+      toast.dismiss('upload-progress');
       toast.success("Product updated successfully");
       queryClient.setQueryData(queryKeys.products, data.product);
       // Invalidate all product-related queries
@@ -203,8 +230,9 @@ export function useUpdateProduct() {
     },
 
     onError: (error: any) => {
+      toast.dismiss('upload-progress');
       console.error("Product update error:", error);
-      toast.error(error.response.data.message || "Failed to update product");
+      toast.error(error.response?.data?.message || error.message || "Failed to update product");
     },
   });
 }

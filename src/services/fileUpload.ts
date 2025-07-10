@@ -52,7 +52,10 @@ export class FileUploadService {
   }
 
   // Upload profile image
-  static async uploadProfileImage(file: File): Promise<ApiResponse<FileUploadResponse[]>> {
+  static async uploadProfileImage(
+    file: File, 
+    onProgress?: (progress: number) => void
+  ): Promise<ApiResponse<FileUploadResponse[]>> {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       throw new Error('File must be an image');
@@ -64,15 +67,8 @@ export class FileUploadService {
       throw new Error('File size must be less than 5MB');
     }
 
-    // Backend already returns array, no need to wrap again
-    const formData = new FormData();
-    formData.append('file', file);
-    
-    return await ApiService.post<FileUploadResponse[]>('/files/upload', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    // Use the enhanced upload method with progress tracking and longer timeout
+    return await ApiService.uploadFile<FileUploadResponse[]>('/files/upload', file, onProgress);
   }
 
   // Upload company avatar image
@@ -99,6 +95,21 @@ export class FileUploadService {
     });
   }
 
+  // Upload media file (images + videos)
+  static async uploadMediaFile(
+    file: File, 
+    onProgress?: (progress: number) => void
+  ): Promise<ApiResponse<FileUploadResponse[]>> {
+    // Validate file type and size
+    const validation = this.validateMediaFile(file);
+    if (!validation.isValid) {
+      throw new Error(validation.error);
+    }
+
+    // Use the enhanced upload method with progress tracking and longer timeout
+    return await ApiService.uploadFile<FileUploadResponse[]>('/files/upload', file, onProgress);
+  }
+
   // Get file URL from response
   static getFileUrl(fileResponse: FileUploadResponse): string {
     return fileResponse.url;
@@ -122,6 +133,38 @@ export class FileUploadService {
     const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
     if (!allowedExtensions.includes(fileExtension)) {
       return { isValid: false, error: 'File must be a valid image format (JPG, PNG, GIF, WebP)' };
+    }
+
+    return { isValid: true };
+  }
+
+  // Validate media file (images + videos)
+  static validateMediaFile(file: File): { isValid: boolean; error?: string } {
+    // Check file type
+    const isImage = file.type.startsWith('image/');
+    const isVideo = file.type.startsWith('video/');
+    
+    if (!isImage && !isVideo) {
+      return { isValid: false, error: 'File must be an image or video' };
+    }
+
+    // Check file size (max 10MB for media files)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      return { isValid: false, error: 'File size must be less than 10MB' };
+    }
+
+    // Check file extension
+    const allowedImageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+    const allowedVideoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.m4v', '.3gp', '.ogv'];
+    const fileExtension = file.name.toLowerCase().substring(file.name.lastIndexOf('.'));
+    
+    if (isImage && !allowedImageExtensions.includes(fileExtension)) {
+      return { isValid: false, error: 'Image must be a valid format (JPG, PNG, GIF, WebP)' };
+    }
+    
+    if (isVideo && !allowedVideoExtensions.includes(fileExtension)) {
+      return { isValid: false, error: 'Video must be a valid format (MP4, WebM, MOV, AVI, etc.)' };
     }
 
     return { isValid: true };

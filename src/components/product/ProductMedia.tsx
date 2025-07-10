@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PlayCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -8,13 +8,30 @@ const MediaCard = ({
   className,
   children,
   type = "image",
-  imgSrc,
+  mediaSrc,
 }: {
   className?: string;
   children?: React.ReactNode;
   type?: "image" | "video";
-  imgSrc?: string;
+  mediaSrc?: string;
 }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const handlePlay = () => {
+    setIsPlaying(true);
+    videoRef.current?.play();
+  };
+
+  const handlePause = () => {
+    setIsPlaying(false);
+    videoRef.current?.pause();
+  };
+
+  const handleEnded = () => {
+    setIsPlaying(false);
+    videoRef.current?.pause();
+  };
+
   return (
     <div
       className={cn(
@@ -22,17 +39,31 @@ const MediaCard = ({
         className
       )}
     >
-      {imgSrc && (
+      {mediaSrc && type === "image" && (
         <img
-          src={imgSrc}
+          src={mediaSrc}
           alt="Media background"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
       )}
-      {type === "video" && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 group-hover:bg-black/40">
-          <PlayCircle className="h-16 w-16 text-white/80 transition-transform duration-300 group-hover:scale-110" />
-        </div>
+      {mediaSrc && type === "video" && (
+        <>
+          <video
+            src={mediaSrc}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            controls
+            preload="metadata"
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onEnded={handleEnded}
+            ref={videoRef}
+            />
+          {!isPlaying && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 group-hover:bg-black/40 cursor-pointer" onClick={handlePlay}  >
+              <PlayCircle className="h-16 w-16 text-white/80 transition-transform duration-300 group-hover:scale-110" />
+            </div>
+          )}
+        </>
       )}
       {children && <div className="relative z-10 h-full">{children}</div>}
     </div>
@@ -72,6 +103,11 @@ const IDCSpotlightCard = () => (
 );
 
 const ProductMedia = ({mediaUrls}: {mediaUrls: string[]}) => {
+  // Helper function to detect if a URL is a video
+  const isVideoUrl = (url: string): boolean => {
+    return /\.(mp4|webm|mov|avi|mkv|flv|wmv|m4v|3gp|ogv)(\?.*)?$/i.test(url);
+  };
+
   return (
     <div className="py-16 sm:py-24">
       
@@ -80,35 +116,25 @@ const ProductMedia = ({mediaUrls}: {mediaUrls: string[]}) => {
         </h2>
 
         <div className="mt-12 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
-          <MediaCard
-            className="col-span-1 md:col-span-2 lg:col-span-1 lg:row-span-2 min-h-[250px]"
-            type="image"
-            imgSrc={mediaUrls[0]}
-          />
+          {mediaUrls.map((url, index) => {
+            const isVideo = isVideoUrl(url);
+            const gridClasses = [
+              "col-span-1 md:col-span-2 lg:col-span-1 lg:row-span-2 min-h-[250px]", // First item
+              "col-span-1 md:col-span-2 lg:col-span-2 min-h-[250px]", // Second item
+              "col-span-1 md:col-span-1 lg:col-span-2 min-h-[250px]", // Third item
+              "col-span-1 md:col-span-1 lg:col-span-1 min-h-[250px]", // Fourth item
+              "col-span-1 md:col-span-2 lg:col-span-2 min-h-[250px]", // Fifth item
+            ];
 
-          <MediaCard
-            className="col-span-1 md:col-span-2 lg:col-span-2 min-h-[250px]"
-            type="image"
-            imgSrc={mediaUrls[1]}
-          />
-
-          <MediaCard
-            className="col-span-1 md:col-span-1 lg:col-span-2 min-h-[250px]"
-            type="image"
-            imgSrc={mediaUrls[2]}
-          />
-
-          <MediaCard
-            className="col-span-1 md:col-span-1 lg:col-span-1 min-h-[250px]"
-            type="image"
-            imgSrc={mediaUrls[3]}
-          />
-
-          <MediaCard
-            className="col-span-1 md:col-span-2 lg:col-span-2 min-h-[250px]"
-            type="video"
-            imgSrc={mediaUrls[4]}
-          />
+            return (
+              <MediaCard
+                key={index}
+                className={gridClasses[index] || "col-span-1 min-h-[250px]"}
+                type={isVideo ? "video" : "image"}
+                mediaSrc={url}
+              />
+            );
+          })}
         </div>
     </div>
   );

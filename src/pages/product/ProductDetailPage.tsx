@@ -191,12 +191,20 @@ export default function ProductDetailPage() {
     : null;
 
   // Map API product to ProductDetailHeader type
+  // Helper function to detect if a URL is a video
+  const isVideoUrl = (url: string): boolean => {
+    return /\.(mp4|webm|mov|avi|mkv|flv|wmv|m4v|3gp|ogv)(\?.*)?$/i.test(url);
+  };
+
+  // Filter media URLs to get only images
+  const imageUrls = product.mediaUrls.filter(url => !isVideoUrl(url));
+  
   const headerProduct = {
     name: product.name,
     rating: product.avgRating ?? 0,
     reviewCount: product.totalReviews ?? 0,
     logoUrl: product.logoUrl || '',
-    bannerUrl: product.mediaUrls[0] || 'https://placehold.co/1200x300/6d28d9/ffffff?text=Banner',
+    bannerUrl: imageUrls[0] || 'https://placehold.co/1200x300/6d28d9/ffffff?text=Banner',
     entryPrice: minPrice !== null ? formatCurrency(minPrice) : 'N/A',
     brandColors: product.brandColors || '#ffffff',
 

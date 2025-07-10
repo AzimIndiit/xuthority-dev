@@ -39,8 +39,8 @@ const schema = z.object({
 
   mediaUrls: z
     .array(fileOrString) // Array of File or URL
-    .min(5, "You must provide exactly 5 images.")
-    .max(5, "You must provide exactly 5 images."),
+    .min(5, "You must provide exactly 5 media files (images/videos).")
+    .max(5, "You must provide exactly 5 media files (images/videos)."),
   features: z
   .array(
     z.object({
@@ -246,7 +246,8 @@ const EditProductPage: React.FC = () => {
         solutionIds: product.data.solutionIds?.map((solution:any) => solution._id),
 
       }
-      setMediaFiles(product.data.mediaUrls?.map((media:any) => media) || []);
+      const mediaUrls = product.data.mediaUrls?.map((media:any) => media) || [];
+      setMediaFiles(mediaUrls);
       reset(payload);
     }
   }, [product]);
@@ -275,7 +276,7 @@ const EditProductPage: React.FC = () => {
     if (!file) return;
   
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      alert("File size must be less than 5MB");
+      alert(`File size must be less than ${MAX_FILE_SIZE_MB}MB`);
       return;
     }
   
@@ -321,9 +322,11 @@ const EditProductPage: React.FC = () => {
     }
   
     const newFiles = [...currentFiles, ...files];
-   clearErrors('mediaUrls')
+    clearErrors('mediaUrls')
     setMediaFiles(newFiles as File[] | FileUpload[]);
     setValue('mediaUrls', newFiles as File[] | string[]);
+    
+
   
    
   
@@ -434,7 +437,7 @@ const EditProductPage: React.FC = () => {
 
       {/* Media Upload */}
       <div>
-        <label className="block mb-1 font-medium" id="mediaUrlsLabel">Upload Product Images</label>
+        <label className="block mb-1 font-medium" id="mediaUrlsLabel">Upload Product Images & Videos</label>
         <div
           onDrop={handleMediaChange}
           onDragOver={(e) => {
@@ -445,30 +448,57 @@ const EditProductPage: React.FC = () => {
           className={`border-2 ${isMediaDragActive ? 'border-blue-500' : 'border-dashed border-gray-300'} rounded-md p-4 flex flex-col items-center justify-center text-center h-40`}
         >
           <label className="cursor-pointer flex flex-col items-center text-gray-500">
-            <input type="file" accept="image/*" multiple onChange={handleMediaChange} className="hidden" />
+            <input type="file" accept="image/*,video/*" multiple onChange={handleMediaChange} className="hidden" />
             <svg className="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0 0V8m0 4h4m-4 0H8m12 4a4 4 0 01-4 4H8a4 4 0 01-4-4V8a4 4 0 014-4h8a4 4 0 014 4v8z" />
             </svg>
-            <span>Drag & drop media or <span className="text-blue-600 underline">click here</span></span>
-            <p className="text-red-500 text-sm mt-1">Max 5 files allowed (10MB each)</p>
+            <span>Drag & drop images/videos or <span className="text-blue-600 underline">click here</span></span>
+            <p className="text-red-500 text-sm mt-1">Max 5 files allowed (10MB each) - Images & Videos supported</p>
           </label>
         </div>
         {errors.mediaUrls && <p className="text-red-500 text-sm mt-1">{errors.mediaUrls.message}</p>}
 
         {mediaFiles.length > 0 && (
           <div className="mt-3 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {mediaFiles.map((file, idx) => (
-              <div key={idx} className="relative">
-                  <img src={ typeof file   === 'string' ? file : URL.createObjectURL(file)} alt={`media-${idx}`} className="rounded object-cover h-28 w-full" />
-                <button
-                  type="button"
-                  onClick={() => setMediaFiles(mediaFiles.filter((_, i) => i !== idx) as File[])}
-                  className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm cursor-pointer"
-                >
-                  &times;
-                </button>
-              </div>
-            ))}
+            {mediaFiles.map((file, idx) => {
+              const fileUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
+              
+              // Enhanced video detection
+              const isVideo = typeof file === 'string' 
+                ? /\.(mp4|webm|mov|avi|mkv|flv|wmv|m4v|3gp|ogv)(\?.*)?$/i.test(file)
+                : file.type?.startsWith('video/');
+              
+
+              
+              return (
+                <div key={idx} className="relative">
+                  {isVideo ? (
+                    <video 
+                      src={fileUrl} 
+                      className="rounded h-28 w-full bg-gray-100" 
+                      controls
+                      preload="metadata"
+                      style={{ objectFit: 'cover' }}
+
+                    />
+                  ) : (
+                    <img 
+                      src={fileUrl} 
+                      alt={`media-${idx}`} 
+                      className="rounded object-cover h-28 w-full"
+
+                    />
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setMediaFiles(mediaFiles.filter((_, i) => i !== idx) as File[])}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm cursor-pointer"
+                  >
+                    &times;
+                  </button>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
@@ -599,7 +629,9 @@ const EditProductPage: React.FC = () => {
           </div>
           
           <div className="flex sm:justify-end w-full">
-            <Button type="submit" disabled={isSubmitting || addProductMutation.isPending} className="w-full sm:w-40 h-12 rounded-full bg-blue-600 text-white text-lg font-semibold" loading={addProductMutation.isPending}>Update</Button>
+            <Button type="submit" disabled={isSubmitting || addProductMutation.isPending} className="w-full sm:w-40 h-12 rounded-full bg-blue-600 text-white text-lg font-semibold" loading={addProductMutation.isPending}>
+              {addProductMutation.isPending ? 'Uploading...' : 'Update'}
+            </Button>
           </div>
         </form>
       </FormProvider>

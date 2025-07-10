@@ -83,7 +83,7 @@ const UserProducts = ({publicProfile}) => {
     const { openAuthModal } = useUIStore();
     const { setSelectedSoftware } = useReviewStore();
     const [currentPage, setCurrentPage] = React.useState(1);
-    const itemsPerPage = 10;
+    const itemsPerPage = 6;
 
     // Fetch user products with pagination
     const { data: productsData, isLoading: productsLoading } = useUserProductsById(publicProfile?._id, {
@@ -95,13 +95,10 @@ const UserProducts = ({publicProfile}) => {
     });
     console.log('productsData', productsData)
     const products = Array.isArray(productsData?.data) ? productsData?.data : [];
-
+    const totalPages = productsData?.meta?.pagination?.pages || 1;
+    const totalItems = productsData?.meta?.pagination?.total || 0;
+  
     // Create pagination object based on fetched data
-    const pagination = usePagination({
-        initialPage: 1,
-        initialItemsPerPage: itemsPerPage,
-        totalItems: productsData?.meta?.pagination?.totalItems || 0
-    });
 
     const handlePageChange = (page: number) => {
         setCurrentPage(page);
@@ -140,7 +137,7 @@ const UserProducts = ({publicProfile}) => {
                           ))}
                         </div>
                     ) : products && products?.length > 0 ? (
-                        <div className="grid grid-cols-1 gap-6 gap-y-8">
+                        <div className="grid grid-cols-1 gap-6 gap-y-12">
                             {products.map((product: any) => (
                                 <SoftwareDetailCard
                                     key={product._id}
@@ -179,16 +176,16 @@ const UserProducts = ({publicProfile}) => {
                 </div>
                 
                 {/* Pagination */}
-                {products && products.length > 0 && pagination.totalPages > 1 && (
+                {products && products.length > 0 && totalPages > 1 && (
                     <div className="px-6 py-4 border-t border-gray-200">
-                        <Pagination
-                            currentPage={currentPage}
-                            totalPages={pagination.totalPages}
-                            onPageChange={handlePageChange}
-                            totalItems={productsData?.meta?.pagination?.totalItems}
-                            itemsPerPage={itemsPerPage}
-                            showInfo={true}
-                        />
+                       <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            showInfo={true}
+          />
                     </div>
                 )}
             </div>

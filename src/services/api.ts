@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 // API Configuration
 const API_BASE_URL = (import.meta as any).env?.VITE_API_BASE_URL || 'http://localhost:8081/api/v1';
 const API_TIMEOUT = 30000; // 30 seconds
+const FILE_UPLOAD_TIMEOUT = 300000; // 5 minutes for file uploads
 
 // Token storage keys
 const TOKEN_KEY = 'xuthority_access_token';
@@ -222,6 +223,7 @@ export class ApiService {
     
     const response = await api.post<ApiResponse<T>>(url, formData, {
       ...config,
+      timeout: FILE_UPLOAD_TIMEOUT, // Use longer timeout for file uploads
       headers: {
         ...config?.headers,
         'Content-Type': 'multipart/form-data',

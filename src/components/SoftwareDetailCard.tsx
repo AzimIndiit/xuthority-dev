@@ -248,6 +248,7 @@ const deleteMutation = useDeleteProduct();
        className="bg-gray-200 hover:bg-gray-300 rounded-full text-gray-900 font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
        onClick={onEdit}
      >
+      
      </Button>
      <Button
       title="Delete"

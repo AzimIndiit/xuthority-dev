@@ -36,6 +36,20 @@ const buttonVariants = cva(
   }
 )
 
+function isChildrenEmpty(children: React.ReactNode) {
+  // Handles: null, undefined, false, '', [], [null], [undefined], etc.
+  if (
+    children === null ||
+    children === undefined ||
+    children === false ||
+    (typeof children === "string" && children.trim() === "") ||
+    (Array.isArray(children) && children.every(isChildrenEmpty))
+  ) {
+    return true
+  }
+  return false
+}
+
 function Button({
   className,
   variant,
@@ -56,6 +70,7 @@ function Button({
   const Comp = asChild ? Slot : "button"
   const LeftIcon = leftIcon
   const RightIcon = rightIcon
+  const hasChildren = !isChildrenEmpty(children)
 
   return (
     <Comp
@@ -65,10 +80,12 @@ function Button({
       {...props}
     >
       {!loading && LeftIcon && <LeftIcon />}
-      <span className="flex items-center gap-2">
-        {children}
-        {loading && <Loader2 className="animate-spin" />}
-      </span>
+      {(hasChildren || loading) && (
+        <span className={cn("flex items-center gap-2", !hasChildren && loading ? "p-0" : undefined)}>
+          {hasChildren && children}
+          {loading && <Loader2 className="animate-spin" />}
+        </span>
+      )}
       {!loading && RightIcon && <RightIcon />}
     </Comp>
   )

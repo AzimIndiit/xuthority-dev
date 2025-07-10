@@ -137,12 +137,13 @@ jobs:
           tar -xzf /tmp/frontend-deployment.tar.gz
           rm /tmp/frontend-deployment.tar.gz
           
-          # Set proper permissions
+          # Create health check endpoint first (while user still has permissions)
+          echo "healthy" > $DEPLOY_DIR/health
+          
+          # Set proper permissions after creating all files
           sudo chown -R www-data:www-data $DEPLOY_DIR
           sudo chmod -R 755 $DEPLOY_DIR
-          
-          # Create health check endpoint
-          echo "healthy" > $DEPLOY_DIR/health
+          sudo chmod 644 $DEPLOY_DIR/health
           
           # Install/update Nginx if not present
           if ! command -v nginx &> /dev/null; then

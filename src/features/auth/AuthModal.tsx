@@ -23,11 +23,11 @@ export function AuthModal() {
 
   // Scroll to top when vendor signup modal opens
   useEffect(() => {
-    if (isAuthModalOpen && authModalView === "vendor-signup") {
+    if (isAuthModalOpen && (authModalView === "vendor-signup" || authModalView === "user-signup")) {
       setTimeout(() => {
-        const vendorForm = document.getElementById('vendor-signup-form');
-        if (vendorForm) {
-          vendorForm.scrollTop = 0;
+        const form = document.getElementById(authModalView === "vendor-signup" ? 'vendor-signup-form' : 'user-signup-form');
+        if (form) {
+          form.scrollTop = 0;
         }
         // Also scroll window to top as backup
         window.scrollTo({ top: 0, behavior: 'instant' });
@@ -36,7 +36,7 @@ export function AuthModal() {
   }, [isAuthModalOpen, authModalView]);
 
   // Force re-render of vendor signup when switching back from login
-  const vendorSignupKey = `vendor-signup-${isAuthModalOpen ? 'open' : 'closed'}-${authModalView}`;
+  const vendorSignupKey = authModalView === "vendor-signup" ? `vendor-signup-${isAuthModalOpen  ? 'open' : 'closed'}-${authModalView}` : `user-signup-${isAuthModalOpen  ? 'open' : 'closed'}-${authModalView}`;
 
   if (!isAuthModalOpen) return null;
 
@@ -95,14 +95,14 @@ export function AuthModal() {
 
   return (
     <Dialog open={isAuthModalOpen} onOpenChange={closeAuthModal} >
-           {authModalView === "vendor-signup" ? (
+           {authModalView === "vendor-signup" || authModalView === "user-signup" ? (
         <DialogContent 
           key={vendorSignupKey}
           showCloseButton={false}
           className="vendor-modal-no-animation !fixed !inset-0 !z-50 !bg-transparent !border-none !shadow-none !p-0 !max-w-none !w-full !h-full !translate-x-0 !translate-y-0 !overflow-y-auto !rounded-none"
         >
-             <div id="vendor-signup-form" className="h-full bg-black/50 flex items-start justify-center p-4 py-8 pb-16 !rounded-none">
-               <div className="bg-white rounded-2xl p-8 w-full max-w-[500px] my-8 mb-16 relative">
+             <div id="vendor-signup-form" className="h-full bg-black/50 flex items-start justify-center p-4 py-8 pb-16 !rounded-none" onClick={closeAuthModal}>
+               <div className="bg-white rounded-2xl p-8 w-full max-w-[500px] my-8 mb-16 relative" onClick={(e) => e.stopPropagation()}>
                  <button
                    onClick={closeAuthModal}
                    className="absolute top-4 right-4 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-2 focus:ring-offset-2 focus:outline-hidden"

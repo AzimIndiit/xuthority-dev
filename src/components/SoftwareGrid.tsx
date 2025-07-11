@@ -219,10 +219,10 @@ export default function SoftwareGrid() {
             <nav className="bg-white border border-gray-200 rounded-xl  ">
               <ul className="divide-y divide-gray-200">
                   {softwareOptions.map((cat) => (
-                  <li key={cat.slug}>
+                  <li key={cat.slug} className="">
                     <Button
                       variant={cat.slug === activeCategory ? "default" : "ghost"}
-                      className={`w-full justify-start rounded-none px-6 py-4 text-left transition-colors font-medium text-sm sm:text-sm md:text-sm lg:text-base ${
+                      className={`w-full justify-start rounded-none px-6 py-8 text-left transition-colors font-medium text-sm sm:text-sm md:text-sm lg:text-base h-10 ${
                         cat.slug === activeCategory
                           ? "bg-red-600 text-white hover:bg-red-700"
                           : "text-gray-900 hover:bg-gray-50"

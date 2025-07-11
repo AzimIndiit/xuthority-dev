@@ -145,7 +145,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
         <span className="text-gray-600 text-xs ml-2">{review?.date || new Date().toLocaleDateString()}</span>
       </div>
       {/* Review Content */}
-      <p className="text-gray-700 text-[13px] leading-relaxed px-4 mb-2  whitespace-pre-line">
+      <p className="text-gray-700 text-[14px] leading-relaxed px-4 mb-2  whitespace-pre-line">
         {highlightText(review.content, searchQuery)}
       </p>
       {/* Footer: Reviewer Info and Verification */}
@@ -163,8 +163,8 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
             )}
           </div>
           <div>
-            <p className="font-semibold text-gray-900 text-[13px] leading-tight">{getUserDisplayName(review.reviewer as any)}</p>
-            <p className="text-xs text-gray-600 leading-tight">
+            <p className="font-semibold text-gray-900 text-[14px] leading-tight">{getUserDisplayName(review.reviewer as any)}</p>
+            <p className="text-[14px] text-gray-600 leading-tight">
               {review.reviewer.title?.split(' ').slice(0, 2).join(' ')}
               {review.reviewer.companyName && (
                 <>
@@ -180,7 +180,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
         <div className="flex gap-2 mt-2 sm:mt-0">
           {review.verification?.isVerified && (
             <span
-              className="text-[10px] text-gray-600 border border-gray-300 rounded-full px-2 py-1 text-center bg-white"
+              className="text-[12px] text-gray-600 border border-gray-300 rounded-full px-2 py-1 text-center bg-white"
               style={{ minWidth: 90, fontWeight: 500 }}
             >
               Validated Review
@@ -188,7 +188,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
           )}
           {review.verification?.verificationType && (
             <span
-              className="text-[10px] text-gray-600 border border-gray-300 rounded-full px-2 py-1 text-center bg-white"
+              className="text-[12px] text-gray-600 border border-gray-300 rounded-full px-2 py-1 text-center bg-white"
               style={{ minWidth: 90, fontWeight: 500 }}
             >
               Review Source: {review.verification.verificationType.replace('_', ' ')}

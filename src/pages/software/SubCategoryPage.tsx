@@ -320,6 +320,7 @@ const SubCategoryPage = () => {
                     industriesAll={product.industries}
                     marketSegmentAll={product.marketSegment}
                     whoCanUseAll={product.whoCanUse}
+                    showCompare={true}
                   />
                 </div>
               ))}

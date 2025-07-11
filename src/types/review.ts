@@ -121,10 +121,8 @@ export function transformBackendReview(backendReview: BackendReview): Review {
       id: backendReview._id || 'unknown',
       title: backendReview.title || 'Untitled Review',
       rating: Number(backendReview.overallRating) || 1,
-     
       date: new Date(backendReview.publishedAt || backendReview.submittedAt || Date.now()).toLocaleDateString(),
       content: backendReview.content || '',
-   
       reviewer: {
         id: reviewer._id || '',
         firstName: firstName,

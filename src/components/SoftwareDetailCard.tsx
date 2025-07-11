@@ -46,6 +46,7 @@ interface SoftwareDetailCardProps {
   industriesAll?: any[];
   marketSegmentAll?: any[];
   whoCanUseAll?: any[];
+  showCompare?: boolean;
 }
 
 function renderStars(rating: number) {
@@ -92,6 +93,7 @@ export default function SoftwareDetailCard({
   whoCanUse,
   industriesAll,
   marketSegmentAll,
+  showCompare = false,
 }: SoftwareDetailCardProps) {
   const {user, isLoggedIn} = useUserStore();
   const navigate = useNavigate();
@@ -197,7 +199,7 @@ const deleteMutation = useDeleteProduct();
       <Card className="relative l bg-[#F7F7F7] rounded-lg shadow p-4 md:p-6 border flex flex-col gap-2 sm:gap-3 pt-4 sm:pt-10 h-full">
         {/* Logo space is handled above */}
         {/* Logo and Compare */}
-       {(user?.role !== 'vendor' && location.pathname !== '/public-profile' && location.pathname !== '/profile/products') && <div className="flex items-start gap-4 ">
+       {showCompare && <div className="flex items-start gap-4 ">
           <div className="flex-1" />
           <div className="flex-1 flex justify-end items-start">
             <label className="flex items-center gap-2 select-none cursor-pointer text-xs sm:text-sm text-gray-500">
@@ -218,7 +220,7 @@ const deleteMutation = useDeleteProduct();
           </div>
         </div>}
         {/* Name, Rating, Review, Write Review */}
-        <div className={`flex sm:flex-row flex-col sm:items-start justify-between gap-4 ${user?.role==='vendor'? 'mt-8': 'mt-3'}`}>
+        <div className={`flex sm:flex-row flex-col sm:items-start justify-between gap-4 ${user?.role==='vendor' || !showCompare ? 'mt-8': 'mt-3'}`}>
           <div>
             <div
               onClick={viewProductPage}

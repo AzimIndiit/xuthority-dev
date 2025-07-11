@@ -318,16 +318,16 @@ console.log('userReview', userReview)
     const currentRating = watchedSubRatings[category as keyof typeof watchedSubRatings] || '';
     return (
       <div className="rounded-lg border border-gray-200">
-        <div className="flex items-center justify-between mb-3 bg-blue-50 px-2 py-1">
+        <div className="flex items-center justify-between  bg-blue-50 px-2 py-2">
           <span className="font-medium text-gray-900">• {label}</span>
         </div>
-        <div className="flex items-center gap-2 p-2">
+        <div className="flex items-center gap-2 p-4">
           {[1, 2, 3, 4, 5, 6, 7].map((rating) => (
             <button
               key={rating}
               type="button"
               onClick={() => handleSubRatingChange(category, rating)}
-              className={`w-8 h-8 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+              className={`w-10 h-10 rounded-full text-sm font-medium transition-colors cursor-pointer ${
                 currentRating === rating.toString()
                   ? "bg-blue-600 text-white"
                   : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"
@@ -339,7 +339,7 @@ console.log('userReview', userReview)
           <button
             type="button"
             onClick={() => setValue(`subRatings.${category}` as any, 'N/A', { shouldValidate: true })}
-            className={`px-3 py-1 rounded-full text-sm font-medium transition-colors cursor-pointer ${
+            className={`  w-10 h-10 rounded-full text-sm font-medium transition-colors cursor-pointer flex items-center justify-center ${
               currentRating === 'N/A'
                 ? "bg-blue-600 text-white"
                 : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-300"

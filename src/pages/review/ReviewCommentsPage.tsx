@@ -23,6 +23,7 @@ import { cn } from '@/lib/utils';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
 import { transformBackendReview } from '@/types/review';
 import ReviewCard from '@/components/product/ReviewCard';
+import { NotFoundPage } from '@/components/common';
 
 // Skeleton component for the entire page
 const ReviewCommentsPageSkeleton: React.FC = () => {
@@ -193,7 +194,7 @@ const ReviewCommentsPage: React.FC = () => {
   }, [reviewId, navigate]);
 
   // Fetch the review details (only if not provided in state)
-  const { data: reviewResponse, isLoading: reviewLoading } = useProductReview(reviewId as string);
+  const { data: reviewResponse, isLoading: reviewLoading, isError: reviewError } = useProductReview(reviewId as string);
 
   // Fetch replies with pagination
   const { data: repliesResponse, isLoading: repliesLoading, refetch: refetchReplies } = useReviewReplies(reviewId || '', {
@@ -203,6 +204,9 @@ const ReviewCommentsPage: React.FC = () => {
     sortOrder: 'desc'
   });
 
+  if(reviewError){
+    return <NotFoundPage title="Review not found" description="The review you're looking for doesn't exist or has been removed." buttonText="Go Back" showBackButton={true} containerHeight="min-h-screen" />
+  }
   // Update allReplies when new data arrives
   useEffect(() => {
     if (repliesResponse?.data && !loadedPages.has(page)) {
@@ -235,7 +239,7 @@ const ReviewCommentsPage: React.FC = () => {
   const { voteHelpful, removeVote, isVoting, isRemoving, hasVoted } = useReplyHelpfulVote();
 
   // Use review from state if available, otherwise from API
-  const review = reviewFromState || transformBackendReview(reviewResponse?.data as any);
+  const review = reviewFromState || (reviewResponse?.data ? transformBackendReview(reviewResponse.data as any) : null);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -383,8 +387,13 @@ const ReviewCommentsPage: React.FC = () => {
   };
 
   // Show skeleton loader when loading initial data
-  if (!reviewId || (reviewLoading && !reviewFromState) || !review) {
+  if (!reviewId || (reviewLoading && !reviewFromState) || (!review && !reviewLoading)) {
     return <ReviewCommentsPageSkeleton />;
+  }
+
+  // If review is still null after loading, show not found
+  if (!review && !reviewLoading) {
+    return <NotFoundPage title="Review not found" description="The review you're looking for doesn't exist or has been removed." buttonText="Go Back" showBackButton={true} containerHeight="min-h-screen" />
   }
 
   const isLoadingInitial = repliesLoading && page === 1 && allReplies.length === 0;

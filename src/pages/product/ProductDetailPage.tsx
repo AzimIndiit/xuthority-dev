@@ -1,5 +1,5 @@
 import React from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useProductBySlug } from "@/hooks/useProducts";
 import ProductNav from "@/components/product/ProductNav";
 import ProductOverview from "@/components/product/ProductOverview";
@@ -8,6 +8,7 @@ import ProductPricing from "@/components/product/ProductPricing";
 import ProductMedia from "@/components/product/ProductMedia";
 import ProductCompanyInfo from "@/components/product/ProductCompanyInfo";
 import ProductReviews from "@/components/product/ProductReviews";
+import { NotFoundPage } from "@/components/common";
 import { Product } from "@/services/product";
 import { formatCurrency } from '@/utils/formatCurrency';
 
@@ -173,14 +174,22 @@ export default function ProductDetailPage() {
   const { productSlug } = useParams<{ productSlug: string }>();
   const { data, isLoading, isError } = useProductBySlug(productSlug || "");
   const product : Product = data?.data;
-
+  const navigate = useNavigate();
   // Show skeleton loader while loading
   if (isLoading) {
     return <ProductDetailSkeleton />;
   }
   
   if (isError || !product) {
-    return <div className="text-center py-12 text-red-500">Product not found.</div>;
+    return (
+      <NotFoundPage 
+        title="Oops! Product not found."
+        description="The product you're looking for doesn't exist or has been removed."
+        buttonText="Go Back Home"
+        navigateTo="/"
+        showBackButton={false}
+      />
+    );
   }
 
 

@@ -41,7 +41,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-900 mb-4">
             {title}
           </h1>
-          <p className="text-base  text-gray-700 mb-6 leading-relaxed max-w-3xl mx-auto">
+          <p className="  text-base md:text-2xl   text-gray-700 mb-6 leading-relaxed max-w-4xl mx-auto">
             {subtitle}
           </p>
           {children}

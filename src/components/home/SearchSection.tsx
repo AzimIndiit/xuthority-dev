@@ -68,7 +68,7 @@ export default function SearchSection() {
     if (!items?.length) return null;
     return (
       <div>
-        <div className="font-bold text-sm mb-1 mt-3 first:mt-0">{title}</div>
+        <div className="font-bold text-base mb-1 mt-3 first:mt-0">{title}</div>
         {items.map((item: any, idx: number) => (
           <div key={item._id || idx} className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded cursor-pointer" onClick={() => {
             if(type === 'product'){
@@ -82,7 +82,7 @@ export default function SearchSection() {
             {type === 'software' && <span className="text-green-500">🧩</span>}
             {type === 'solution' && <span className="text-gray-500">🛠️</span>}
             {type === 'product' && <span className="text-blue-500">{idx === 0 ? '📦' : '📦'}</span>}
-            <span className={type === 'software' && item.name === 'sales tools' ? 'text-red-500 text-xs' : 'text-xs'}>{item.name}</span>
+            <span className={type === 'software' && item.name === 'sales tools' ? 'text-red-500 text-base' : 'text-base'}>{item.name}</span>
           </div>
         ))}
       </div>
@@ -90,7 +90,7 @@ export default function SearchSection() {
   }
 
   return (
-    <section className=" flex flex-col items-center justify-center min-h-[90dvh] w-full bg-gradient-to-br from-yellow-100 via-yellow-50 to-yellow-200  px-4 sm:px-6 lg:px-8 py-12" style={{backgroundImage: 'url(/svg/home_bg.svg)',backgroundSize: 'cover',backgroundPosition: 'center' ,backgroundRepeat: 'no-repeat'}}>
+    <section className=" flex flex-col items-center justify-center min-h-[70dvh] w-full bg-gradient-to-br from-yellow-100 via-yellow-50 to-yellow-200  px-4 sm:px-6 lg:px-8 py-12" style={{backgroundImage: 'url(/svg/home_bg.svg)',backgroundSize: 'cover',backgroundPosition: 'center' ,backgroundRepeat: 'no-repeat'}}>
       <div className="w-full lg:max-w-screen-xl mx-auto">
         <h1 className="text-4xl lg:text-6xl font-bold text-center mb-3 sm:mb-4 mt-8 md:mt-0 px-4 leading-[1.2]">
           Find the right software with Us!
@@ -104,7 +104,7 @@ export default function SearchSection() {
               type="text"
               value={input}
               onChange={e => setInput(e.target.value)}
-              placeholder="Search here..."
+              placeholder="Search for software, solutions, or products..."
               className="flex-1 px-5 py-3 text-base bg-transparent border-none focus:ring-0 placeholder-gray-400 outline-none shadow-none rounded-none h-14 "
               onFocus={() => input && setShowDropdown(true)}
               autoComplete="off"

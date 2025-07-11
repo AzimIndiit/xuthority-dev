@@ -32,7 +32,7 @@ const DetailItem = ({
   children: React.ReactNode;
 }) => (
   <div className="flex items-start gap-3 border-t border-gray-200 py-4">
-    <Icon className="h-5 w-5 flex-shrink-0 text-gray-500 mt-1" />
+    <Icon className="h-5 w-5 flex-shrink-0 text-gray-500 " />
     <div className="flex-grow text-sm text-gray-800">
       <span className="font-semibold">{label}</span>
       <span className="text-gray-600 ml-2">{children}</span>
@@ -78,7 +78,7 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
             alt="Company Logo"
             className="h-16 w-16 rounded-full border-4 border-white shadow-md"
           />}
-          <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl ">
+          <h2 className="text-2xl font-bold tracking-tight text-gray-900 ">
             {companyData.name} Company Info
           </h2>
         </div>
@@ -87,10 +87,10 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
           {companyData.description}
         </p>
 
-        <div className="mt-12">
-          <h3 className="text-xl font-bold text-gray-900">Seller Details</h3>
+        <div className="mt-5">
+          <h3 className="text-2xl font-bold text-gray-900">Seller Details</h3>
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 md:gap-x-12">
-            <div className="max-w-md">
+            <div className="max-w-md ">
               {companyData.seller && <DetailItem icon={User} label="Seller">
                 (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
               </DetailItem>}

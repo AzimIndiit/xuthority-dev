@@ -178,9 +178,9 @@ export default function SoftwareGrid() {
   }
 
   return (
-    <section className="py-8 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50" >
+    <section className="py-24 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50" >
       <div className="w-full lg:max-w-screen-xl mx-auto">
-        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-8 text-gray-900">
+        <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-5xl font-bold text-center max-w-3xl mx-auto mb-8 text-gray-900">
           The Most Widely Used Software Categories.
         </h2>
         <div className="flex flex-col sm:flex-row  gap-4 lg:gap-8 items-start">

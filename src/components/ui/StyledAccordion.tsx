@@ -51,7 +51,7 @@ export const StyledAccordion = ({
       <AccordionItem value="item-1" className="border-none">
         <AccordionTrigger
           className={cn(
-            "bg-[#e6f0fa] px-6 py-4 rounded-t-xl text-sm sm:text-base font-bold flex justify-between items-center text-left",
+            "bg-[#DCEDFF] px-6 py-4 rounded-t-xl text-sm sm:text-base font-bold flex justify-between items-center text-left",
             !hasItems && "rounded-b-xl"
           )}
         >

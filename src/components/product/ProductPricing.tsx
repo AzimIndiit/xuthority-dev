@@ -79,20 +79,16 @@ const pricingData = [
   },
 ];
 
-const ProductPricing = ({pricing}: {pricing: any}) => {
+const ProductPricing = ({pricing, product}: {pricing: any, product: any}) => {
   console.log('pricing', pricing)
   return (
-    <div className="relative  py-16 sm:py-24">
+    <div className="relative  py-10 ">
      
-        <div className=" ">
-          <h2 className=" text-2xl sm:text-4xl font-semibold tracking-tight text-gray-900">
-            Cloudflare Application Security and Performance Pricing
+          <h2 className=" text-2xl font-bold tracking-tight text-gray-900">
+           {product?.name} Pricing
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-gray-600 sm:text-sm">
-            Cloudflare Application Security and Performance has 3 pricing editions. A free trial is also available. Look at different pricing editions below and see what edition and features meet your budget and needs.
-          </p>
-        </div>
-        <div className="mt-16 flex items-stretch gap-x-4 sm:gap-x-8 overflow-x-auto py-4">
+       
+        <div className=" flex items-stretch gap-x-4 sm:gap-x-8 overflow-x-auto py-4">
             {pricing?.map((plan: any) => (
             <div key={plan.planName} className="w-80 sm:w-96 flex-shrink-0">
               <PricingCard {...plan} icon={<img src="/svg/pricing.svg" alt="pricing" className="w-10 h-10" />} />

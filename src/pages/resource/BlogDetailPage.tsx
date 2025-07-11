@@ -171,7 +171,7 @@ export const BlogDetailPage: React.FC = () => {
         <div className="space-y-6">
           {/* Status Badge */}
           <div className="inline-flex">
-              <div className="text-red-600 py-1 text-md font-semibold rounded">
+              <div className="text-red-600 py-1 text-lg font-semibold rounded ">
                 On Demand
               </div>
           </div>
@@ -191,7 +191,7 @@ export const BlogDetailPage: React.FC = () => {
 
                 {/* Watch Now Button */}
                 <div className="pt-4">
-                  {blog.watchUrl ? (
+                  {!blog.watchUrl ? (
                     <Button
                       onClick={handleWatchNow}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200 shadow-lg hover:shadow-xl"

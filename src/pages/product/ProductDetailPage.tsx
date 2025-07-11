@@ -253,12 +253,12 @@ export default function ProductDetailPage() {
           <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
             {/* Wavy line background */}
 
-      {product.pricing.length > 0 &&      <ProductPricing pricing={product.pricing}  />}
+      {product.pricing.length > 0 &&      <ProductPricing pricing={product.pricing} product={product} />}
           </div>
         </section>
         <section id="media">
           <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
-            <ProductMedia mediaUrls={product.mediaUrls || []} />
+            <ProductMedia mediaUrls={product.mediaUrls || []} product={product} />
           </div>
         </section>
         <section id="company-info">

@@ -16,7 +16,7 @@ export default function Footer() {
         <div className="md:w-1/3 flex flex-col gap-4">
           <div className="flex items-center gap-2">
             <Link to="/">
-              <img src="/xuthority_logo.svg" alt="Xuthority Logo" className="h-10" />
+              <img src="/xuthority_logo.svg" alt="Xuthority Logo" className="h-12" />
             </Link>
           </div>
           <p className="text-gray-300 text-base max-w-md">

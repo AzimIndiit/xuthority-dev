@@ -77,13 +77,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
       {/* Header: Title, Actions */}
       <div className="flex flex-col sm:flex-row justify-between items-start gap-2 px-4 pt-4">
         <div className="flex-1 min-w-0">
-          <h3 className="text-[15px] font-semibold text-gray-900 mb-0 leading-tight">
+          <h3 className="text-[22px] font-semibold text-gray-900 mb-0 leading-tight">
             <span className="font-normal text-black">"</span>
             {highlightText(review.title, searchQuery)}
             <span className="font-normal text-black">"</span>
           </h3>
         </div>
- { showComments &&      <div className="flex items-center gap-4 text-xs font-medium mb-2 sm:mt-0">
+ { showComments &&      <div className="flex items-center gap-4 text-base font-medium mb-2 sm:mt-0">
           <button
             onClick={handleHelpfulClick}
             disabled={isVoting || isRemoving}
@@ -94,20 +94,20 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
             )}
             style={{ minWidth: 0 }}
           >
-            <ThumbsUp size={14} className="mr-0.5" />
+            <ThumbsUp size={16} className="mr-0.5" />
             {isVoting || isRemoving ? "..." : (
               <>
                 <span className="font-semibold">Helpful?</span>
                 {helpfulCount > 0 && (
-                  <span className="ml-0.5 text-xs font-normal">
+                  <span className="ml-0.5 text-base font-normal">
                     ({helpfulCount})
                   </span>
                 )}
               </>
             )}
           </button>
-          <button onClick={handleCommentClick} className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-blue-600 hover:underline cursor-pointer">
-            <MessageSquare size={14} className="mr-0.5" />
+          <button onClick={handleCommentClick} className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-[#0071e3] hover:underline cursor-pointer">
+            <MessageSquare size={16} className="mr-0.5" />
             <span className="font-semibold">
             Add Comments {backendReview?.totalReplies ? ` (${backendReview.totalReplies})` : ''}
             </span>
@@ -120,19 +120,19 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
               className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-red-600 hover:underline cursor-pointer"
               style={{ minWidth: 0 }}
             >
-              <Reply  size={14} className="mr-0.5 "  />
-              <span className="font-semibold text-xs " >
+              <Reply  size={16} className="mr-0.5 "  />
+                <span className="font-semibold text-base " >
                 View Reply
                 {backendReview?.totalReplies ? ` (${backendReview.totalReplies})` : ''}
               </span>
             </button>
            {review.product?.userId === user?.id && <button
               onClick={handleDisputeClick}
-              className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-blue-600 hover:underline cursor-pointer"
+              className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-[#0071e3] hover:underline cursor-pointer"
               style={{ minWidth: 0 }}
             >
-              <FileText size={14} className="mr-0.5" />
-              <span className="font-semibold text-xs " >
+                <FileText size={16} className="mr-0.5" />
+              <span className="font-semibold text-base " >
                 Dispute
               </span>
             </button>}
@@ -142,17 +142,17 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
       {/* Rating and Date */}
       <div className="flex items-center px-4 mt-1 mb-1">
         <StarRating rating={review?.rating || 1} />
-        <span className="text-gray-600 text-xs ml-2">{review?.date || new Date().toLocaleDateString()}</span>
+        <span className="text-black font-semibold text-base ml-2">{review?.date || new Date().toLocaleDateString()}</span>
       </div>
       {/* Review Content */}
-      <p className="text-gray-700 text-[14px] leading-relaxed px-4 mb-2  whitespace-pre-line">
+      <p className="text-gray-700 text-[16px] leading-relaxed px-4 mb-2  whitespace-pre-line mt-2">
         {highlightText(review.content, searchQuery)}
       </p>
       {/* Footer: Reviewer Info and Verification */}
       <div className="bg-pink-50 px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-pink-100">
         <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10">
-            <Avatar className="h-10 w-10 cursor-pointer" onClick={() => {  if(review.reviewer.id !== user?.id){ navigate(`/public-profile/${review.reviewer.slug}`)}else{
+          <div className="relative w-14 h-14">
+            <Avatar className="h-14 w-14 cursor-pointer" onClick={() => {  if(review.reviewer.id !== user?.id){ navigate(`/public-profile/${review.reviewer.slug}`)}else{
               navigate(`/profile`)
             }}}>
               <AvatarImage src={review.reviewer.avatar} alt={getUserDisplayName(review.reviewer as any)} />

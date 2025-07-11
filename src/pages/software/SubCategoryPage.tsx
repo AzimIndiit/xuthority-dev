@@ -282,7 +282,7 @@ const SubCategoryPage = () => {
         <div className="relative mt-12 min-h-[60vh]">
           {/* Products Grid */}
           {products && products.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2  gap-6 gap-y-10">
+            <div className="grid grid-cols-1 lg:grid-cols-2  gap-6 gap-y-14">
               {products.map((product: any) => (
                 <div
                   key={product._id}

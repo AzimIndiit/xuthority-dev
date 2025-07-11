@@ -67,9 +67,9 @@ const ProductNav = () => {
                   href={`#${tab.id}`}
                   onClick={(e) => handleTabClick(e, tab.id)}
                   className={cn(
-                    "whitespace-nowrap rounded-lg px-4 py-2 text-xs lg:text-sm font-semibold text-gray-600 transition-colors duration-200",
+                    "whitespace-nowrap rounded-lg px-4 py-4 text-xs lg:text-sm font-semibold text-gray-600 transition-colors duration-200",
                     activeTab === tab.id
-                      ? "bg-red-600 text-white shadow-md"
+                      ? "bg-[#E91515] text-white shadow-md"
                       : "hover:bg-gray-200"
                   )}
                 >
@@ -82,7 +82,7 @@ const ProductNav = () => {
           <div className="hidden flex-shrink-0 items-center gap-6 sm:flex">
             <a
               href={`/product-detail/${productSlug}/community`}
-              className="flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:underline"
+              className="flex items-center gap-1.5 text-sm font-medium text-[#0071e3] hover:underline"
             >
               <Users className="h-4 w-4" />
               Community
@@ -100,7 +100,7 @@ const ProductNav = () => {
         <div className="flex w-full border-y sm:hidden mt-3">
           <a
             href={`/product-detail/${productSlug}/community`}
-            className="flex flex-1 items-center justify-center gap-2 border-r py-3 text-sm font-medium text-blue-600"
+            className="flex flex-1 items-center justify-center gap-2 border-r py-3 text-sm font-medium text-[#0071e3]"
           >
             <Users className="h-5 w-5" />
             <span>Community</span>

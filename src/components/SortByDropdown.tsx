@@ -5,7 +5,7 @@ import {
   DropdownMenuContent,
 } from "@/components/ui/dropdown-menu";
 import PillButton from "@/components/ui/PillButton";
-import { Menu } from "lucide-react";
+import { ListFilter, Menu } from "lucide-react";
 
 const SORT_OPTIONS = [
   {
@@ -46,8 +46,8 @@ export default function SortByDropdown({ value, onChange }: SortByDropdownProps)
   console.log('activeGroup', activeGroup)
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <PillButton icon={<Menu className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} className="text-xs ">
+      <DropdownMenuTrigger asChild >
+        <PillButton icon={<ListFilter className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} className="text-xs cursor-pointer">
           Sort By
         </PillButton>
       </DropdownMenuTrigger>

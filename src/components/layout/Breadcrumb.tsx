@@ -33,7 +33,7 @@ console.log(pathnames[0],"sdasd");
         <ShadcnBreadcrumb>
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild className="text-gray-900 font-semibold hover:text-blue-600 capitalize">
+              <BreadcrumbLink asChild className="text-gray-900 font-semibold hover:text-blue-600 capitalize text-base ">
                 <Link to="/">Home</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
@@ -58,11 +58,11 @@ console.log(pathnames[0],"sdasd");
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
                     {shouldBeNonClickable ? (
-                      <BreadcrumbPage className="font-semibold text-gray-700 capitalize">
+                      <BreadcrumbPage className="font-semibold text-gray-700 capitalize text-base">
                         {name}
                       </BreadcrumbPage>
                     ) : (
-                      <BreadcrumbLink asChild className="text-gray-700 hover:text-blue-600 capitalize font-semibold">
+                      <BreadcrumbLink asChild className="text-gray-700 hover:text-blue-600 capitalize font-semibold text-base">
                         <Link to={linkTo}>{name}</Link>
                       </BreadcrumbLink>
                     )}

@@ -43,8 +43,8 @@ const ProductOverview = ({product}: {product: any}) => {
   };
 
   return (
-    <div className="py-4 md:py-8 ">
-      <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
+    <div className="py-4 md:py-10 ">
+      <h2 className="text-2xl md:text-2xl font-bold text-gray-900">
         {productDetails.name} Overview
       </h2>
       <p className="mt-4 text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-line">
@@ -65,7 +65,7 @@ const ProductOverview = ({product}: {product: any}) => {
       </div> */}
 
       <div className="mt-10">
-        <h3 className="text-xl font-bold text-gray-900">Other Details</h3>
+        <h3 className="text-2xl font-bold text-gray-900">Other Details</h3>
         <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-12">
           {/* Left Column */}
           <div className="max-w-md">

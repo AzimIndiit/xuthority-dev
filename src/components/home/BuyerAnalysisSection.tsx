@@ -2,14 +2,14 @@ import { Button } from "../ui/button";
 
 export default function BuyerAnalysisSection() {
   return (
-    <section className="w-full bg-[#f5f9fd] py-12 px-4 sm:px-6 lg:px-8">
+    <section className="w-full bg-[#f1f8ff] py-24 px-4 sm:px-6 lg:px-8">
       <div className="w-full lg:max-w-screen-xl mx-auto flex flex-col-reverse md:flex-row items-center  md:gap-12 justify-between">
         {/* Text Content */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl  text-gray-900 mb-4">
             Our Analysis of Buyer<br className="hidden sm:block" /> Behavior!
           </h2>
-          <p className="text-gray-600 mb-6 max-w-lg">
+          <p className="text-gray-600 mb-6 max-w-lg leading-relaxed">
             AI drives increased software spending, but buyers demand quick ROI, according to a 2024 Buyer Behavior Report based on a survey of over 1,900 B2B buyers worldwide
           </p>
           <Button
@@ -24,7 +24,7 @@ export default function BuyerAnalysisSection() {
             src="/svg/home/home_section_2.svg"
     
             alt="Buyer analysis illustration"
-            className="w-full h-40 sm:h-60 object-contain " 
+            className="w-full h-40 sm:h-80 w object-contain " 
           />
         </div>
       </div>

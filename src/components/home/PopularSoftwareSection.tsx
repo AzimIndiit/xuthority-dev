@@ -41,7 +41,7 @@ const PopularSoftwareSection = () => {
   // Loading state
   if (isLoading) {
     return (
-      <section className="py-12 md:py-20 bg-gray-50">
+      <section className="py-24 md:py-20 bg-gray-50">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-center">
             Popular Software Categories
@@ -116,12 +116,12 @@ const PopularSoftwareSection = () => {
   }
 
   return (
-    <section className="py-12 md:py-20 bg-gray-50">
+    <section className="py-24 bg-gray-50">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
-        <h2 className="text-3xl md:text-4xl font-bold text-center">
+        <h2 className="text-3xl md:text-5xl font-bold text-center">
           Popular Software Categories
         </h2>
-        <p className="mt-4 text-lg text-gray-600 text-center max-w-3xl mx-auto">
+        <p className="mt-4 text-lg text-gray-600 text-center max-w-4xl mx-auto leading-relaxed">
           Explore our most popular software categories with top-rated products 
           to find the right solution for your business needs.
         </p>

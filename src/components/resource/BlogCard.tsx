@@ -40,7 +40,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
   return (
     <div 
       className={cn(
-        'group cursor-pointer overflow-hidden rounded-2xl bg-white shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:-translate-y-1',
+        'group cursor-pointer overflow-hidden rounded-xl bg-white shadow-sm border border-gray-200 transition-all duration-300 hover:shadow-md hover:-translate-y-1',
         className
       )}
       onClick={onClick}
@@ -59,14 +59,14 @@ const BlogCard: React.FC<BlogCardProps> = ({
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="px-4 pb-4 pt-2">
         {getStatusBadge()}
 
-        <h3 className="mb-4 sm:text-2xl text-xl font-bold text-black leading-tight">
+        <h3 className="mb-4  text-base sm:text-lg font-bold text-black leading-tight line-clamp-2" >
           {blog.title}
         </h3>
         
-        <p className="text-gray-500 text-sm sm:text-base leading-relaxed">
+        <p className="text-gray-500 text-sm sm:text-base leading-relaxed line-clamp-2">
           {blog.description}
         </p>
       </div>

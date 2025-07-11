@@ -1,3 +1,4 @@
+import useUserStore from '@/store/useUserStore';
 import React from 'react';
 
 export interface Value {
@@ -49,8 +50,9 @@ export const ValuesSection: React.FC<ValuesSectionProps> = ({
   onButtonClick,
   className = ""
 }) => {
+  const {isLoggedIn,user} = useUserStore();
   return (
-    <div className={`py-16 bg-gradient-to-b from-red-100/50 via-white to-red-100/50 ${className} `}>
+    <div className={`py-24 bg-gradient-to-b from-red-100/50 via-white to-red-100/50 ${className} `}>
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
@@ -65,10 +67,10 @@ export const ValuesSection: React.FC<ValuesSectionProps> = ({
                 <img
                   src={value.image}
                   alt={value.imageAlt}
-                  className="w-32 h-32 object-contain"
+                  className="w-52 h-52 object-contain"
                 />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4">
                 {value.title}
               </h3>
               <p className="text-gray-600 leading-relaxed">
@@ -78,10 +80,10 @@ export const ValuesSection: React.FC<ValuesSectionProps> = ({
           ))}
         </div>
 
-        {showJoinButton && (
+        {showJoinButton &&( !isLoggedIn) && (
           <div className="text-center">
             <button 
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold transition-colors cursor-pointer"
               onClick={onButtonClick}
             >
               {buttonText} <span aria-hidden className="ml-2">→</span>

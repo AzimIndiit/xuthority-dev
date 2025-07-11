@@ -10,15 +10,15 @@ export default function LeaveReviewSection() {
   const { openAuthModal } = useUIStore();
   const navigate = useNavigate();
   return (
-    <section className="w-full bg-white py-12 px-4 sm:px-6 lg:px-8">
+    <section className="w-full bg-white py-24 px-4 sm:px-6 lg:px-8">
       <div className="w-full lg:max-w-screen-xl mx-auto flex flex-col-reverse sm:flex-row-reverse items-center  sm:gap-12">
         {/* Text Content */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
-          <h2 className="text-2xl  md:text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl  md:text-5xl  text-gray-900 mb-4">
             Experience with <br className="hidden sm:block" />
-            Software? <span className="text-black">Leave a Review!</span>
+            Software? <strong className="text-black">Leave a Review!</strong>
           </h2>
-          <p className="text-gray-600 mb-6 max-w-lg">
+          <p className="text-gray-600 mb-6 max-w-lg leading-relaxed">
             Experience seamless coordination and personalized attention with our Dedicated Project Manager. From inception to execution, your project will be in expert hands, ensuring efficient communication, timely deliverables, and a tailored approach that meets your unique objectives.
           </p>
           <Button
@@ -42,7 +42,7 @@ export default function LeaveReviewSection() {
             src="/svg/home/home_section_1.svg"
       
             alt="Leave a review illustration"
-            className="w-full h-40 sm:h-60 object-contain " 
+            className="w-full h-40 sm:h-80 object-contain " 
           />
         </div>
       </div>

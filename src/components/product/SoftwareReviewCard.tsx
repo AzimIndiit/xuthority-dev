@@ -123,17 +123,17 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
               </h3>
               <div className="flex items-center space-x-2">
                 <div className="flex items-center space-x-1">
-                  <StarRating rating={software.avgRating} />
+                  <StarRating rating={software.avgRating} /> 
                 </div>
-                <span className="text-sm text-gray-600 font-medium">
-                  ({software.totalReviews})
+                <span className="text-sm text-black font-semibold">
+                  ({software.totalReviews}) {software.avgRating.toFixed(1) } out of 5.0
                 </span>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          { showComments &&      <div className="flex items-center gap-4 text-xs font-medium mb-2 sm:mt-0">
+          { showComments &&      <div className="flex items-center gap-4 text-base font-medium mb-2 sm:mt-0">
           <button
             onClick={handleHelpfulClick}
             disabled={isVoting || isRemoving}
@@ -144,20 +144,20 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
             )}
             style={{ minWidth: 0 }}
           >
-            <ThumbsUp size={14} className="mr-0.5" />
+            <ThumbsUp size={16} className="mr-0.5" />
             {isVoting || isRemoving ? "..." : (
               <>
                 <span className="font-semibold">Helpful?</span>
                 {helpfulCount > 0 && (
-                  <span className="ml-0.5 text-xs font-normal">
+                  <span className="ml-0.5 text-base font-normal">
                     ({helpfulCount})
                   </span>
                 )}
               </>
             )}
           </button>
-          <button onClick={handleCommentClick} className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-blue-600 hover:underline cursor-pointer">
-            <MessageSquare size={14} className="mr-0.5" />
+          <button onClick={handleCommentClick} className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-[#0071e3] hover:underline cursor-pointer">
+            <MessageSquare size={16} className="mr-0.5" />
             <span className="font-semibold">
             Add Comments {review?.totalReplies ? ` (${review.totalReplies})` : ''}
             </span>
@@ -170,19 +170,19 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
               className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-red-600 hover:underline cursor-pointer"
               style={{ minWidth: 0 }}
             >
-              <Reply  size={14} className="mr-0.5 "  />
-              <span className="font-semibold text-xs " >
+              <Reply  size={16} className="mr-0.5 "  />
+              <span className="font-semibold text-base " >
                 View Reply
                 {review?.totalReplies ? ` (${ review.totalReplies})` : ''}
               </span>
             </button>
            {software?.userId === user?.id && <button
               onClick={handleDisputeClick}
-              className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-blue-600 hover:underline cursor-pointer"
+              className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-[#0071e3] hover:underline cursor-pointer"
               style={{ minWidth: 0 }}
             >
-              <FileText size={14} className="mr-0.5" />
-              <span className="font-semibold text-xs " >
+                <FileText size={16} className="mr-0.5" />
+              <span className="font-semibold text-base " >
                 Dispute
               </span>
             </button>}
@@ -232,7 +232,7 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
                 <div className="flex items-center space-x-1">
                 <StarRating rating={review.overallRating} />
             </div>
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-black font-semibold">
               {formatDate(review.updatedAt)}
             </span>
           </div>

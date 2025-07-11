@@ -81,7 +81,7 @@ export default function ProductDetailHeader({
     <>
       {/* Banner */}
       <div
-        className="h-36 md:h-64 bg-cover bg-center"
+        className="h-36 md:h-72 bg-cover bg-center"
         style={{ backgroundImage: `url(${product.bannerUrl})` }}
       />
 
@@ -120,7 +120,7 @@ export default function ProductDetailHeader({
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                       <StarRating rating={product.rating} />
-                      <span className="text-gray-600 text-xs sm:text-sm">
+                      <span className="text-black font-semibold text-xs sm:text-sm">
                         ({product.reviewCount}) {product.rating.toFixed(1)} out of 5.0
                       </span>
                     </div>

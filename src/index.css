@@ -57,6 +57,10 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --font-family-buffalo: Buffalo, sans-serif;
+  --color-red-500: #E91515;
+  --color-red-600: #E91515;
+  --color-blue-500: #0071E3;
+  --color-blue-600: #0071E3;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);

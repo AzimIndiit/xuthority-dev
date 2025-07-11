@@ -6,14 +6,14 @@ export default function ClaimProfileSection() {
   const { isLoggedIn } = useUserStore();
   const { openAuthModal } = useUIStore();
   return (
-    <section className="w-full bg-[#fdf3ed] py-12 px-4 sm:px-6 lg:px-8">
+    <section className="w-full bg-[#fef5f4] py-24 px-4 sm:px-6 lg:px-8">
       <div className="w-full lg:max-w-screen-xl mx-auto flex flex-col-reverse md:flex-row items-center  sm:gap-12 justify-between">
         {/* Text Content */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left justify-between">
-          <h2 className="text-2xl  md:text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl  md:text-5xl  text-gray-900 mb-4">
             Reach More Potential Buyers<br className="hidden sm:block" /> for Your Software.
           </h2>
-          <p className="text-gray-600 mb-6 max-w-lg">
+          <p className="text-gray-600 mb-6 max-w-lg leading-relaxed">
             Expand your market presence and connect with the right audience. Our platform helps you showcase your software to millions of interested buyers, ensuring greater visibility and increased opportunities for sales.
           </p>
          {!isLoggedIn && <Button
@@ -31,7 +31,7 @@ export default function ClaimProfileSection() {
             src="/svg/home/home_section_3.svg"
           
             alt="Claim profile illustration"
-            className=" w-full h-40 sm:h-60 object-contain " 
+            className=" w-full h-40 sm:h-80 object-contain " 
           />
         </div>
       </div>

@@ -93,7 +93,7 @@ export default function FilterDropdown({ filters, onFilterChange, onApply, onCle
       <DropdownMenuTrigger asChild>
         <PillButton 
           icon={<SlidersHorizontal className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} 
-          className="text-xs"
+          className="text-xs cursor-pointer"
           disabled={isLoading}
         >
           Filters

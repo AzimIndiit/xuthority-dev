@@ -50,7 +50,7 @@ const ResourceTabs: React.FC<ResourceTabsProps> = ({
               key={tab.id}
               onClick={() => onTabChange(tab.slug)}
               className={cn(
-                'px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 whitespace-nowrap cursor-pointer',
+                'px-4 py-4 text-sm font-semibold rounded-lg transition-all duration-200 whitespace-nowrap cursor-pointer',
                 activeTab === tab.slug
                   ? 'bg-red-600 text-white shadow-md'
                   : 'text-gray-600 hover:text-gray-900'

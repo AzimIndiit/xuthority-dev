@@ -105,12 +105,12 @@ export default function Navbar() {
             <img
               src="/xuthority_logo.svg"
               alt="Xuthority Logo"
-              className="h-10"
+              className="h-12"
             />
           </div>
           {/* Desktop Nav Links (only on lg+) */}
           <div className="flex items-center justify-between lg:space-x-3 xl:space-x-8">
-            <ul className="hidden lg:flex lg:space-x-6 xl:space-x-8">
+            <ul className="hidden xl:flex lg:space-x-6 xl:space-x-8">
               {navLinks.slice(0, 5).map((link) => (
                 <li key={link.label}>
                   <a
@@ -192,7 +192,7 @@ export default function Navbar() {
               </div>
               {/* Hamburger for mobile & tablet (shown below lg) */}
               <Button
-                className="lg:hidden ml-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="xl:hidden ml-2 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                 onClick={() => setDrawerOpen(true)}
                 aria-label="Open menu"
                 variant="ghost"

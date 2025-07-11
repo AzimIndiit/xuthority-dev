@@ -398,7 +398,7 @@ const ReviewCommentsPage: React.FC = () => {
 
   const isLoadingInitial = repliesLoading && page === 1 && allReplies.length === 0;
   const isLoadingMore = repliesLoading && page > 1;
-console.log(hasMoreReplies,'allReplies');
+console.log(allReplies,'allReplies');
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
@@ -420,7 +420,11 @@ console.log(hasMoreReplies,'allReplies');
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-4">
           <div className="p-6 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900">
-              Comments ({totalComments})
+            Comment on Review 
+            <p className="text-sm text-gray-400">
+            Share your thoughts or ask questions about this review to join the conversation and provide additional insights.
+            </p>
+          
             </h2>
           </div>
 
@@ -439,21 +443,20 @@ console.log(hasMoreReplies,'allReplies');
                   type="submit"
                   disabled={!comment.trim() || createReplyMutation.isPending}
                   className="bg-red-600 hover:bg-red-700 text-white"
+                  loading={createReplyMutation.isPending}
                 >
-                  {createReplyMutation.isPending ? 'Posting...' : 'Post Comment'}
+               Post Comment
                 </Button>
               </div>
             </form>
           </div>
 
-          {/* Comments List */}
-          <div className="p-6">
-            {/* Show comment being posted */}
-            {createReplyMutation.isPending && (
-              <div className="mb-6">
-                <CommentPostingSkeleton />
-              </div>
-            )}
+     
+        </div>
+      </div>
+     {/* Comments List */}
+     <div className="p-6 w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
+     
 
             {isLoadingInitial ? (
               // Show comment skeletons while loading initial comments
@@ -470,10 +473,19 @@ console.log(hasMoreReplies,'allReplies');
               </div>
             ) : (
               <>
-                <div className="space-y-6">
-                  {allReplies.map((reply: any) => (
-                    <div key={reply._id} className="flex items-start gap-3 animate-fadeIn">
-                      <Avatar className="w-10 h-10 cursor-pointer" onClick={() => {  if(reply.author.id !== user?.id){ navigate(`/public-profile/${reply.author.slug}`)}else{
+              <p className="text-sm font-semibold my-4">Replies ({totalComments})</p>
+                     {/* Show comment being posted */}
+            {/* {createReplyMutation.isPending && (
+              <div className="mb-6">
+                <CommentPostingSkeleton />
+              </div>
+            )} */}
+                <div className="space-y-2">
+                  {allReplies.map((reply: any) => {
+                    console.log('reply', reply.author?._id,user)
+                    return (
+                    <div key={reply._id} className="flex items-start gap-3 animate-fadeIn border border-gray-200 p-4 rounded-md shadow-sm bg-white">
+                      <Avatar className="w-14 h-14 cursor-pointer" onClick={() => {  if(reply.author.id !== user?.id){ navigate(`/public-profile/${reply.author.slug}`)}else{
                         navigate(`/profile`)
                       }}}>
                         <AvatarImage 
@@ -493,15 +505,17 @@ console.log(hasMoreReplies,'allReplies');
                               {getUserDisplayName(reply.author)}
                             </span>
                             <span className="text-sm text-gray-500">
-                              {formatRelativeTime(reply.createdAt)}
+                              {formatDate(reply.createdAt, { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
-                            {reply.isEdited && (
-                              <span className="text-sm text-gray-400">(edited)</span>
-                            )}
+                          
                           </div>
                           
                           {user?.id === reply.author._id && (
-                            <DropdownMenu>
+                            <div className="flex items-center gap-2">
+                                {reply.isEdited && (
+                              <span className="text-sm text-gray-400">(edited)</span>
+                            )}
+                              <DropdownMenu>
                               <DropdownMenuTrigger asChild>
                                 <button className="text-gray-400 hover:text-gray-600 p-1">
                                   <MoreVertical size={16} />
@@ -521,6 +535,7 @@ console.log(hasMoreReplies,'allReplies');
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
+                            </div>
                           )}
                         </div>
                         
@@ -558,7 +573,7 @@ console.log(hasMoreReplies,'allReplies');
                           <p className="text-gray-700 whitespace-pre-wrap">{reply.content}</p>
                         )}
                         
-                        <div className="mt-3">
+                        {/* <div className="mt-3">
                           <button
                             onClick={() => handleHelpfulClick(reply)}
                             disabled={isVoting || isRemoving}
@@ -572,10 +587,10 @@ console.log(hasMoreReplies,'allReplies');
                             <ThumbsUp size={14} className={cn(hasVoted(reply) && "fill-current")} />
                             <span>Helpful ({reply.helpfulVotes?.count || 0})</span>
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
-                  ))}
+                  )})}
                 </div>
 
                 {/* Show loading skeleton when loading more comments */}
@@ -603,9 +618,6 @@ console.log(hasMoreReplies,'allReplies');
               </>
             )}
           </div>
-        </div>
-      </div>
-
       {/* Delete Confirmation Modal */}
       <ConfirmationModal
         isOpen={showDeleteModal}

@@ -152,17 +152,24 @@ export default function TestimonialsCarousel() {
   }
   console.log('dotActive', dotActive)
   return (
-    <section className="relative w-full bg-[#f8f8f8] py-16 px-2 sm:px-6 flex flex-col items-center overflow-hidden">
+    <section className="relative w-full bg-[#f8f8f8] py-24 px-2 sm:px-6 flex flex-col items-center overflow-hidden">
       <div className="w-full lg:max-w-screen-xl mx-auto flex flex-col items-center ">
         {/* Decorative Circles */}
         <div className="absolute left-0 top-10 w-32 h-32 sm:w-40 sm:h-40 bg-blue-200 rounded-full opacity-60 -z-10" />
         <div className="absolute left-10 top-20 w-20 h-20 bg-blue-100 rounded-full opacity-80 -z-10" />
         <div className="absolute right-0 bottom-0 w-64 h-32 bg-red-100 rounded-tl-full opacity-60 -z-10" />
 
-        <h2 className="text-3xl sm:text-4xl font-bold text-center mb-10 text-gray-900">
+        <h2 className="text-3xl sm:text-5xl font-bold text-center mb-12 text-gray-900">
           What they Say About Us!
         </h2>
-        <div className="w-full max-w-6xl flex justify-center">
+    
+       
+        <div className="w-full max-w-6xl flex justify-center relative">
+        <div className="w-full h-full absolute -top-18  -left-13">
+       <img src="/svg/testimonial.svg" alt="testimonials" className="w-40 h-40 object-contain" />
+
+        </div>
+
           <Carousel
             setApi={setApi}
             opts={{
@@ -173,21 +180,22 @@ export default function TestimonialsCarousel() {
             className="w-full"
           >
             <CarouselContent>
+
               {testimonials.map((t, idx) => (
                 <CarouselItem
                   key={t.name + idx}
                   className="md:basis-1/2 lg:basis-1/3 flex flex-col"
-                >
-                  <div className="bg-white rounded-xl shadow-sm p-7 flex flex-col justify-between min-h-[320px] mx-2 flex-1">
-                    <p className="text-gray-800 text-base mb-8">{t.text}</p>
+                > 
+                  <div className="bg-white rounded-md  border border-gray-200 p-4 flex flex-col justify-between min-h-[320px] mx-2 flex-1">
+                    <p className="text-gray-800 text-base mb-8 leading-relaxed font-semibold ">{t.text}</p>
                     <div className="flex items-center justify-between mt-auto">
-                      <span className="text-red-600 text-3xl font-family-buffalo">
+                      <span className="text-red-600 text-4xl font-family-buffalo">
                         {t.name}
                       </span>
                       <img
                         src={t.avatar}
                         alt={t.name}
-                        className="w-10 h-10 rounded-full object-cover border-2 border-white shadow"
+                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
                       />
                     </div>
                   </div>

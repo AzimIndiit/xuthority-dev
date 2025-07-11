@@ -220,7 +220,7 @@ const deleteMutation = useDeleteProduct();
           </div>
         </div>}
         {/* Name, Rating, Review, Write Review */}
-        <div className={`flex sm:flex-row flex-col sm:items-start justify-between gap-4 ${user?.role==='vendor' || !showCompare ? 'mt-8': 'mt-3'}`}>
+        <div className={`flex sm:flex-row flex-col sm:items-start justify-between gap-4 ${!showCompare ? 'mt-8': 'mt-3'}`}>
           <div>
             <div
               onClick={viewProductPage}
@@ -230,7 +230,7 @@ const deleteMutation = useDeleteProduct();
             </div>
             <div className=" flex items-center gap-2 mt-1">
               <StarRating rating={rating} />
-              <span className="text-gray-600 text-xs sm:text-sm">
+              <span className="text-black font-semibold text-xs sm:text-sm">
                 ({reviewCount}) {rating.toFixed(1)} out of 5.0
               </span>
             </div>
@@ -311,13 +311,13 @@ const deleteMutation = useDeleteProduct();
        {location.pathname !== '/profile/products' && <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4 ">
          { <button
             onClick={() => setShowAddToListModal(true)}
-            className={`${user?.role==='vendor' ? 'invisible': 'flex'} items-center gap-1 !text-[11px] xl:!text-[12px] font-medium sm:px-2 py-1 rounded transition cursor-pointer ${
+            className={`${user?.role==='vendor' ? 'invisible': 'flex'} items-center gap-1 !text-[11px] xl:!text-[14px] font-medium sm:px-2 py-1 rounded transition cursor-pointer ${
               isInFavorites 
                 ? 'text-red-500' 
                 : 'text-gray-500 hover:text-red-500'
             }`}
           >
-            <Heart className={`w-5 h-5 ${isInFavorites ? 'fill-red-500' : ''}`} /> Save to My List
+            <Heart className={`w-6 h-5 ${isInFavorites ? 'fill-red-500' : ''}`} /> Save to My List
           </button>}
           <div className="flex sm:flex-row flex-col sm:items-center justify-between gap-2 ">
             <Button className="bg-white border hover:bg-white borderr-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px]  h-10 xl:h-12 sm:ml-2">

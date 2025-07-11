@@ -62,7 +62,7 @@ const StarRating = ({
   const emptyStars = totalStars - fullStars - (halfStar ? 1 : 0);
 
   // Determine color based on rating
-  const colorClass = rating < 3 ? "text-red-500" : "text-yellow-400";
+  const colorClass = rating < 4 ? "text-red-500" : "text-yellow-400";
 
   return (
     <div className={cn("flex items-center gap-0.5", colorClass, className)}>

@@ -33,26 +33,26 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
 
   return (
     <section 
-      className={`relative flex flex-col min-h-[70dvh] w-full ${backgroundClass} px-4 sm:px-6 lg:px-8 py-12 ${className}`}
+      className={`relative flex flex-col min-h-[70dvh] w-full overflow-hidden ${backgroundClass} px-4 sm:px-6 lg:px-8 py-12 ${className}`}
       style={sectionStyle}
     >
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         <div className="text-center mx-auto my-20">
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-gray-900 mb-4">
+          <h1 className="text-3xl sm:text-6xl font-extrabold text-gray-900 mb-4">
             {title}
           </h1>
-          <p className="  text-base md:text-2xl   text-gray-700 mb-6 leading-relaxed max-w-4xl mx-auto">
+          <p className="  text-xl lg:text-2xl   text-gray-700 mb-6 w-full sm:max-w-5xl mx-auto leading-relaxed">
             {subtitle}
           </p>
           {children}
         </div>
         
         {illustration && (
-          <div className="flex justify-center mt-8 absolute bottom-0 w-full left-0 px-4 sm:px-6">
+          <div className="flex justify-center  -mb-[60px]  px-4 sm:px-6">
             <img
               src={illustration}
               alt={illustrationAlt}
-              className="w-full max-w-xl mx-auto h-[250px]"
+              className="w-full max-w-xl mx-auto h-[200px] md:h-[220px] lg:h-[330px]"
               style={illustrationStyle}
             />
           </div>

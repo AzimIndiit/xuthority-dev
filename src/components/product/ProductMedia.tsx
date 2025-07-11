@@ -102,20 +102,20 @@ const IDCSpotlightCard = () => (
   </div>
 );
 
-const ProductMedia = ({mediaUrls}: {mediaUrls: string[]}) => {
+const ProductMedia = ({mediaUrls, product}: {mediaUrls: string[], product: any}) => {
   // Helper function to detect if a URL is a video
   const isVideoUrl = (url: string): boolean => {
     return /\.(mp4|webm|mov|avi|mkv|flv|wmv|m4v|3gp|ogv)(\?.*)?$/i.test(url);
   };
 
   return (
-    <div className="py-16 sm:py-24">
+    <div className="py-10 ">
       
-        <h2 className="text-2xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Cloudflare Application Security and Performance Media
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900">
+         {product?.name} Media
         </h2>
 
-        <div className="mt-12 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
+        <div className="mt-5 grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 w-full">
           {mediaUrls.map((url, index) => {
             const isVideo = isVideoUrl(url);
             const gridClasses = [

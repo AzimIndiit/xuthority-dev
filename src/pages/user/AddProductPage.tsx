@@ -399,7 +399,7 @@ console.log('mediaUrls', mediaFiles)
         {
             watch('logoUrl') &&
              <div className="relative w-28  ">
-             <img src={typeof watch('logoUrl') === 'string' ? watch('logoUrl') as string : URL.createObjectURL(watch('logoUrl') as File)} alt="Logo Preview" className=" h-28 w-28 rounded object-cover" />
+             <img src={typeof watch('logoUrl') === 'string' ? watch('logoUrl') as string : URL.createObjectURL(watch('logoUrl') as File)} alt="Logo Preview" className=" h-28 w-28 rounded object-contain" />
              <button
                type="button"
                onClick={() => setValue('logoUrl', '', { shouldValidate: true })}

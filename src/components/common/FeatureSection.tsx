@@ -26,11 +26,11 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
   children
 }) => {
   return (
-    <section className={`w-full ${backgroundColor} py-12 px-4 sm:px-6 lg:px-8 ${className}`}>
+    <section className={`w-full ${backgroundColor} py-24 px-4 sm:px-6 lg:px-8 ${className}`}>
       <div className={`w-full lg:max-w-screen-xl mx-auto flex flex-col-reverse ${reverse ? 'sm:flex-row-reverse' : 'sm:flex-row'} items-center sm:gap-12`}>
         {/* Text Content */}
         <div className="w-full md:w-1/2 flex flex-col items-center md:items-start text-center md:text-left">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-5xl font-bold text-gray-900 mb-4">
             {title}
           </h2>
           <p className="text-gray-600 mb-6 max-w-lg">
@@ -52,7 +52,7 @@ export const FeatureSection: React.FC<FeatureSectionProps> = ({
           <img
             src={illustration}
             alt={illustrationAlt}
-            className="w-full h-40 sm:h-60 object-contain"
+            className="w-full h-40 sm:h-80 object-contain"
           />
         </div>
       </div>

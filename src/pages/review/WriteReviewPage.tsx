@@ -148,11 +148,27 @@ const WriteReviewPage = () => {
     const linkedinVerified = searchParams.get('linkedin_verified');
     const linkedinData = searchParams.get('linkedin_data');
     const linkedinError = searchParams.get('linkedin_error');
+    const preserveState = searchParams.get('preserve_state');
 
     if (linkedinError) {
-      toast.verification.error(`LinkedIn verification failed: ${linkedinError}`);
-      // Clear the error parameter
+      // Show error message
+      if (linkedinError.includes('cancelled')) {
+        toast.verification.error('LinkedIn verification was cancelled. You can try again or choose a different verification method.');
+      } else {
+        toast.verification.error(`LinkedIn verification failed: ${linkedinError}`);
+      }
+      
+      // If preserve_state is true, keep the user on step 2 with their selected software
+      if (preserveState === 'true') {
+        // Ensure user stays on step 2 (VerifyIdentity) if they have a selected software
+        if (selectedSoftware && currentStep !== 2) {
+          setCurrentStep(2);
+        }
+      }
+      
+      // Clear the error parameters
       searchParams.delete('linkedin_error');
+      searchParams.delete('preserve_state');
       setSearchParams(searchParams);
       return;
     }
@@ -188,7 +204,7 @@ const WriteReviewPage = () => {
         setSearchParams(searchParams);
       }
     }
-  }, [searchParams, setSearchParams, setVerificationData, setCurrentStep]);
+  }, [searchParams, setSearchParams, setVerificationData, setCurrentStep, selectedSoftware, currentStep]);
 
   const renderCurrentStep = () => {
     switch (currentStep) {

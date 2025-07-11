@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronRight, Loader2 } from "lucide-react";
+import { ArrowLeftIcon, ChevronRight, Loader2 } from "lucide-react";
 import { useSoftwareCategories, useSolutionCategories } from "@/hooks/useCategoryOptions";
 
 // Skeleton loader component for category cards
@@ -171,15 +171,9 @@ const SoftwareCategoryPage = () => {
               className="rounded-full border-red-400 px-8 py-2 text-base font-semibold text-red-500 hover:bg-red-50 hover:text-red-600"
               onClick={handleViewAllClick}
               disabled={isViewAllLoading}
+            loading={isViewAllLoading}
             >
-              {isViewAllLoading ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Loading...
-                </>
-              ) : (
-                'View All Categories'
-              )}
+              View All Categories
             </Button>
           </div>
         )}

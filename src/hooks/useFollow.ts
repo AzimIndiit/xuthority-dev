@@ -67,10 +67,11 @@ export const useFollowStats = (userId: string) => {
 
 // Hook to get follow status
 export const useFollowStatus = (userId: string) => {
+  const {user} = useUserStore();
   return useQuery<{ isFollowing: boolean; userId: string }>({
     queryKey: followQueryKeys.status(userId),
     queryFn: () => FollowService.getFollowStatus(userId),
-    enabled: !!userId,
+    enabled: !!userId && !!user?._id,
     select: (data:any) => {
       return {
         isFollowing: data.data.isFollowing,

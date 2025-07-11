@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import FavoriteService, { FavoriteListsResponse, FavoriteListProductsResponse, FavoriteStatusResponse } from '@/services/favorites';
 import { useToast } from './useToast';
+import useUserStore from '@/store/useUserStore';
 
 // Query keys for favorites
 export const favoriteQueryKeys = {
@@ -18,9 +19,11 @@ export const useFavoriteLists = (params?: {
   limit?: number;
   search?: string;
 }) => {
+  const {user} = useUserStore();
   return useQuery<FavoriteListsResponse, Error>({
     queryKey: [...favoriteQueryKeys.lists(), params],
     queryFn: () => FavoriteService.getUserFavoriteLists(params),
+    enabled: !!user?._id ,
     staleTime: 30 * 1000, // 30 seconds
     gcTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -51,10 +54,11 @@ export const useFavoriteListProducts = (
  * Hook to check if product is in user's favorites
  */
 export const useFavoriteStatus = (productId: string) => {
+  const {user} = useUserStore();
   return useQuery<FavoriteStatusResponse, Error>({
     queryKey: favoriteQueryKeys.status(productId),
     queryFn: () => FavoriteService.checkIfFavorite(productId),
-    enabled: !!productId,
+    enabled: !!productId && !!user?._id,
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });

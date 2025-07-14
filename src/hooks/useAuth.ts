@@ -344,8 +344,10 @@ export const useUpdateProfileWithImage = () => {
 
       // Upload profile image if provided
       if (imageFile) {
+        console.log('Profile image file debug info:', FileUploadService.getFileDebugInfo(imageFile));
         const validation = FileUploadService.validateImageFile(imageFile);
         if (!validation.isValid) {
+          console.error('Profile image validation failed:', validation.error);
           throw new Error(validation.error);
         }
 
@@ -354,13 +356,15 @@ export const useUpdateProfileWithImage = () => {
           throw new Error(uploadResponse.error?.message || 'Failed to upload profile image');
         }
         console.log('uploadResponse', uploadResponse)
-        avatarUrl = uploadResponse.data[0].url;
+        avatarUrl = FileUploadService.getFileUrl(uploadResponse.data);
       }
 
       // Upload company image if provided
       if (companyImageFile) {
+        console.log('Company image file debug info:', FileUploadService.getFileDebugInfo(companyImageFile));
         const validation = FileUploadService.validateImageFile(companyImageFile);
         if (!validation.isValid) {
+          console.error('Company image validation failed:', validation.error);
           throw new Error(validation.error);
         }
 
@@ -369,7 +373,7 @@ export const useUpdateProfileWithImage = () => {
           throw new Error(uploadResponse.error?.message || 'Failed to upload company image');
         }
         console.log('company uploadResponse', uploadResponse)
-        companyAvatarUrl = uploadResponse.data[0].url;
+        companyAvatarUrl = FileUploadService.getFileUrl(uploadResponse.data);
       }
 
       // Update profile with new avatar URLs

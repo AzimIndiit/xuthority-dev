@@ -103,9 +103,9 @@ const UploadScreenshotModal: React.FC<UploadScreenshotModalProps> = ({
       // Upload file using FileUploadService
       const response = await FileUploadService.uploadFile(data.file);
       
-      if (response.success && response.data && response.data.length > 0) {
-        // Get the file URL from the first uploaded file
-        const fileUrl = response.data[0].url;
+      if (response.success && response.data) {
+        // Get the file URL using the FileUploadService helper
+        const fileUrl = FileUploadService.getFileUrl(response.data);
         
         // Call onSuccess with the file URL
         if (onSuccess) {
@@ -219,7 +219,7 @@ const UploadScreenshotModal: React.FC<UploadScreenshotModalProps> = ({
                   to upload or drop image here
                 </div>
                 <div className="text-gray-500 text-sm mt-1">
-                  Support Jpg, png, Pdf, Zip
+                  Support Jpg, png
                 </div>
               </div>
             )}

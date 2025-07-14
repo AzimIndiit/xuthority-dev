@@ -1,20 +1,19 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { addProduct, fetchProducts, Product, fetchProductBySlug, fetchProductById, updateProduct, deleteProduct, fetchProductsByCategory, getUserProductsById, getMyProducts } from '../services/product';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import FileUploadService from '@/services/fileUpload';
+import { addProduct, deleteProduct, getMyProducts, fetchProductById, fetchProducts, fetchProductsByCategory, fetchProductBySlug, updateProduct, getUserProductsById, FilterOptions, Product } from '@/services/product';
 import toast from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
-import { FilterOptions } from '@/services/product';
 
 export const queryKeys = {
   products: ['products'] as const,
 };
 
 export function useProducts(page: number, limit: number) {
-  return useQuery({
-    queryKey: ['products', page, limit],
-    queryFn: () => fetchProducts(page, limit),
+      return useQuery({
+      queryKey: ['products', page, limit],
+      queryFn: () => fetchProducts(page, limit),
 
-  });
+    });
 }
 
 export interface PaginatedProducts {
@@ -55,10 +54,10 @@ export function useProductsByCategory(
 
   
 
-  return useQuery({
-    queryKey,
-    queryFn: () => fetchProductsByCategory(category, subCategory, searchQuery, page, limit, filters),
-    enabled: !!category && !!subCategory,
+      return useQuery({
+      queryKey,
+      queryFn: () => fetchProductsByCategory(category, subCategory, searchQuery, page, limit, filters),
+      enabled: !!category && !!subCategory,
     // Cache configuration to prevent unnecessary API calls
     staleTime: 5 * 60 * 1000, // 5 minutes - data is considered fresh for 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache for 10 minutes
@@ -70,19 +69,14 @@ export function useProductsByCategory(
 } 
 
 export function useAddProduct() {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: async (product: Product): Promise<{ product: Product }> => {
-      // Show upload started notification
-      const hasFiles = (product.logoUrl && typeof product.logoUrl !== "string") || 
-                       product.mediaUrls.some(item => typeof item !== "string");
-      
-      if (hasFiles) {
-        toast.loading("Uploading files...", { id: 'upload-progress' });
-      }
-      let logoUrl: File | string = product.logoUrl;
-      let mediaUrls: (string | File)[] = product.mediaUrls;
+    mutationFn: async (product: Product) => {
+      let logoUrl = product.logoUrl;
+      let mediaUrls = product.mediaUrls || [];
 
-      // Upload logo if it's a File
+      // Handle logo upload
       if (logoUrl && typeof logoUrl !== "string") {
         const validation = FileUploadService.validateImageFile(logoUrl);
         if (!validation.isValid) {
@@ -92,13 +86,14 @@ export function useAddProduct() {
         if (!uploadResponse.success) {
           throw new Error(uploadResponse.error?.message || "Failed to upload logo");
         }
-        logoUrl = uploadResponse.data[0].url;
+        logoUrl = FileUploadService.getFileUrl(uploadResponse.data);
       }
 
-      // Upload media files if any are File instances
+      // Handle media uploads
       const uploadedMediaUrls: string[] = await Promise.all(
         mediaUrls.map(async (item, index) => {
           if (typeof item === "string") return item;
+          
           const validation = FileUploadService.validateMediaFile(item);
           if (!validation.isValid) {
             throw new Error(validation.error);
@@ -112,7 +107,9 @@ export function useAddProduct() {
           if (!res.success) {
             throw new Error(res.error?.message || "Failed to upload media");
           }
-          return res.data[0].url;
+          
+          // Use the helper method to get the appropriate URL
+          return FileUploadService.getFileUrl(res.data);
         })
       );
 
@@ -122,35 +119,24 @@ export function useAddProduct() {
         mediaUrls: uploadedMediaUrls,
       };
 
-      const res  = await addProduct(finalProduct);
-
-      return { product: res.data };
+             const res = await addProduct(finalProduct);
+       return { product: res.data };
     },
-
-    onSuccess: (data) => {
-      toast.dismiss('upload-progress');
-      toast.success("Product added successfully");
-      queryClient.setQueryData(queryKeys.products, data.product);
-      // Invalidate all product-related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.products });
-      queryClient.invalidateQueries({ queryKey: ['myProducts'] });
-      queryClient.invalidateQueries({ queryKey: ['userProducts'] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
     },
-
-    onError: (error: any) => {
-      toast.dismiss('upload-progress');
-      console.error("Product add error:", error);
-      toast.error(error.response?.data?.message || error.message || "Failed to add product");
+    onError: (error) => {
+      console.error('Product creation error:', error);
     },
   });
 }
 
 export function useFetchProductById(id: string) {
-  return useQuery({
-    queryKey: ['product', id],
-    queryFn: () => fetchProductById(id),
-    enabled: !!id,
-  });
+      return useQuery({
+      queryKey: ['product', id],
+      queryFn: () => fetchProductById(id),
+      enabled: !!id,
+    });
 }
 
 // export function useUpdateProduct() {
@@ -161,19 +147,14 @@ export function useFetchProductById(id: string) {
 //   });
 // }
 export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+  
   return useMutation({
-    mutationFn: async ({id,product}: {id: string, product: Product}): Promise<{ product: Product }> => {
-      // Show upload started notification
-      const hasFiles = (product.logoUrl && typeof product.logoUrl !== "string") || 
-                       product.mediaUrls.some(item => typeof item !== "string");
-      
-      if (hasFiles) {
-        toast.loading("Uploading files...", { id: 'upload-progress' });
-      }
-      let logoUrl: File | string = product.logoUrl;
-      let mediaUrls: (string | File)[] = product.mediaUrls;
+    mutationFn: async ({ id, product }: { id: string; product: Product }) => {
+      let logoUrl = product.logoUrl;
+      let mediaUrls = product.mediaUrls || [];
 
-      // Upload logo if it's a File
+      // Handle logo upload
       if (logoUrl && typeof logoUrl !== "string") {
         const validation = FileUploadService.validateImageFile(logoUrl);
         if (!validation.isValid) {
@@ -183,13 +164,14 @@ export function useUpdateProduct() {
         if (!uploadResponse.success) {
           throw new Error(uploadResponse.error?.message || "Failed to upload logo");
         }
-        logoUrl = uploadResponse.data[0].url;
+        logoUrl = FileUploadService.getFileUrl(uploadResponse.data);
       }
 
-      // Upload media files if any are File instances
+      // Handle media uploads
       const uploadedMediaUrls: string[] = await Promise.all(
         mediaUrls.map(async (item, index) => {
           if (typeof item === "string") return item;
+          
           const validation = FileUploadService.validateMediaFile(item);
           if (!validation.isValid) {
             throw new Error(validation.error);
@@ -203,7 +185,9 @@ export function useUpdateProduct() {
           if (!res.success) {
             throw new Error(res.error?.message || "Failed to upload media");
           }
-          return res.data[0].url;
+          
+          // Use the helper method to get the appropriate URL - this fixes the error
+          return FileUploadService.getFileUrl(res.data);
         })
       );
 
@@ -213,35 +197,24 @@ export function useUpdateProduct() {
         mediaUrls: uploadedMediaUrls,
       };
 
-      const res  = await updateProduct(id,finalProduct as any);
-
+      const res = await updateProduct(id, finalProduct as any);
       return { product: res.data };
     },
-
-    onSuccess: (data) => {
-      toast.dismiss('upload-progress');
-      toast.success("Product updated successfully");
-      queryClient.setQueryData(queryKeys.products, data.product);
-      // Invalidate all product-related queries
-      queryClient.invalidateQueries({ queryKey: queryKeys.products });
-      queryClient.invalidateQueries({ queryKey: ['myProducts'] });
-      queryClient.invalidateQueries({ queryKey: ['userProducts'] });
-      queryClient.invalidateQueries({ queryKey: ['product'] });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['my-products'] });
     },
-
-    onError: (error: any) => {
-      toast.dismiss('upload-progress');
-      console.error("Product update error:", error);
-      toast.error(error.response?.data?.message || error.message || "Failed to update product");
+    onError: (error) => {
+      console.error('Product update error:', error);
     },
   });
 }
 export function useProductBySlug(slug: string) {
-  return useQuery({
-    queryKey: ['product', slug],
-    queryFn: () => fetchProductBySlug(slug),
-    staleTime: 1000 * 60 * 5,
-    gcTime: 1000 * 60 * 5,
+      return useQuery({
+      queryKey: ['product', slug],
+      queryFn: () => fetchProductBySlug(slug),
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 5,
     enabled: !!slug,
   });
 }
@@ -277,10 +250,10 @@ export function useUserProductsById(userId: string, options?: {
 }) {
   return useQuery({
     queryKey: ['userProducts', userId, options],
-    queryFn: async () => {
-      const response = await getUserProductsById(userId, options);
-      if (response.success && response.data) {
-        return response;
+          queryFn: async () => {
+        const response = await getUserProductsById(userId, options);
+        if (response.success && response.data) {
+          return response;
       }
       throw new Error(response.error?.message || 'Failed to fetch user products');
     },

@@ -106,6 +106,7 @@ const useUserStore = create<UserState>()(
               isLoading: false,
               error: null,
             });
+            toast.dismiss()
             toast.success('Login successful!');
             return true;
           } else {
@@ -198,6 +199,7 @@ const useUserStore = create<UserState>()(
               queryClient.setQueryData(queryKeys.user, user);
               queryClient.setQueryData(queryKeys.profile, user);
             }
+            toast.dismiss()
             toast.success('Registration successful!');
             return true;
           } else {
@@ -205,6 +207,7 @@ const useUserStore = create<UserState>()(
               isLoading: false,
               error: response.error?.message || 'Registration failed',
             });
+            toast.dismiss()            
             toast.error(response.error?.message || 'Registration failed');
             return false;
           }
@@ -214,6 +217,7 @@ const useUserStore = create<UserState>()(
             isLoading: false,
             error: errorMessage,
           });
+          toast.dismiss()
           toast.error(errorMessage);
           return false;
         }
@@ -247,6 +251,7 @@ const useUserStore = create<UserState>()(
               isLoading: false,
               error: null,
             });
+            toast.dismiss()
             toast.success('Registration successful!');
             return true;
           } else {
@@ -254,6 +259,7 @@ const useUserStore = create<UserState>()(
               isLoading: false,
               error: response.error?.message || 'Registration failed',
             });
+            toast.dismiss()
             toast.error(response.error?.message || 'Registration failed');
             return false;
           }
@@ -263,6 +269,7 @@ const useUserStore = create<UserState>()(
             isLoading: false,
             error: errorMessage,
           });
+          toast.dismiss()
           toast.error(errorMessage);
           return false;
         }
@@ -282,6 +289,7 @@ const useUserStore = create<UserState>()(
             isLoading: false,
             error: null,
           });
+          toast.dismiss()
           toast.success('Successfully logged out!');
         } catch (error) {
           AuthService.tokenStorage.removeToken();
@@ -295,6 +303,7 @@ const useUserStore = create<UserState>()(
             isLoading: false,
             error: null,
           });
+          toast.dismiss()
           toast.success('Successfully logged out!');
         }
       },

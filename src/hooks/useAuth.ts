@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import useUserStore from '@/store/useUserStore';
 import { AuthService, LoginRequest, UserRegisterRequest, VendorRegisterRequest, UpdateProfileRequest, ChangePasswordRequest } from '../services/auth';
 import { FileUploadService } from '../services/fileUpload';
-import toast from 'react-hot-toast';
+
 import { queryClient } from '@/lib/queryClient';
 import useToast from './useToast';
 
@@ -229,8 +229,8 @@ export const useRegisterUser = () => {
         throw new Error('Registration failed');
       }
     },
-    onError: (error: any) => {
-      console.error('Registration error:', error);
+    onError: (err: any) => {
+      console.error('Registration error:', err);
     },
   });
 };
@@ -270,8 +270,8 @@ export const useRegisterVendor = () => {
         throw new Error('Vendor registration failed');
       }
     },
-    onError: (error: any) => {
-      console.error('Vendor registration error:', error);
+    onError: (err: any) => {
+      console.error('Vendor registration error:', err);
     },
   });
 };
@@ -297,6 +297,7 @@ export const useLogout = () => {
 // Hook for profile update mutation
 export const useUpdateProfile = () => {
   const { updateUser } = useUserStore();
+  const { success, error } = useToast ();
 
   return useMutation({
     mutationFn: async (data: UpdateProfileRequest) => {
@@ -315,11 +316,11 @@ export const useUpdateProfile = () => {
       // Also invalidate to ensure consistency
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
       queryClient.invalidateQueries({ queryKey: queryKeys.profile });
-      toast.success('Profile updated successfully');
+      success('Profile updated successfully');
     },
-    onError: (error: any) => {
-      console.error('Profile update error:', error);
-      toast.error(error.message || 'Failed to update profile');
+    onError: (err: any) => {
+      console.error('Profile update error:', err);
+      error(err.message || 'Failed to update profile');
     },
   });
 };
@@ -327,7 +328,7 @@ export const useUpdateProfile = () => {
 // Hook for profile update with image upload
 export const useUpdateProfileWithImage = () => {
   const { updateUser } = useUserStore();
-
+  const { success, error } = useToast ();
   return useMutation({
     mutationFn: async ({ 
       profileData, 
@@ -394,11 +395,11 @@ export const useUpdateProfileWithImage = () => {
       // Also invalidate to ensure consistency
       queryClient.invalidateQueries({ queryKey: queryKeys.user });
       queryClient.invalidateQueries({ queryKey: queryKeys.profile });
-      toast.success('Profile updated successfully');
+      success('Profile updated successfully');
     },
-    onError: (error: any) => {
-      console.error('Profile update with image error:', error);
-      toast.error(error.message || 'Failed to update profile');
+    onError: (err: any) => {
+      console.error('Profile update with image error:', err);
+      error(err.message || 'Failed to update profile');
     },
   });
 };

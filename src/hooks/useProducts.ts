@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import FileUploadService from '@/services/fileUpload';
 import { addProduct, deleteProduct, getMyProducts, fetchProductById, fetchProducts, fetchProductsByCategory, fetchProductBySlug, updateProduct, getUserProductsById, FilterOptions, Product } from '@/services/product';
-import toast from 'react-hot-toast';
 import { queryClient } from '@/lib/queryClient';
+import useToast from './useToast';
 
 export const queryKeys = {
   products: ['products'] as const,
@@ -69,8 +69,7 @@ export function useProductsByCategory(
 } 
 
 export function useAddProduct() {
-  const queryClient = useQueryClient();
-  
+  const toast = useToast();
   return useMutation({
     mutationFn: async (product: Product) => {
       let logoUrl = product.logoUrl;
@@ -128,7 +127,7 @@ export function useAddProduct() {
     },
     onError: (error: any) => {
       console.error('Product creation error:', error);
-      toast.error(error.message || "Failed to add product");
+      toast.error(error.response.data.error.message || "Failed to add product");
     },
   });
 }
@@ -149,8 +148,7 @@ export function useFetchProductById(id: string) {
 //   });
 // }
 export function useUpdateProduct() {
-  const queryClient = useQueryClient();
-  
+  const toast = useToast();
   return useMutation({
     mutationFn: async ({ id, product }: { id: string; product: Product }) => {
       let logoUrl = product.logoUrl;
@@ -209,7 +207,7 @@ export function useUpdateProduct() {
     },
     onError: (error: any) => {
       console.error('Product update error:', error);
-      toast.error(error.message || "Failed to update product");
+      toast.error(error.response.data.error.message || "Failed to update product");
     },
   });
 }
@@ -224,6 +222,7 @@ export function useProductBySlug(slug: string) {
 }
 
 export function useDeleteProduct() {
+  const toast = useToast();
   return useMutation({
     mutationFn: async (id: string) => {
       return deleteProduct(id);

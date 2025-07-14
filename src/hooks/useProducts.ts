@@ -124,9 +124,11 @@ export function useAddProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success("Product added successfully!");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Product creation error:', error);
+      toast.error(error.message || "Failed to add product");
     },
   });
 }
@@ -203,9 +205,11 @@ export function useUpdateProduct() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
       queryClient.invalidateQueries({ queryKey: ['my-products'] });
+      toast.success("Product updated successfully!");
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error('Product update error:', error);
+      toast.error(error.message || "Failed to update product");
     },
   });
 }

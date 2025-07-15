@@ -91,6 +91,25 @@ export default function Navbar() {
     setShowLogoutModal(false);
   };
 
+  const handleWriteReviewClick = () => {
+      if (!isLoggedIn) {
+        setDrawerOpen(false);
+        openAuthModal('login', {
+          type: 'navigate-to-write-review',
+          payload: {
+            software: null,
+            currentStep: 1
+          }
+        });
+        return;
+      }
+      setSelectedSoftware(null);
+      setCurrentStep(1);
+      setDrawerOpen(false);
+      navigate("/write-review");
+  
+  }
+
   return (
     <>
       <header className="w-full bg-white border-b border-gray-100 ">
@@ -128,15 +147,7 @@ export default function Navbar() {
                
                 {(!isLoggedIn || user?.role === "user") && (
                   <Button
-                    onClick={() => {
-                      if (!isLoggedIn) {
-                        openAuthModal();
-                        return;
-                      }
-                      setSelectedSoftware(null);
-                      setCurrentStep(1);
-                      navigate("/write-review");
-                    }}
+                    onClick={handleWriteReviewClick}
                     className="bg-blue-600 text-white font-semibold rounded-full px-6 py-2 text-base shadow hover:bg-blue-700 transition-colors sm:max-w-40"
                     disabled={logoutMutation.isPending}
                   >
@@ -395,16 +406,8 @@ export default function Navbar() {
         {/* Drawer Footer Actions (always visible in drawer) */}
         <div className="flex flex-col sm:flex-row items-center justify-center space-y-3 sm:space-y-0 sm:space-x-4 p-4 border-t border-gray-100">
        {(!isLoggedIn || user?.role === 'user') &&   <Button
-            onClick={() => {
-              if (!isLoggedIn) {
-                openAuthModal();
-                return;
-              }
-              setSelectedSoftware(null);
-              setCurrentStep(1);
-              navigate("/write-review");
-              setDrawerOpen(false);
-            }}
+            onClick={handleWriteReviewClick}
+      
             className="bg-blue-600 text-white font-semibold rounded-full px-4 sm:px-6 py-2 text-sm sm:text-base shadow hover:bg-blue-700 transition-colors w-full sm:w-1/2"
           >
             Write A Review

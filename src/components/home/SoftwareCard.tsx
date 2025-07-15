@@ -48,7 +48,17 @@ export default function SoftwareCard({id, name, logo, rating, reviewCount, logoB
           <Button 
             onClick={() => {
               if(!isLoggedIn) {
-                openAuthModal();
+                openAuthModal('login', {
+                  type: 'navigate-to-write-review',
+                  payload: {
+                    software: {
+                      id: id,
+                      name: name,
+                      logoUrl: logo
+                    },
+                    currentStep: 2
+                  }
+                });
                 return;
               }
               setSelectedSoftware({id,name,logoUrl:logo});

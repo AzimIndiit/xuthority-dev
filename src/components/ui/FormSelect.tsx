@@ -399,7 +399,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
           );
         }}
       />
-      {error && <p className="text-red-500 text-sm mt-2">{error.message?.toString()}</p>}
+      {error && <p className="text-red-500 text-xs mt-2">{error.message?.toString()}</p>}
     </div>
   );
 };

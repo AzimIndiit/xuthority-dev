@@ -94,7 +94,7 @@ export function AuthModal() {
 
 
   return (
-    <Dialog open={isAuthModalOpen} onOpenChange={closeAuthModal} >
+    <Dialog open={isAuthModalOpen} onOpenChange={closeAuthModal}  >
            {authModalView === "vendor-signup" || authModalView === "user-signup" ? (
         <DialogContent 
           key={vendorSignupKey}

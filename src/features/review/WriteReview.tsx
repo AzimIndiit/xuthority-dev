@@ -435,8 +435,9 @@ console.log('userReview', userReview)
             <Textarea
               {...register("description")}
               placeholder="Write about your experience..."
-              className="w-full min-h-32"
+              className="w-full min-h-32 max-h-[300px] rounded-lg resize-none break-all"
               rows={6}
+              maxLength={2000}
             />
             {errors.description && (
               <p className="text-red-500 text-sm mt-2">{errors.description.message}</p>

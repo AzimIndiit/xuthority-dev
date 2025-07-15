@@ -168,7 +168,7 @@ const DisputeModal: React.FC<DisputeModalProps> = ({
                   placeholder="Explain dispute in detail..."
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  className="min-h-[150px] rounded-lg border-gray-300 resize-none"
+                  className="min-h-[150px] max-h-[300px] rounded-lg border-gray-300 resize-none break-all"
                   required
                   minLength={10}
                   disabled={createDisputeMutation.isPending || updateDisputeMutation.isPending}

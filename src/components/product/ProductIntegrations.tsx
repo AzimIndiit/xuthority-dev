@@ -26,7 +26,7 @@ const   IntegrationCard = ({ name, image }: { name: string, image: string }) => 
         className="w-full h-full object-contain"
       />
     </div>
-    <p className="text-base font-semibold text-gray-800">{name}</p>
+    <p className="text-base font-semibold text-gray-800 line-clamp-1">{name}</p>
   </div>
 );
 

@@ -5,11 +5,15 @@ import useUserStore from '@/store/useUserStore';
 import { AuthService } from '@/services/auth';
 import LottieLoader from '@/components/LottieLoader';
 import { useToast } from '@/hooks/useToast';
+import useUIStore from '@/store/useUIStore';
+import { useReviewStore } from '@/store/useReviewStore';
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { loginWithToken } = useUserStore();
+  const { postLoginAction, clearPostLoginAction } = useUIStore();
+  const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const [error, setError] = useState<string | null>(null);
   const toast = useToast();
 
@@ -66,8 +70,16 @@ const AuthCallback: React.FC = () => {
           toast.dismiss();
           toast.auth.success(`Login successful!`);
           
-          // Redirect to dashboard or home
-          navigate('/');
+          // Execute post-login action if exists
+          if (postLoginAction?.type === 'navigate-to-write-review') {
+            setSelectedSoftware(postLoginAction.payload.software);
+            setCurrentStep(postLoginAction.payload.currentStep);
+            clearPostLoginAction();
+            navigate('/write-review');
+          } else {
+            // Redirect to dashboard or home
+            navigate('/');
+          }
         } else {
           throw new Error('Failed to login user');
         }

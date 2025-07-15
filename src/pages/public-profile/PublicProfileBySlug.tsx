@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import {  HelpCircle, Star as StarIcon, Twitter, Linkedin } from 'lucide-react';
 import { formatNumber } from '@/utils/formatNumber';
 import { getTruncatedDisplayName, getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
@@ -124,6 +125,9 @@ const PublicProfileBySlugPage: React.FC = () => {
   const { isLoggedIn } = useStableAuth();
   const { openAuthModal } = useUIStore();
   const toast = useToast();
+  const [isBadgesModalOpen, setIsBadgesModalOpen] = useState(false);
+  const [selectedBadge, setSelectedBadge] = useState<any>(null);
+  const [isBadgeDetailModalOpen, setIsBadgeDetailModalOpen] = useState(false);
 
   // Fetch user data by slug - MUST BE CALLED UNCONDITIONALLY
   const { 
@@ -190,6 +194,15 @@ const PublicProfileBySlugPage: React.FC = () => {
     }
   };
 
+  const handleBadgeClick = (badge: any) => {
+    setSelectedBadge(badge);
+    setIsBadgeDetailModalOpen(true);
+  };
+
+  const handleViewAllBadges = () => {
+    setIsBadgesModalOpen(true);
+  };
+
 
 
   return (
@@ -251,6 +264,40 @@ const PublicProfileBySlugPage: React.FC = () => {
               </Button>
             </div>
           </div>
+              {/* Badges */}
+              {(  publicProfile?.userType === 'vendor'  && stats?.badges?.length > 0) && (
+                  <div className="mb-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3">Badges ({stats?.badges?.length})</h3>
+                    <div className="flex items-center space-x-3">
+                      {stats?.badges?.slice(0, 4)?.map((badge: any) => (
+                          <div 
+                            key={badge?._id} 
+                            className="flex flex-col items-center rounded-full p-2 cursor-pointer hover:scale-105 transition-transform" 
+                            style={{backgroundColor:  badge?.badgeId?.colorCode}}
+                            onClick={() => handleBadgeClick(badge)}
+                          >
+                             <img
+                           src={badge?.badgeId?.icon as string}
+                           alt={`${badge?.badgeId?.title} Badge`}
+                           style={{ filter: badge?.status === 'approved' ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.5)' }}
+                           className="w-8 h-8"
+                         />
+                          </div>
+                      ))}
+                  
+                    </div>
+                    {stats?.badges?.length > 4 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleViewAllBadges}
+                          className="ml-2 px-2 py-1 h-auto text-gray-600 hover:text-gray-900 rounded-full text-xs mt-4"
+                        >
+                          View All
+                        </Button>
+                      )}
+                  </div>
+                )}
 
                 {/* Social Links */}
                 {(publicProfile?.socialLinks?.twitter || publicProfile?.socialLinks?.linkedin) && (
@@ -316,6 +363,62 @@ const PublicProfileBySlugPage: React.FC = () => {
            {publicProfile?.userType === 'vendor' && <UserProducts publicProfile={publicProfile} />}
           </div>
         </div>
+
+        {/* All Badges Modal */}
+        <Dialog open={isBadgesModalOpen} onOpenChange={setIsBadgesModalOpen}>
+          <DialogContent className="sm:max-w-2xl p-6 rounded-xl">
+            <DialogHeader className="text-center ">
+              <DialogTitle className="text-lg font-bold text-gray-900">
+                All Badges ({stats?.badges?.length})
+              </DialogTitle>
+            </DialogHeader>
+            
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-4 max-h-96 overflow-y-auto min-h-46">
+              {stats?.badges.length >0  && stats?.badges?.map((badge: any) => (
+                <div className="flex flex-col items-center">
+                  <div 
+                  key={badge?._id}
+                    className="w-12 h-12 rounded-full flex items-center justify-center mb-2 flex-col"
+                    style={{backgroundColor: badge?.badgeId?.colorCode}}
+                  >
+                    <img
+                      src={badge?.badgeId?.icon as string}
+                      alt={`${badge?.badgeId?.title} Badge`}
+                      style={{ filter: badge?.status === 'approved' ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.5)' }}
+                      className="w-8 h-8"
+                    />
+                  </div>
+                  <span className="text-xs text-center font-medium text-gray-900 line-clamp-2">{badge?.badgeId?.title}</span>
+                </div>
+                              ))}
+            </div>
+
+          
+          </DialogContent>
+        </Dialog>
+
+        {/* Individual Badge Detail Modal */}
+        <Dialog open={isBadgeDetailModalOpen} onOpenChange={setIsBadgeDetailModalOpen}>
+          <DialogContent className="sm:max-w-md p-6 rounded-xl">
+            <DialogHeader className="text-center mt-6">
+              <DialogTitle className="text-xl font-bold text-gray-900 mb-2 text-center">
+              {selectedBadge?.badgeId?.title}
+              </DialogTitle>
+              <DialogDescription className="text-gray-600 text-sm leading-relaxed text-center">
+                {selectedBadge?.badgeId?.description}
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="mt-6">
+              <Button 
+                onClick={() => setIsBadgeDetailModalOpen(false)}
+                className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full"
+              >
+                Got It
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
     </div>
   );
 };

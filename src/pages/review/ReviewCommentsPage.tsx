@@ -25,6 +25,64 @@ import { transformBackendReview } from '@/types/review';
 import ReviewCard from '@/components/product/ReviewCard';
 import { NotFoundPage } from '@/components/common';
 
+// ReplyContent component with read more/less functionality
+interface ReplyContentProps {
+  reply: any;
+  expandedReplies: { [key: string]: boolean };
+  showReadMoreReplies: { [key: string]: boolean };
+  checkReplyTruncation: (replyId: string, contentElement: HTMLParagraphElement | null) => void;
+  toggleReplyExpanded: (replyId: string) => void;
+}
+
+const ReplyContent: React.FC<ReplyContentProps> = ({ 
+  reply, 
+  expandedReplies, 
+  showReadMoreReplies, 
+  checkReplyTruncation, 
+  toggleReplyExpanded 
+}) => {
+  const contentRef = React.useRef<HTMLParagraphElement>(null);
+  const isExpanded = expandedReplies[reply._id] || false;
+  const showReadMore = showReadMoreReplies[reply._id] || false;
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      checkReplyTruncation(reply._id, contentRef.current);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [reply.content, reply._id, checkReplyTruncation]);
+
+  return (
+    <>
+      <p 
+        ref={contentRef}
+        className="text-gray-700 whitespace-pre-line"
+        style={{
+          display: !isExpanded && showReadMore ? '-webkit-box' : 'block',
+          WebkitLineClamp: !isExpanded && showReadMore ? 4 : 'none',
+          WebkitBoxOrient: 'vertical' as const,
+          overflow: !isExpanded && showReadMore ? 'hidden' : 'visible',
+          whiteSpace: !isExpanded && showReadMore ? 'normal' : 'pre-line'
+        }}
+      >
+        {reply.content}
+      </p>
+      
+      {showReadMore && (
+        <button
+          onClick={() => toggleReplyExpanded(reply._id)}
+          className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 transition-colors inline-flex items-center gap-1 hover:underline cursor-pointer"
+        >
+          {isExpanded ? "Read less" : "Read more"}
+          <span className="text-xs">
+            {isExpanded ? "▲" : "▼"}
+          </span>
+        </button>
+      )}
+    </>
+  );
+};
+
 // Skeleton component for the entire page
 const ReviewCommentsPageSkeleton: React.FC = () => {
   return (
@@ -183,8 +241,45 @@ const ReviewCommentsPage: React.FC = () => {
   const [page, setPage] = useState(1);
   const [allReplies, setAllReplies] = useState<any[]>([]);
   const [hasMoreReplies, setHasMoreReplies] = useState(false);
+  
+  // Read more/less state for replies
+  const [expandedReplies, setExpandedReplies] = useState<{ [key: string]: boolean }>({});
+  const [showReadMoreReplies, setShowReadMoreReplies] = useState<{ [key: string]: boolean }>({});
   const [totalComments, setTotalComments] = useState(0);
   const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set());
+
+  // Read more/less utility functions
+  const checkReplyTruncation = (replyId: string, contentElement: HTMLParagraphElement | null) => {
+    if (contentElement) {
+      // Temporarily remove truncation to measure full height
+      const originalStyle = contentElement.style.cssText;
+      
+      // Set to full display to measure actual height
+      contentElement.style.display = 'block';
+      contentElement.style.webkitLineClamp = 'none';
+      contentElement.style.overflow = 'visible';
+      contentElement.style.whiteSpace = 'pre-line';
+      
+      const lineHeight = parseFloat(getComputedStyle(contentElement).lineHeight) || 20;
+      const maxHeight = lineHeight * 4; // 4 lines
+      const actualHeight = contentElement.scrollHeight;
+      
+      // Restore original style
+      contentElement.style.cssText = originalStyle;
+      
+      setShowReadMoreReplies(prev => ({
+        ...prev,
+        [replyId]: actualHeight > maxHeight
+      }));
+    }
+  };
+
+  const toggleReplyExpanded = (replyId: string) => {
+    setExpandedReplies(prev => ({
+      ...prev,
+      [replyId]: !prev[replyId]
+    }));
+  };
 
   // Redirect if no reviewId in state
   useEffect(() => {
@@ -435,8 +530,10 @@ console.log(allReplies,'allReplies');
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
                 placeholder={isLoggedIn ? "Write your comment here..." : "Please log in to comment"}
-                className="w-full mb-4 min-h-[100px]"
+                className="w-full mb-4 min-h-[200px] max-h-[300px] rounded-lg resize-none break-all"
                 disabled={!isLoggedIn}
+                maxLength={2000}
+                required={true}
               />
               <div className="flex justify-end">
                 <Button
@@ -505,7 +602,7 @@ console.log(allReplies,'allReplies');
                               {getUserDisplayName(reply.author)}
                             </span>
                             <span className="text-sm text-gray-500">
-                              {formatDate(reply.createdAt, { month: 'short', day: 'numeric', year: 'numeric' })}
+                              {new Date(reply.createdAt).toLocaleDateString('en-GB')}
                             </span>
                           
                           </div>
@@ -570,7 +667,13 @@ console.log(allReplies,'allReplies');
                             </div>
                           </div>
                         ) : (
-                          <p className="text-gray-700 whitespace-pre-wrap">{reply.content}</p>
+                          <ReplyContent 
+                            reply={reply}
+                            expandedReplies={expandedReplies}
+                            showReadMoreReplies={showReadMoreReplies}
+                            checkReplyTruncation={checkReplyTruncation}
+                            toggleReplyExpanded={toggleReplyExpanded}
+                          />
                         )}
                         
                         {/* <div className="mt-3">

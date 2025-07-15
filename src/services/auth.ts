@@ -252,6 +252,7 @@ export class AuthService {
     followers: number;
     following: number;
     products?: number;
+    badges?: any[];
   }>> {
     return await ApiService.get(`/users/${userId}/profile-stats`);
   }

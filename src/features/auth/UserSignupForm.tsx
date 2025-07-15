@@ -10,6 +10,8 @@ import { Eye, EyeOff, Check, X } from "lucide-react";
 import useUIStore from "@/store/useUIStore";
 import { useRegisterUser, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
+import { useReviewStore } from "@/store/useReviewStore";
+import { useNavigate } from "react-router-dom";
 
 const signupSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }).trim().max(50, { message: "First name must be less than 50 characters" }).nonempty({ message: "First name is required" }),
@@ -78,7 +80,9 @@ const PasswordRequirementsChecker = ({ password }: { password: string }) => {
 };
 
 export function UserSignupForm() {
-  const { setAuthModalView, closeAuthModal } = useUIStore();
+  const { setAuthModalView, closeAuthModal, postLoginAction, clearPostLoginAction } = useUIStore();
+  const { setSelectedSoftware, setCurrentStep } = useReviewStore();
+  const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
   
@@ -117,7 +121,17 @@ export function UserSignupForm() {
         acceptedTerms: data.terms,
         acceptedMarketing: data.updates || false,
       });
-      closeAuthModal();
+      
+      // Execute post-login action if exists
+      if (postLoginAction?.type === 'navigate-to-write-review') {
+        setSelectedSoftware(postLoginAction.payload.software);
+        setCurrentStep(postLoginAction.payload.currentStep);
+        clearPostLoginAction();
+        closeAuthModal();
+        navigate('/write-review');
+      } else {
+        closeAuthModal();
+      }
     } catch (error) {
       // Error is handled by the mutation hook
       console.error('Registration error:', error);
@@ -133,7 +147,7 @@ export function UserSignupForm() {
   };
 
   return (
-    <form id="user-signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <form id="user-signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-1">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor="firstName">First Name</Label>
@@ -147,7 +161,7 @@ export function UserSignupForm() {
           />
           <div className="min-h-[20px]">
             {errors.firstName && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 text-xs ">
                 {errors.firstName.message}
               </p>
             )}
@@ -165,7 +179,7 @@ export function UserSignupForm() {
           />
           <div className="min-h-[20px]">
             {errors.lastName && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 text-xs ">
                 {errors.lastName.message}
               </p>
             )}
@@ -183,7 +197,7 @@ export function UserSignupForm() {
         />
         <div className="min-h-[20px]">
           {errors.email && (
-            <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+            <p className="text-red-500 text-xs ">{errors.email.message}</p>
           )}
         </div>
       </div>
@@ -212,7 +226,7 @@ export function UserSignupForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="text-red-500 text-xs ">
             {errors.password.message}
           </p>
         )}
@@ -232,7 +246,7 @@ export function UserSignupForm() {
           <div className="grid gap-1.5 leading-none">
             <label
               htmlFor="terms"
-              className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              className="text-[12px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
               To continue, please agree to our{" "}
               <a href="/terms" target="_blank" className="font-semibold text-red-500 hover:underline">
@@ -245,7 +259,7 @@ export function UserSignupForm() {
               .
             </label>
             {errors.terms && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 text-xs ">
                 {errors.terms.message}
               </p>
             )}
@@ -259,7 +273,7 @@ export function UserSignupForm() {
           />
           <label
             htmlFor="updates"
-            className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            className="text-[12px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
           >
             I would like to receive updates about products, solutions, and
             special offers from XUTHORITY.
@@ -269,7 +283,7 @@ export function UserSignupForm() {
       
       <Button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full my-4 "
         disabled={registerMutation.isPending}
         loading={registerMutation.isPending}
       >

@@ -119,23 +119,31 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
   // Accumulate lists for pagination
   React.useEffect(() => {
     if (favoritesData?.lists) {
-      if (currentPage === 1) {
-        // First page - replace all lists
+      if (currentPage === 1 && !hasLoadedInitial) {
+        // First page on initial load or after refetch - replace all lists
         setAllLists(favoritesData.lists);
         setHasLoadedInitial(true);
+      } else if (currentPage === 1 && hasLoadedInitial) {
+        // Refreshing first page - replace all lists
+        setAllLists(favoritesData.lists);
       } else {
         // Subsequent pages - append new lists
         setAllLists(prev => [...prev, ...favoritesData.lists]);
       }
     }
-  }, [favoritesData, currentPage]);
+  }, [favoritesData, currentPage, hasLoadedInitial]);
 
   // Reset pagination when refetching
   const handleRefetch = () => {
     setCurrentPage(1);
-    setAllLists([]);
     setHasLoadedInitial(false);
-    refetch();
+    // Clear lists only after successful refetch to prevent empty state
+    refetch().then(() => {
+      // Lists will be updated by the useEffect when new data arrives
+    }).catch(() => {
+      // If refetch fails, don't clear the existing lists
+      console.error('Failed to refetch favorite lists');
+    });
   };
 
   // Sort lists based on selected criteria
@@ -153,13 +161,18 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
     }
   }, [allLists, sortBy]);
 
-
   const handleCreateSuccess = () => {
+    // For create, we need a full refetch since a new list was added
     handleRefetch();
   };
 
   const handleEditSuccess = () => {
-    handleRefetch();
+    // For edit, we can just refetch without clearing the lists
+    // This prevents the empty state issue
+    refetch();
+    // Close the edit dialog and clear selected list
+    setShowEditDialog(false);
+    setSelectedList(null);
   };
 
   const handleDeleteSuccess = () => {
@@ -366,6 +379,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
       {selectedList && (
         <>
           <CreateListModal
+            key={`edit-${selectedList.name}-${selectedList.productIds.join(',')}`}
             isOpen={showEditDialog}
             onOpenChange={setShowEditDialog}
             onSuccess={handleEditSuccess}

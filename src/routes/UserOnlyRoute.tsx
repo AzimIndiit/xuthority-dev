@@ -11,7 +11,7 @@ export default function UserOnlyRoute({ children }: { children: React.ReactNode 
   useEffect(() => {
     if (!isLoggedIn || user?.role !== "user") {
       toast.dismiss();  
-      toast.auth.error("You don't have permission");
+      // toast.auth.error("You don't have permission");
       navigate("/", { replace: true });
     }
   }, [isLoggedIn, user, navigate]);

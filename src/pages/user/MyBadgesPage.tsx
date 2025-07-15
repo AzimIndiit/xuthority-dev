@@ -112,6 +112,7 @@ const MyBadgesPage: React.FC = () => {
               key={badge._id}
               badgeId={badge._id}
               title={badge.title}
+              description={badge.description}
               icon={badge.icon}
               bgColor={badge.colorCode}
               iconColor={badge.colorCode}

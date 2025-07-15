@@ -18,6 +18,8 @@ import useUIStore from "@/store/useUIStore";
 import { useRegisterVendor, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
 import { useToast } from "@/hooks/useToast";
+import { useReviewStore } from "@/store/useReviewStore";
+import { useNavigate } from "react-router-dom";
 import { scrollToTop } from "@/utils/scrollToTop";
 import { useIndustryOptions } from "@/hooks/useIndustry";
 import { FormSelect } from "@/components/ui/FormSelect";
@@ -93,7 +95,9 @@ const PasswordRequirementsChecker = ({ password }: { password: string }) => {
 };
 
 export function VendorSignupForm() {
-  const { setAuthModalView, closeAuthModal } = useUIStore();
+  const { setAuthModalView, closeAuthModal, postLoginAction, clearPostLoginAction } = useUIStore();
+  const { setSelectedSoftware, setCurrentStep } = useReviewStore();
+  const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [password, setPassword] = useState('');
   const toast = useToast();
@@ -140,8 +144,17 @@ export function VendorSignupForm() {
         acceptedTerms: data.terms,
         acceptedMarketing: data.updates || false,
       });
-      // toast.auth.success("User registration successful");
-      closeAuthModal();
+      
+      // Execute post-login action if exists
+      if (postLoginAction?.type === 'navigate-to-write-review') {
+        setSelectedSoftware(postLoginAction.payload.software);
+        setCurrentStep(postLoginAction.payload.currentStep);
+        clearPostLoginAction();
+        closeAuthModal();
+        navigate('/write-review');
+      } else {
+        closeAuthModal();
+      }
     } catch (error) {
       // Error is handled by the mutation hook
       console.error('Vendor registration error:', error);
@@ -158,7 +171,7 @@ export function VendorSignupForm() {
 
   return (
     <FormProvider {...methods}>
-      <form id="vendor-signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form id="vendor-signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-1">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor="firstName">First Name</Label>
@@ -172,7 +185,7 @@ export function VendorSignupForm() {
           />
           <div className="min-h-[20px]">
             {errors.firstName && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 text-xs ">
                 {errors.firstName.message}
               </p>
             )}
@@ -190,7 +203,7 @@ export function VendorSignupForm() {
           />
           <div className="min-h-[20px]">
             {errors.lastName && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 text-xs ">
                 {errors.lastName.message}
               </p>
             )}
@@ -201,21 +214,21 @@ export function VendorSignupForm() {
         <Label htmlFor="email">Email</Label>
         <Input id="email" placeholder="Enter Email" {...register("email")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} />
         <div className="min-h-[20px]">
-          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+          {errors.email && <p className="text-red-500 text-xs ">{errors.email.message}</p>}
         </div>
       </div>
       <div className="grid gap-2">
         <Label htmlFor="companyName">Company Name</Label>
         <Input id="companyName" placeholder="Enter Company Name" {...register("companyName")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} maxLength={100} />
         <div className="min-h-[20px]">
-          {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
+          {errors.companyName && <p className="text-red-500 text-xs ">{errors.companyName.message}</p>}
         </div>
       </div>
        <div className="grid gap-2">
         <Label htmlFor="companyEmail">Company Email</Label>
         <Input id="companyEmail" placeholder="Enter Company Email" {...register("companyEmail")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} maxLength={254} />
         <div className="min-h-[20px]">
-          {errors.companyEmail && <p className="text-red-500 text-xs mt-1">{errors.companyEmail.message}</p>}
+          {errors.companyEmail && <p className="text-red-500 text-xs ">{errors.companyEmail.message}</p>}
         </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -249,7 +262,7 @@ export function VendorSignupForm() {
             )}
           />
           <div className="min-h-[20px]">
-            {errors.companySize && <p className="text-red-500 text-xs mt-1">{errors.companySize.message}</p>}
+            {errors.companySize && <p className="text-red-500 text-xs ">{errors.companySize.message}</p>}
           </div>
         </div>
       </div>
@@ -278,7 +291,7 @@ export function VendorSignupForm() {
           </button>
         </div>
         {errors.password && (
-          <p className="text-red-500 text-xs mt-1">
+          <p className="text-red-500 text-xs">
             {errors.password.message}
           </p>
         )}
@@ -298,7 +311,7 @@ export function VendorSignupForm() {
           <div className="grid gap-1.5 leading-none">
             <label
               htmlFor="terms"
-              className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              className="text-[12px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
             >
               To continue, please agree to our{" "}
               <a href="/terms" target="_blank" className="font-semibold text-red-500 hover:underline">
@@ -311,7 +324,7 @@ export function VendorSignupForm() {
               .
             </label>
             {errors.terms && (
-              <p className="text-red-500 text-xs mt-1">
+              <p className="text-red-500 text-xs ">
                 {errors.terms.message}
               </p>
             )}
@@ -325,7 +338,7 @@ export function VendorSignupForm() {
           />
           <label
             htmlFor="updates"
-            className="text-[10px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+            className="text-[12px] font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
           >
             I would like to receive updates about products, solutions, and
             special offers from XUTHORITY.
@@ -334,7 +347,7 @@ export function VendorSignupForm() {
       </div>
       <Button
         type="submit"
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full"
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-full my-4"
         disabled={registerMutation.isPending}
         loading={registerMutation.isPending}
       >

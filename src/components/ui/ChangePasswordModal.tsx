@@ -27,7 +27,7 @@ const changePasswordSchema = z.object({
     .regex(/(?=.*\d)/, 'New password must contain at least one number'),
   confirmNewPassword: z.string().min(1, 'Please confirm your new password'),
 }).refine((data) => data.newPassword === data.confirmNewPassword, {
-  message: "New passwords don't match",
+  message: "Confirm password doesn't match",
   path: ["confirmNewPassword"],
 }).refine((data) => data.currentPassword !== data.newPassword, {
   message: "New password must be different from current password",

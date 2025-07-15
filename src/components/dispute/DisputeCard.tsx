@@ -7,7 +7,7 @@ import StarRating from '../ui/StarRating';
 import { Textarea } from '../ui/textarea';
 import { Input } from '../ui/input';
 import useUserStore from '@/store/useUserStore';
-import { getUserDisplayName } from '@/utils/userHelpers';
+import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 import { useNavigate } from 'react-router-dom';
 import { useReviewStore } from '@/store/useReviewStore';
 import { Product } from '@/services/product';
@@ -38,6 +38,9 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
   const [editExplanation, setEditExplanation] = useState(dispute.explanations ? false : true);
   const [isDeleteDisputeModalOpen, setIsDeleteDisputeModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
+  const contentRef = React.useRef<HTMLParagraphElement>(null);
     const deleteReviewMutation = useDeleteReview();
   const addExplanationMutation = useAddExplanation();
   const updateExplanationMutation = useUpdateExplanation();
@@ -46,6 +49,40 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
   useEffect(() => {
     setExplanation(dispute.explanations || '');
   }, [dispute.explanations]);
+
+  // Check if dispute description needs truncation
+  React.useEffect(() => {
+    const checkTruncation = () => {
+      if (contentRef.current) {
+        // Temporarily remove truncation to measure full height
+        const element = contentRef.current;
+        const originalStyle = element.style.cssText;
+        
+        // Set to full display to measure actual height
+        element.style.display = 'block';
+        element.style.webkitLineClamp = 'none';
+        element.style.overflow = 'visible';
+        element.style.whiteSpace = 'pre-line';
+        
+        const lineHeight = parseFloat(getComputedStyle(element).lineHeight) || 20;
+        const maxHeight = lineHeight * 4; // 4 lines
+        const actualHeight = element.scrollHeight;
+        
+        // Restore original style
+        element.style.cssText = originalStyle;
+        
+        setShowReadMore(actualHeight > maxHeight);
+      }
+    };
+
+    // Use setTimeout to ensure the content is rendered
+    const timer = setTimeout(checkTruncation, 0);
+    return () => clearTimeout(timer);
+  }, [dispute.description]);
+
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   const handleDeleteReview = () => {
     deleteReviewMutation.mutate(review.id);
@@ -102,7 +139,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
               navigate(`/profile`)
             }}}>
               <AvatarImage src={review.avatar} alt={getUserDisplayName(review as any)} />
-              <AvatarFallback>{getUserDisplayName(review as any)}</AvatarFallback>
+              <AvatarFallback>{getUserInitials(review as any)}</AvatarFallback>
             </Avatar>
     
           </div>
@@ -130,7 +167,31 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
             <StarRating rating={review.rating} />
             <span className="text-gray-600 text-xs sm:text-sm">{review.date}</span>
           </div>
-          <p className="text-gray-700 mt-4 text-xs sm:text-sm">{review.content}</p>
+          <p 
+              ref={contentRef}
+              className="text-gray-700 mt-4 text-xs sm:text-sm  whitespace-pre-line"
+              style={{
+                display: !isExpanded && showReadMore ? '-webkit-box' : 'block',
+                WebkitLineClamp: !isExpanded && showReadMore ? 4 : 'none',
+                WebkitBoxOrient: 'vertical' as const,
+                overflow: !isExpanded && showReadMore ? 'hidden' : 'visible',
+                whiteSpace: !isExpanded && showReadMore ? 'normal' : 'pre-line'
+              }}
+            >
+              {review.content}
+            </p>
+            {showReadMore && (
+              <button
+                onClick={toggleExpanded}
+                className="text-blue-600 hover:text-blue-800 text-xs font-medium mt-2 transition-colors inline-flex items-center gap-1 hover:underline cursor-pointer"
+              >
+                {isExpanded ? "Read less" : "Read more"}
+                <span className="text-xs">
+                  {isExpanded ? "▲" : "▼"}
+                </span>
+              </button>
+            )}
+       
         </div>
      { review.isOwnReview &&  dispute.status === 'active' &&  <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
           <Button onClick={() => {
@@ -209,14 +270,14 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       {dispute.explanations && user?.role === 'user' && dispute.status === 'active' && (
         <div className='mt-4'>
           <h3 className="text-lg sm:text-xl font-bold text-gray-900">Explanation</h3>
-          <div className="mt-2 flex justify-between items-center text-gray-700 text-sm bg-gray-50 p-3 rounded-lg border border-gray-20">
+          <div className="mt-2 flex justify-between items-start text-gray-700 text-sm bg-gray-50 p-3 rounded-lg border border-gray-20 gap-4">
             <p className="0">
               {dispute.explanations}
             </p>
-            <button className='text-blue-600 text-sm cursor-pointer' onClick={() => {
+           { review.isOwnReview &&  <button className='text-blue-600 text-sm cursor-pointer' onClick={() => {
               setEditExplanation(prev => !prev)
               setExplanation(dispute.explanations)
-            }}>Edit</button>
+            }}>Edit</button>}
           </div>
         </div>
       )}

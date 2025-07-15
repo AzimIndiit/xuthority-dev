@@ -212,10 +212,21 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
 
   const onWriteReview = () => {
     if (!isLoggedIn) {
-      return openAuthModal();
+      return openAuthModal('login', {
+        type: 'navigate-to-write-review',
+        payload: {
+          software: {
+            id: product._id,
+            name: product.name,
+            logoUrl: product.logoUrl
+          },
+          currentStep: 2
+        }
+      });
     }
     setSelectedSoftware({id: product._id, name: product.name,logoUrl: product.logoUrl});
     navigate('/write-review');
+    
   };
 
   // Memoize handleSearch to prevent infinite loops

@@ -26,6 +26,9 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
   const navigate = useNavigate();
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [showReadMore, setShowReadMore] = useState(false);
+  const contentRef = React.useRef<HTMLParagraphElement>(null);
   const { voteHelpful, removeVote, isVoting, isRemoving, hasVoted } = useHelpfulVote();
   const deleteReviewMutation = useDeleteReview();
   const isUserVoted = review ? hasVoted(review as any) : false;
@@ -39,9 +42,39 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
     });
   };
 
-  
+  // Check if review content needs truncation
+  React.useEffect(() => {
+    const checkTruncation = () => {
+      if (contentRef.current) {
+        // Temporarily remove truncation to measure full height
+        const element = contentRef.current;
+        const originalStyle = element.style.cssText;
+        
+        // Set to full display to measure actual height
+        element.style.display = 'block';
+        element.style.webkitLineClamp = 'none';
+        element.style.overflow = 'visible';
+        element.style.whiteSpace = 'pre-line';
+        
+        const lineHeight = parseFloat(getComputedStyle(element).lineHeight) || 22;
+        const maxHeight = lineHeight * 4; // 4 lines
+        const actualHeight = element.scrollHeight;
+        
+        // Restore original style
+        element.style.cssText = originalStyle;
+        
+        setShowReadMore(actualHeight > maxHeight);
+      }
+    };
 
+    // Use setTimeout to ensure the content is rendered
+    const timer = setTimeout(checkTruncation, 0);
+    return () => clearTimeout(timer);
+  }, [review.content]);
 
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   const handleHelpfulClick = () => {
     if (!isLoggedIn) {
@@ -96,9 +129,9 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
           <div className="flex items-center space-x-4">
             {/* Software Logo */}
-            <div className="w-14 h-14 sm:w-16 sm:h-16 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0" onClick={() => {
+            <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0  ${software.slug && software.isActive === 'active' ? 'cursor-pointer' : 'cursor-not-allowed'}`} onClick={() => {
               if(software.slug && software.isActive === 'active'){
-                navigate(`/product/${software.slug}`)
+                navigate(`/product-detail/${software.slug}`)
               }
             }}>
               {software.logoUrl ? (
@@ -240,9 +273,32 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
           </div>
 
           {/* Review Content */}
-          <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
-            {review.content}
-          </p>
+          <div>
+            <p 
+              ref={contentRef}
+              className="text-gray-700 leading-relaxed text-sm sm:text-base"
+              style={{
+                display: !isExpanded && showReadMore ? '-webkit-box' : 'block',
+                WebkitLineClamp: !isExpanded && showReadMore ? 4 : 'none',
+                WebkitBoxOrient: 'vertical' as const,
+                overflow: !isExpanded && showReadMore ? 'hidden' : 'visible',
+                whiteSpace: !isExpanded && showReadMore ? 'normal' : 'pre-line'
+              }}
+            >
+              {review.content}
+            </p>
+            {showReadMore && (
+              <button
+                onClick={toggleExpanded}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 transition-colors inline-flex items-center gap-1 hover:underline cursor-pointer"
+              >
+                {isExpanded ? "Read less" : "Read more"}
+                <span className="text-xs">
+                  {isExpanded ? "▲" : "▼"}
+                </span>
+              </button>
+            )}
+          </div>
 
           
         </div>

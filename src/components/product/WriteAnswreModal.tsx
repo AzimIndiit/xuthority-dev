@@ -100,8 +100,9 @@ const WriteAnswreModal: React.FC<WriteAnswreModalProps> = ({
               id="answer"
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
-              className="mt-2 min-h-[120px] rounded-lg"
+              className="mt-2 min-h-[120px] max-h-[300px] rounded-lg resize-none break-all"
               required
+              maxLength={1000}
             />
             
           </div>

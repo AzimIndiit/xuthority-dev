@@ -76,12 +76,12 @@ export const ForVendorsPage: React.FC = () => {
 
       
       >
-        <Button
+       {!isLoggedIn && <Button
           onClick={handleClaimProfile}
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-3 shadow transition-all"
         >
          Claim Your Profile <span aria-hidden className="ml-2">→</span>
-        </Button>
+        </Button>}
       </FeatureSection>
 
       {/* Testimonials */}

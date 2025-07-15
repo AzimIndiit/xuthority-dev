@@ -9,6 +9,8 @@ import { Eye, EyeOff } from "lucide-react";
 import useUIStore from "@/store/useUIStore";
 import { useLogin, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
+import { useReviewStore } from "@/store/useReviewStore";
+import { useNavigate } from "react-router-dom";
 
 const loginSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -20,7 +22,9 @@ const loginSchema = z.object({
 type LoginFormInputs = z.infer<typeof loginSchema>;
 
 export function LoginForm() {
-  const { setAuthModalView, closeAuthModal } = useUIStore();
+  const { setAuthModalView, closeAuthModal, postLoginAction, clearPostLoginAction } = useUIStore();
+  const { setSelectedSoftware, setCurrentStep } = useReviewStore();
+  const navigate = useNavigate();
   const [passwordVisible, setPasswordVisible] = useState(false);
   
   // Use the new authentication hooks
@@ -45,7 +49,17 @@ export function LoginForm() {
         email: data.email,
         password: data.password,
       });
-      closeAuthModal();
+      
+      // Execute post-login action if exists
+      if (postLoginAction?.type === 'navigate-to-write-review') {
+        setSelectedSoftware(postLoginAction.payload.software);
+        setCurrentStep(postLoginAction.payload.currentStep);
+        clearPostLoginAction();
+        closeAuthModal();
+        navigate('/write-review');
+      } else {
+        closeAuthModal();
+      }
     } catch (error) {
       // Error is handled by the mutation hook
       console.error('Login error:', error);

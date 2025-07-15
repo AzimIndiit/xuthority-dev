@@ -3,8 +3,12 @@ import { Button } from '@/components/ui/button';
 import { HeroSection, ValuesSection, FeatureSection } from '@/components/common';
 import { useAuthenticatedAction } from '@/hooks/useAuthenticatedAction';
 import TestimonialsCarousel from '@/components/home/TestimonialsCarousel';
+import useUserStore from '@/store/useUserStore';
+import useUIStore from '@/store/useUIStore';
 
 export const AboutPage: React.FC = () => {
+  const { isLoggedIn, user } = useUserStore();
+  const {openAuthModal} = useUIStore();
   const { executeAction } = useAuthenticatedAction({
     redirectTo: '/write-review',
     resetReviewStore: true
@@ -69,12 +73,12 @@ export const AboutPage: React.FC = () => {
         illustrationAlt="Leave a review illustration"
         reverse={true}
       >
-        <Button
+       { (!isLoggedIn  || user?.role === 'user' )&& <Button
           onClick={handleWriteReview}
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-3 shadow transition-all"
         >
           Write a Review <span aria-hidden className="ml-2">→</span>
-        </Button>
+        </Button>}
       </FeatureSection>
 
       {/* Testimonials */}

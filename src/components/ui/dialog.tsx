@@ -32,7 +32,7 @@ function DialogOverlay({
   className,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
-  return (
+  return ( 
     <DialogPrimitive.Overlay
       data-slot="dialog-overlay"
       className={cn(
@@ -53,7 +53,7 @@ function DialogContent({
   showCloseButton?: boolean
 }) {
   return (
-    <DialogPortal data-slot="dialog-portal">
+    <DialogPortal data-slot="dialog-portal" >
       <DialogOverlay />
   <div className="w-full h-full">
   <DialogPrimitive.Content

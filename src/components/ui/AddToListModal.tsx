@@ -32,9 +32,7 @@ const addToListSchema = z.discriminatedUnion('mode', [
   z.object({
     mode: z.literal('new'),
     newListName: z.string()
-      .min(2, 'List name must be at least 2 characters')
-      .max(100, 'List name must be less than 100 characters')
-      .trim().nonempty('List name is required'),
+      .min(2, 'List name must be at least 2 characters') .trim().max(30, 'List name must be less than 30 characters').nonempty('List name is required'),
   }),
 ]);
 

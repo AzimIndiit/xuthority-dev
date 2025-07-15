@@ -14,7 +14,7 @@ function RootLayout() {
       <ScrollToTop />
       <Navbar />
       <Breadcrumb />
-      <main className="flex-1">
+      <main className="flex-1 min-h-[calc(100vh-200px)]">
         <Outlet />
       </main>
       <Footer />

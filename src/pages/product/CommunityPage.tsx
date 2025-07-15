@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronDown, Plus, ListFilter, PlusCircle } from "lucide-react";
+import { ChevronDown, Plus, ListFilter, PlusCircle, ArrowLeftIcon } from "lucide-react";
 import { Question, MyAnswer } from "@/types/community";
 import QuestionCard, { QuestionCardSkeleton } from "@/components/product/QuestionCard";
 import {
@@ -13,6 +13,7 @@ import {
 import MyAnswerCard, { MyAnswerCardSkeleton } from '@/components/product/MyAnswerCard';
 import AskQuestionModal from "@/components/product/AskQuestionModal";
 import WriteAnswreModal from "@/components/product/WriteAnswreModal";
+import Pagination from "@/components/ui/pagination";
 import { useQuestions, useAnswers, useUserAnswers } from "@/hooks/useCommunity";
 import { useParams } from "react-router-dom";
 import { formatDate } from "@/utils/formatDate";
@@ -23,27 +24,32 @@ import SecondaryLoader from "@/components/ui/SecondaryLoader";
 import toast from "react-hot-toast";
 import useUIStore from "@/store/useUIStore";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 const CommunityPage = () => {
+  const navigate = useNavigate();
   const { productSlug } = useParams();
   const { user ,isLoggedIn} = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<'createdAt' | 'totalAnswers'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [activeTab, setActiveTab] = useState('community-qa');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [myAnswersPage, setMyAnswersPage] = useState(1);
   const { openAuthModal } = useUIStore();
   const queryClient = useQueryClient();
   // Fetch questions from API
-  const { data: questionsData, isLoading: questionsLoading } = useQuestions({
-    page: 1,
-    limit: 10,
+  const { data: questionsData, isLoading: questionsLoading,isFetching: questionsFetching } = useQuestions({
+    page: currentPage,
+    limit: itemsPerPage,
     sortBy,
     sortOrder,
     status: 'approved'
   }, productSlug);
 
   // Fetch user's answers
-  const { data: userAnswersData, isLoading: userAnswersLoading } = useUserAnswers(user?.id || '', productSlug);
+  const { data: userAnswersData, isLoading: userAnswersLoading,isFetching: userAnswersFetching } = useUserAnswers(user?.id || '', productSlug);
 
   // Transform API data to match the existing UI structure
   const questions: Question[] = useMemo(() => {
@@ -73,9 +79,20 @@ const CommunityPage = () => {
       isOwnAnswer: answer.isOwnAnswer
     }));
   }, [userAnswersData]);
-  console.log('myAnswers', myAnswers)
+
+  // Client-side pagination for My Answers (since API doesn't support pagination yet)
+  const paginatedMyAnswers = useMemo(() => {
+    const startIndex = (myAnswersPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return myAnswers.slice(startIndex, endIndex);
+  }, [myAnswers, myAnswersPage, itemsPerPage]);
+
+  const myAnswersTotalPages = Math.ceil(myAnswers.length / itemsPerPage);
 
   const handleSortChange = (value: string) => {
+    // Reset to first page when changing sort
+    setCurrentPage(1);
+    
     if (value === 'mostRecent') {
       setSortBy('createdAt');
       setSortOrder('desc');
@@ -88,14 +105,16 @@ const CommunityPage = () => {
   const handleTabChange = (value: string) => {
     setActiveTab(value);
     
-    // Invalidate queries based on the tab being switched to
+    // Reset pagination when changing tabs
     if (value === 'community-qa') {
+      setCurrentPage(1);
       // Invalidate questions queries when switching to Community Q&A tab
       queryClient.invalidateQueries({ 
         queryKey: ['community-questions'],
         refetchType: 'active'
       });
     } else if (value === 'my-answers') {
+      setMyAnswersPage(1);
       // Invalidate user answers queries when switching to My Answers tab
       queryClient.invalidateQueries({ 
         queryKey: ['user-answers'],
@@ -104,12 +123,30 @@ const CommunityPage = () => {
     }
   };
 
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleMyAnswersPageChange = (page: number) => {
+    setMyAnswersPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
     <div className="bg-white min-h-screen">
       <main className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-4 justify-between w-full">
+          <div className="flex items-center gap-2">
+          <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span>
             <h1 className="text-2xl sm:text-3xl font-bold">Community</h1>
+          </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -164,7 +201,7 @@ const CommunityPage = () => {
           </div>
           <TabsContent value="community-qa">
             <div className="space-y-6 mt-6">
-              {questionsLoading ? (
+              {questionsLoading || questionsFetching ? (
                 // Show skeleton loaders while loading
                 <>
                   {[1, 2, 3, 4].map((index) => (
@@ -182,10 +219,23 @@ const CommunityPage = () => {
                 ))
               )}
             </div>
+            
+            {/* Pagination for Questions */}
+            {!questionsLoading && !questionsFetching && questions.length > 0 && questionsData?.pagination && (
+              <Pagination
+                currentPage={currentPage}
+                totalPages={questionsData.pagination.pages || 1}
+                onPageChange={handlePageChange}
+                totalItems={questionsData.pagination.total || 0}
+                itemsPerPage={itemsPerPage}
+                showInfo={true}
+                className="mt-8"
+              />
+            )}
           </TabsContent>
           <TabsContent value="my-answers">
             <div className="space-y-6 mt-6">
-              {userAnswersLoading ? (
+              {userAnswersLoading || userAnswersFetching ? (
                 // Show skeleton loaders while loading
                 <>
                   {[1, 2, 3, 4].map((index) => (
@@ -198,11 +248,24 @@ const CommunityPage = () => {
                   <p>You haven't answered any questions yet!</p>
                 </div>
               ) : (
-                myAnswers.map((answer) => (
+                paginatedMyAnswers.map((answer) => (
                   <MyAnswerCard key={answer.id} myAnswer={answer} />
                 ))
               )}
             </div>
+            
+            {/* Pagination for My Answers */}
+            {!userAnswersLoading && !userAnswersFetching && myAnswers.length > 0 && myAnswersTotalPages > 1 && (
+              <Pagination
+                currentPage={myAnswersPage}
+                totalPages={myAnswersTotalPages}
+                onPageChange={handleMyAnswersPageChange}
+                totalItems={myAnswers.length}
+                itemsPerPage={itemsPerPage}
+                showInfo={true}
+                className="mt-8"
+              />
+            )}
           </TabsContent>
         </Tabs>
         <AskQuestionModal isOpen={isModalOpen} onOpenChange={setIsModalOpen} productSlug={productSlug} />

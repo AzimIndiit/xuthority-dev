@@ -56,7 +56,7 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChang
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-lg p-8 rounded-xl">
+      <DialogContent className="sm:max-w-lg p-8 rounded-xl ">
         <form onSubmit={handleSubmit}>
           <DialogHeader className="text-center">
             <DialogTitle className="text-3xl font-bold">Ask Question</DialogTitle>
@@ -73,8 +73,9 @@ const AskQuestionModal: React.FC<AskQuestionModalProps> = ({ isOpen, onOpenChang
               id="question"
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
-              className="mt-2 min-h-[120px] rounded-lg"
+              className="mt-2 min-h-[120px] max-h-[300px] rounded-lg resize-none break-all"
               required
+              maxLength={1000}
             />
           </div>
           <DialogFooter>

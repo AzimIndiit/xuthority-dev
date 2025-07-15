@@ -21,9 +21,9 @@ import { cn } from '@/lib/utils';
 // Form validation schema
 const listModalSchema = z.object({
   listName: z.string()
-    .min(2, 'List name must be at least 2 characters')
-    .max(100, 'List name must be less than 100 characters')
-    .trim().nonempty('List name is required'),
+    .min(2, 'List name must be at least 2 characters') .trim()
+    .max(30, 'List name must be less than 30 characters')
+   .nonempty('List name is required'),
   productIds: z.array(z.string()).min(1, 'At least one product is required')
 });
 
@@ -60,8 +60,8 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   const methods = useForm<ListModalFormData>({
     resolver: zodResolver(listModalSchema),
     mode: 'onChange',
-    defaultValues: initialValues,
-    values: initialValues, // This ensures form updates when props change
+    defaultValues: { listName: '', productIds: [] },
+    // Remove values prop as it might conflict with manual reset
   });
 
   const { 
@@ -72,7 +72,6 @@ const CreateListModal: React.FC<CreateListModalProps> = ({
   } = methods;
 
   const selectedProductIds = watch('productIds') || [];
-console.log('existingProductIds', existingProductIds)
   // API hooks
   const createListMutation = useCreateFavoriteList();
   const renameListMutation = useRenameFavoriteList();
@@ -91,15 +90,7 @@ console.log('existingProductIds', existingProductIds)
     }));
   }, [productsDataArray]);
   
-  // Debug logging
-  console.log('Modal Debug:', {
-    mode,
-    existingListName,
-    existingProductIds,
-    initialValues,
-    selectedProductIds,
-    productOptionsLength: productOptions.length
-  });
+
 
   // Initialize form when modal opens
   const initializeModal = () => {
@@ -111,6 +102,14 @@ console.log('existingProductIds', existingProductIds)
   const resetModal = () => {
     reset({ listName: '', productIds: [] });
   };
+
+  // Effect to reinitialize form when props change and modal is open
+  React.useEffect(() => {
+    if (isOpen && mode === 'edit') {
+      const initialValues = getInitialFormValues();
+      reset(initialValues);
+    }
+  }, [isOpen, mode, existingListName, existingProductIds, reset, getInitialFormValues]);
 
   // No need for separate add/remove functions since we're using FormSelect with multiple
 
@@ -186,7 +185,13 @@ console.log('existingProductIds', existingProductIds)
   // Handle modal open/close changes
   const handleOpenChange = (open: boolean) => {
     if (open) {
-      initializeModal();
+      // Initialize immediately when opening
+      if (mode === 'edit') {
+        const initialValues = getInitialFormValues();
+        reset(initialValues);
+      } else {
+        resetModal();
+      }
     } else {
       resetModal();
     }

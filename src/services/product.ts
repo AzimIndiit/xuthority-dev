@@ -106,25 +106,36 @@ export async function fetchProductsByCategory(
       params.append('maxPrice', filters.price[1].toString());
     }
     if (filters.sortBy) {
-      // Handle custom sort values
-      if (filters.sortBy === 'ratings-desc') {
-        params.append('sortBy', 'avgRating');
-        params.append('sortOrder', 'desc');
-      } else if (filters.sortBy === 'ratings-asc') {
-        params.append('sortBy', 'avgRating');
-        params.append('sortOrder', 'asc');
-      } else if (filters.sortBy === 'pricing-desc') {
-        params.append('sortBy', 'pricing');
-        params.append('sortOrder', 'desc');
-      } else if (filters.sortBy === 'pricing-asc') {
-        params.append('sortBy', 'pricing');
-        params.append('sortOrder', 'asc');
-      } else if (filters.sortBy === 'reviewCounts-desc') {
-        params.append('sortBy', 'totalReviews');
-        params.append('sortOrder', 'desc');
-      } else if (filters.sortBy === 'reviewCounts-asc') {
-        params.append('sortBy', 'totalReviews');
-        params.append('sortOrder', 'asc');
+      // Handle multiple sort criteria (comma-separated)
+      if (filters.sortBy.includes(',')) {
+        // Send the comma-separated values directly to backend
+        params.append('sortBy', filters.sortBy);
+        // Backend will handle parsing and mapping
+      } else {
+        // Handle single sort values (backward compatibility)
+        if (filters.sortBy === 'ratings-desc') {
+          params.append('sortBy', 'avgRating');
+          params.append('sortOrder', 'desc');
+        } else if (filters.sortBy === 'ratings-asc') {
+          params.append('sortBy', 'avgRating');
+          params.append('sortOrder', 'asc');
+        } else if (filters.sortBy === 'pricing-desc') {
+          params.append('sortBy', 'pricing');
+          params.append('sortOrder', 'desc');
+        } else if (filters.sortBy === 'pricing-asc') {
+          params.append('sortBy', 'pricing');
+          params.append('sortOrder', 'asc');
+        } else if (filters.sortBy === 'reviewCounts-desc') {
+          params.append('sortBy', 'totalReviews');
+          params.append('sortOrder', 'desc');
+        } else if (filters.sortBy === 'reviewCounts-asc') {
+          params.append('sortBy', 'totalReviews');
+          params.append('sortOrder', 'asc');
+        } else {
+          // Default handling for other sort values
+          params.append('sortBy', filters.sortBy);
+          params.append('sortOrder', filters.sortOrder || 'desc');
+        }
       }
     }
   }

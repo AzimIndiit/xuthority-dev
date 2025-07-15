@@ -37,11 +37,11 @@ export const BlogDetailPage: React.FC = () => {
 
   const handleBlogClick = (clickedBlog: Blog) => {
     try {
-      if (clickedBlog.watchUrl) {
-        window.open(clickedBlog.watchUrl, '_blank');
-      } else {
+      // if (clickedBlog.watchUrl) {
+      //   window.open(clickedBlog.watchUrl, '_blank');
+      // } else {
         navigate(`/resources/${clickedBlog.slug}`);
-      }
+      // }
     } catch (error) {
       console.error('Failed to navigate to blog:', error);
       // Fallback: try direct navigation
@@ -191,19 +191,12 @@ export const BlogDetailPage: React.FC = () => {
 
                 {/* Watch Now Button */}
                 <div className="pt-4">
-                  {!blog.watchUrl ? (
+                  {blog.watchUrl && (
                     <Button
                       onClick={handleWatchNow}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 py-3 rounded-full transition-colors duration-200 shadow-lg hover:shadow-xl"
                     >
                       Watch Now
-                    </Button>
-                  ) : (
-                    <Button
-                      disabled
-                      className="bg-gray-400 text-white font-semibold px-8 py-3 rounded-full cursor-not-allowed"
-                    >
-                      Watch URL Not Available
                     </Button>
                   )}
                 </div>

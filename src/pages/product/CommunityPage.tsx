@@ -20,14 +20,19 @@ import { getUserDisplayName } from "@/utils/userHelpers";
 import useUserStore from "@/store/useUserStore";
 import LottieLoader from "@/components/LottieLoader";
 import SecondaryLoader from "@/components/ui/SecondaryLoader";
+import toast from "react-hot-toast";
+import useUIStore from "@/store/useUIStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 const CommunityPage = () => {
   const { productSlug } = useParams();
-  const { user } = useUserStore();
+  const { user ,isLoggedIn} = useUserStore();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [sortBy, setSortBy] = useState<'createdAt' | 'totalAnswers'>('createdAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-
+  const [activeTab, setActiveTab] = useState('community-qa');
+  const { openAuthModal } = useUIStore();
+  const queryClient = useQueryClient();
   // Fetch questions from API
   const { data: questionsData, isLoading: questionsLoading } = useQuestions({
     page: 1,
@@ -68,6 +73,7 @@ const CommunityPage = () => {
       isOwnAnswer: answer.isOwnAnswer
     }));
   }, [userAnswersData]);
+  console.log('myAnswers', myAnswers)
 
   const handleSortChange = (value: string) => {
     if (value === 'mostRecent') {
@@ -76,6 +82,25 @@ const CommunityPage = () => {
     } else if (value === 'newest') {
       setSortBy('createdAt');
       setSortOrder('asc');
+    }
+  };
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    
+    // Invalidate queries based on the tab being switched to
+    if (value === 'community-qa') {
+      // Invalidate questions queries when switching to Community Q&A tab
+      queryClient.invalidateQueries({ 
+        queryKey: ['community-questions'],
+        refetchType: 'active'
+      });
+    } else if (value === 'my-answers') {
+      // Invalidate user answers queries when switching to My Answers tab
+      queryClient.invalidateQueries({ 
+        queryKey: ['user-answers'],
+        refetchType: 'active'
+      });
     }
   };
 
@@ -107,7 +132,7 @@ const CommunityPage = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="community-qa">
+        <Tabs value={activeTab} onValueChange={handleTabChange}>
           <div className="flex  items-start sm:items-center gap-4 justify-between w-full">
             <TabsList className="bg-gray-200 rounded-xl inline-flex cursor-pointer w-full sm:w-auto  h-10 sm:h-12">
               <TabsTrigger
@@ -124,7 +149,14 @@ const CommunityPage = () => {
               </TabsTrigger>
             </TabsList>
             <div className="flex items-center gap-4 w-full sm:w-auto">
-              <Button onClick={() => setIsModalOpen(true)} className="bg-blue-600 text-white hover:bg-blue-700 rounded-full w-full sm:w-auto text-xs sm:text-sm h-10 sm:h-12">
+              <Button onClick={() => {
+               if (!isLoggedIn) {
+                openAuthModal();
+                return;
+              }
+              
+              setIsModalOpen(true)}
+            } className="bg-blue-600 text-white hover:bg-blue-700 rounded-full w-full sm:w-auto text-xs sm:text-sm h-10 sm:h-12">
                 <Plus className=" w-3 h-3 sm:mr-2 sm:w-4 sm:h-4 " />
                 Ask Questions
               </Button>

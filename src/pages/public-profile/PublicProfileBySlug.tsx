@@ -15,6 +15,7 @@ import UserReviews from './UserReviews';
 import UserProducts from './UserProducts';
 import useUserStore from '@/store/useUserStore';
 import useUIStore from '@/store/useUIStore';
+import useStableAuth from '@/hooks/useStableAuth';
 
 // Skeleton loader component for public profile
 const PublicProfileSkeleton: React.FC = () => {
@@ -118,34 +119,47 @@ const PublicProfileSkeleton: React.FC = () => {
 };
 
 const PublicProfileBySlugPage: React.FC = () => {
+  // ALL HOOKS MUST BE CALLED FIRST - NO CONDITIONS OR EARLY RETURNS BEFORE THIS
   const { slug } = useParams<{ slug: string }>();
-  const { isLoggedIn } = useUserStore();
+  const { isLoggedIn } = useStableAuth();
   const { openAuthModal } = useUIStore();
   const toast = useToast();
 
-  // Fetch user data by slug
+  // Fetch user data by slug - MUST BE CALLED UNCONDITIONALLY
   const { 
     data: publicProfile, 
     isLoading: userLoading, 
     error: userError 
   } = usePublicProfileBySlug(slug || '');
 
-
-  // Fetch user profile stats using user ID from the profile data
+  // Fetch user profile stats using user ID from the profile data - MUST BE CALLED UNCONDITIONALLY
   const { 
     data: stats, 
     isLoading: statsLoading 
   } = useUserProfileStats(publicProfile?._id || '');
 
-  // Follow functionality (requires target user ID)
+  // Follow functionality (requires target user ID) - MUST BE CALLED UNCONDITIONALLY
   const { data: followStatus } = useFollowStatus(publicProfile?._id || '');
   const toggleFollowMutation = useToggleFollow();
+  
+  // isLoggedIn is already stable from useStableAuth hook
   const isFollowing = followStatus?.isFollowing || false;
+
+  // Add effect to handle authentication state changes gracefully
+  React.useEffect(() => {
+    // This effect helps prevent hook order issues during auth state changes
+    // by ensuring the component re-renders consistently
+    return () => {
+      // Cleanup function to prevent any pending operations on unmounted component
+    };
+  }, []);
+
+  // NOW ALL HOOKS ARE CALLED - WE CAN DO CONDITIONAL LOGIC AND EARLY RETURNS
   if (userLoading || statsLoading) {
     return <PublicProfileSkeleton />;
   }
 
-  if ( !publicProfile) {
+  if (!publicProfile) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 import {
   Breadcrumb as ShadcnBreadcrumb,
   BreadcrumbItem,
@@ -8,6 +8,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import { useBlogBySlug } from "@/hooks/useResources";
 
 // A map to provide custom names for path segments.
 const breadcrumbNameMap: { [key: string]: string } = {
@@ -20,8 +21,19 @@ const breadcrumbNameMap: { [key: string]: string } = {
 
 const Breadcrumb = () => {
   const location = useLocation();
+  const params = useParams();
   const pathnames = location?.pathname?.split("/").filter((x) => x);
-console.log(pathnames[0],"sdasd");
+  
+  // Check if we're on a blog detail page
+  const isBlogDetailPage = pathnames[0] === 'resources' && pathnames.length === 2 && !!params.slug;
+  
+  // Fetch blog data if we're on a blog detail page
+  const { data: blog, isLoading: blogLoading } = useBlogBySlug(
+    params.slug || '', 
+    isBlogDetailPage
+  );
+
+  console.log(pathnames[0],"sdasd");
   // Don't render breadcrumbs on the homepage.
   if (pathnames.length === 0 || ['for-vendors','about-us',].includes(pathnames[0])) {
     return null;
@@ -41,10 +53,18 @@ console.log(pathnames[0],"sdasd");
               const to = `/${pathnames.slice(0, index + 1).join("/")}`;
               const isLast = index === pathnames.length - 1;
               
-              // Special handling for profile tabs
+              // Special handling for profile tabs and blog detail pages
               let name = breadcrumbNameMap[value];
               if (!name) {
-                name = value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
+                // If this is the last segment of a blog detail page, use the actual blog title
+                if (isBlogDetailPage && isLast && blog?.title) {
+                  name = blog.title;
+                } else if (isBlogDetailPage && isLast && blogLoading) {
+                  // Show loading state for blog detail page
+                  name = "Loading...";
+                } else {
+                  name = value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
+                }
               }
 
               // For profile tabs, make the link go to the profile base page

@@ -39,7 +39,7 @@ export default function ReviewRatingsComparison({ products, className }: ReviewR
                 return (
                   <td key={product.id} className="p-3 sm:p-4 text-center w-1/4">
                     <div className="flex flex-col items-center gap-2">
-                      <StarRating rating={product?.avgRating} size="md" showEmpty />
+                      <StarRating rating={product?.avgRating} size="md"  />
                       <span className="text-sm sm:text-base font-medium">
                         {product?.avgRating?.toFixed(1)} out of 5
                       </span>

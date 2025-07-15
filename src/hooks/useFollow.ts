@@ -68,10 +68,15 @@ export const useFollowStats = (userId: string) => {
 // Hook to get follow status
 export const useFollowStatus = (userId: string) => {
   const {user} = useUserStore();
+  
+  // Ensure stable parameters to prevent hook order changes
+  const stableUserId = userId || '';
+  const stableCurrentUserId = user?._id || '';
+  
   return useQuery<{ isFollowing: boolean; userId: string }>({
-    queryKey: followQueryKeys.status(userId),
-    queryFn: () => FollowService.getFollowStatus(userId),
-    enabled: !!userId && !!user?._id,
+    queryKey: followQueryKeys.status(stableUserId),
+    queryFn: () => FollowService.getFollowStatus(stableUserId),
+    enabled: !!stableUserId && !!stableCurrentUserId,
     select: (data:any) => {
       return {
         isFollowing: data.data.isFollowing,
@@ -79,6 +84,14 @@ export const useFollowStatus = (userId: string) => {
       };
     },
     staleTime: 2 * 60 * 1000, // 2 minutes
+    // Add retry configuration to handle auth state changes gracefully
+    retry: (failureCount, error: any) => {
+      // Don't retry on auth errors during login/logout
+      if (error?.message?.includes('auth') || error?.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 };
 

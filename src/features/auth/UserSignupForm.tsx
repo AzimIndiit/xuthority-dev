@@ -145,11 +145,13 @@ export function UserSignupForm() {
             disabled={registerMutation.isPending}
             maxLength={50}
           />
-          {errors.firstName && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.firstName.message}
-            </p>
-          )}
+          <div className="min-h-[20px]">
+            {errors.firstName && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.firstName.message}
+              </p>
+            )}
+          </div>
         </div>
         <div className="grid gap-2">
           <Label htmlFor="lastName">Last Name</Label>
@@ -161,11 +163,13 @@ export function UserSignupForm() {
             disabled={registerMutation.isPending}
             maxLength={50}
           />
-          {errors.lastName && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.lastName.message}
-            </p>
-          )}
+          <div className="min-h-[20px]">
+            {errors.lastName && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.lastName.message}
+              </p>
+            )}
+          </div>
         </div>
       </div>
       <div className="grid gap-2">
@@ -177,9 +181,11 @@ export function UserSignupForm() {
           className="rounded-full h-14 px-4"
           disabled={registerMutation.isPending}
         />
-        {errors.email && (
-          <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
-        )}
+        <div className="min-h-[20px]">
+          {errors.email && (
+            <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>
+          )}
+        </div>
       </div>
       <div className="grid gap-2">
         <Label htmlFor="password">Password</Label>

@@ -58,11 +58,11 @@ export const ResourcesPage: React.FC = () => {
 
   const handleBlogClick = (blog: Blog) => {
     // Navigate to blog detail page or open blog URL
-    if (blog.watchUrl) {
-      window.open(blog.watchUrl, '_blank');
-    } else {
+    // if (blog.watchUrl) {
+    //   window.open(blog.watchUrl, '_blank');
+    // } else {
       navigate(`/resources/${blog.slug}`);
-    }
+    
   };
 
   const handleViewAll = (categoryId: string) => {

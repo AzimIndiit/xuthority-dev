@@ -118,7 +118,7 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-hidden ">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">Add Product to Compare</DialogTitle>
         </DialogHeader>
@@ -136,7 +136,7 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
         </div>
 
         {/* Products List */}
-        <div className="mt-6 overflow-y-auto max-h-[calc(80vh-200px)] pr-2">
+        <div className="mt-6 overflow-y-auto max-h-[calc(80vh-200px)] pr-2 min-h-[calc(80vh-200px)]">
           {(isLoading || isFetching) ? (
             <div className="space-y-3">
               {[...Array(5)].map((_, index) => (

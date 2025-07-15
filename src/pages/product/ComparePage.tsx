@@ -55,7 +55,7 @@ export default function ComparePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl">
+    <div className="container mx-auto px-4 py-4 sm:py-8 max-w-7xl min-h-[60vh]">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-xl sm:text-3xl font-bold mb-2">
           Compare {sanitizedProducts.map(p => p.name).join(' and ')}
@@ -66,9 +66,9 @@ export default function ComparePage() {
       </div>
 
       {sanitizedProducts.length === 0 ? (
-        <Card className="p-8 sm:p-12 text-center">
+        <Card className="p-8 sm:p-12 text-center min-h-[40vh] flex flex-col items-center justify-center">
           <p className="text-gray-500 mb-4">No products selected for comparison.</p>
-          <Button onClick={() => navigate('/')} className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={() => setIsAddProductModalOpen(true)} className="bg-blue-600 hover:bg-blue-700  mx-auto">
             Browse Products
           </Button>
         </Card>

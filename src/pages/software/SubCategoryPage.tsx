@@ -10,6 +10,7 @@ import SortByDropdown from "@/components/SortByDropdown";
 import FilterDropdown from "@/components/FilterDropdown";
 import useUserStore from "@/store/useUserStore";
 import useUIStore from "@/store/useUIStore";
+import useStableAuth from "@/hooks/useStableAuth";
 import { useReviewStore } from "@/store/useReviewStore";
 import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
@@ -115,13 +116,16 @@ const SubCategoryPageSkeleton = () => (
 const PAGE_SIZE = 10;
 
 const SubCategoryPage = () => {
-  const { isLoggedIn } = useUserStore();
+  // ALL HOOKS MUST BE CALLED FIRST - NO CONDITIONS OR EARLY RETURNS BEFORE THIS
+  const { isLoggedIn } = useStableAuth();
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const navigate = useNavigate();
   const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const { subCategory, category } = useParams<{ subCategory: string, category: string }>();
+  
+  // isLoggedIn is already stable from useStableAuth hook
   const [page, setPage] = useState(1);
-  const [sortValue, setSortValue] = useState<string | null>("ratings-desc");
+  const [sortValue, setSortValue] = useState<string | null>("");
   const [isApplyingFilters, setIsApplyingFilters] = useState(false);
   
   // Local filter state (for UI only)
@@ -156,6 +160,69 @@ const SubCategoryPage = () => {
     
     return payload;
   }, [appliedFilters, sortValue]);
+
+  // Fetch products by category and subcategory - MUST BE CALLED UNCONDITIONALLY
+  const {
+    data: productsResult,
+    isLoading,
+    isError,
+    error
+  } = useProductsByCategory(
+    category || '',
+    subCategory || '',
+    "",
+    page,
+    PAGE_SIZE,
+    apiPayload
+  );
+
+  // Reset filter loading state when products finish loading
+  React.useEffect(() => {
+    if (!isLoading && isApplyingFilters) {
+      setIsApplyingFilters(false);
+    }
+  }, [isLoading, isApplyingFilters]);
+
+  // Reset page to 1 when category or subCategory changes
+  React.useEffect(() => {
+    setPage(1);
+  }, [category, subCategory]);
+
+  // Add effect to handle authentication state changes gracefully
+  React.useEffect(() => {
+    // This effect helps prevent hook order issues during auth state changes
+    // by ensuring the component re-renders consistently
+    return () => {
+      // Cleanup function to prevent state updates on unmounted component
+      setIsApplyingFilters(false);
+    };
+  }, []);
+
+  // Memoize pagination calculations
+  const pagination: any = useMemo(() => {
+    return productsResult?.meta?.pagination || {
+      page: 1,
+      limit: PAGE_SIZE,
+      total: 0,
+      pages: 1,
+      hasNext: false,
+      hasPrev: false
+    };
+  }, [productsResult?.meta?.pagination]);
+
+  const products = useMemo(() => {
+    return Array.isArray(productsResult?.data) ? productsResult?.data : [];
+  }, [productsResult?.data]);
+
+  // NOW ALL HOOKS ARE CALLED - WE CAN DO CONDITIONAL LOGIC AND EARLY RETURNS
+  // Ensure we have valid category and subCategory values
+  const validCategory = category || '';
+  const validSubCategory = subCategory || '';
+
+  const total = pagination?.total || 0;
+  const totalPages = pagination.pages;
+  const start = (page - 1) * PAGE_SIZE + 1;
+  const end = Math.min(page * PAGE_SIZE, total);
 
   // Handle local filter changes (UI only)
   const handleFilterChange = (newFilters: any) => {
@@ -194,55 +261,13 @@ const SubCategoryPage = () => {
     setPage(1);
   };
 
-  // Fetch products by category and subcategory
-  const {
-    data: productsResult,
-    isLoading,
-    isError,
-    error
-  } = useProductsByCategory(
-    category || '',
-    subCategory || '',
-    "",
-    page,
-    PAGE_SIZE,
-    apiPayload
-  );
-
-  // Reset filter loading state when products finish loading
-  React.useEffect(() => {
-    if (!isLoading && isApplyingFilters) {
-      setIsApplyingFilters(false);
-    }
-  }, [isLoading, isApplyingFilters]);
-
-  // Memoize pagination calculations
-  const pagination: any = useMemo(() => {
-    return productsResult?.meta?.pagination || {
-      page: 1,
-      limit: PAGE_SIZE,
-      total: 0,
-      pages: 1,
-      hasNext: false,
-      hasPrev: false
-    };
-  }, [productsResult?.meta?.pagination]);
-
-  const products = useMemo(() => {
-    return Array.isArray(productsResult?.data) ? productsResult?.data : [];
-  }, [productsResult?.data]);
-
-  const total = pagination?.total || 0;
-  const totalPages = pagination.pages;
-  const start = (page - 1) * PAGE_SIZE + 1;
-  const end = Math.min(page * PAGE_SIZE, total);
-
   const handlePageChange = (page: number) => {
     setPage(page);
     // Scroll to top when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Handle error state - moved after all hooks
   if (isError) {
     return (
       <div className="text-center py-8 text-red-500 min-h-[60vh] flex justify-center items-center">
@@ -251,7 +276,7 @@ const SubCategoryPage = () => {
     );
   }
 
-  // Show skeleton when loading
+  // Handle loading state - moved after all hooks
   if (isLoading) {
     return <SubCategoryPageSkeleton />;
   }

@@ -63,17 +63,28 @@ export const usePublicProfile = (userId: string) => {
 
 // Hook for public profile query by slug
 export const usePublicProfileBySlug = (slug: string) => {
+  // Ensure stable parameters to prevent hook order changes
+  const stableSlug = slug || '';
+  
   return useQuery({
-    queryKey: ['publicProfileBySlug', slug],
+    queryKey: ['publicProfileBySlug', stableSlug],
     queryFn: async () => {
-      const response = await AuthService.getPublicProfileBySlug(slug);
+      const response = await AuthService.getPublicProfileBySlug(stableSlug);
       if (response.success && response.data) {
         return response.data.user;
       }
       throw new Error(response.error?.message || 'Failed to fetch public profile');
     },
-    enabled: !!slug,
+    enabled: !!stableSlug,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    // Add retry configuration to handle auth state changes gracefully
+    retry: (failureCount, error: any) => {
+      // Don't retry on auth errors during login/logout
+      if (error?.message?.includes('auth') || error?.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 };
 
@@ -122,17 +133,28 @@ export const useUserReviewsById = (userId: string, options?: {
 
 // Hook for user profile statistics query
 export const useUserProfileStats = (userId: string) => {
+  // Ensure stable parameters to prevent hook order changes
+  const stableUserId = userId || '';
+  
   return useQuery({
-    queryKey: ['userProfileStats', userId],
+    queryKey: ['userProfileStats', stableUserId],
     queryFn: async () => {
-      const response = await AuthService.getUserProfileStats(userId);
+      const response = await AuthService.getUserProfileStats(stableUserId);
       if (response.success && response.data) {
         return response.data;
       }
       throw new Error(response.error?.message || 'Failed to fetch user profile statistics');
     },
-    enabled: !!userId,
+    enabled: !!stableUserId,
     staleTime: 5 * 60 * 1000, // 5 minutes
+    // Add retry configuration to handle auth state changes gracefully
+    retry: (failureCount, error: any) => {
+      // Don't retry on auth errors during login/logout
+      if (error?.message?.includes('auth') || error?.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 };
 
@@ -164,13 +186,17 @@ export const useLogin = () => {
     mutationFn: async (credentials: LoginRequest) => {
       const success = await loginWithAPI(credentials);
       if (success) {
-        // Clear cache first, then set fresh data
-        queryClient.removeQueries();
-        queryClient.clear();
-        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        // Clear auth-related queries more gracefully
+        setTimeout(() => {
+          queryClient.removeQueries({ queryKey: ['user'] });
+          queryClient.removeQueries({ queryKey: ['profile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        }, 100);
 
         // Wait a bit to ensure token is properly set in headers
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         // Fetch fresh profile data after successful login
         await getProfileWithAPI();
@@ -203,13 +229,17 @@ export const useRegisterUser = () => {
     mutationFn: async (data: UserRegisterRequest) => {
       const success = await registerUserWithAPI(data);
       if (success) {
-        // Clear cache first, then set fresh data
-        queryClient.removeQueries();
-        queryClient.clear();
-        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        // Clear auth-related queries more gracefully
+        setTimeout(() => {
+          queryClient.removeQueries({ queryKey: ['user'] });
+          queryClient.removeQueries({ queryKey: ['profile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        }, 100);
         
         // Wait a bit to ensure token is properly set in headers
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // Fetch fresh profile data after successful registration
         await getProfileWithAPI();
@@ -244,13 +274,17 @@ export const useRegisterVendor = () => {
     mutationFn: async (data: VendorRegisterRequest) => {
       const success = await registerVendorWithAPI(data);
       if (success) {
-        // Clear cache first, then set fresh data
-        queryClient.removeQueries();
-        queryClient.clear();
-        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        // Clear auth-related queries more gracefully
+        setTimeout(() => {
+          queryClient.removeQueries({ queryKey: ['user'] });
+          queryClient.removeQueries({ queryKey: ['profile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        }, 100);
         
         // Wait a bit to ensure token is properly set in headers
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // Fetch fresh profile data after successful registration
         await getProfileWithAPI();

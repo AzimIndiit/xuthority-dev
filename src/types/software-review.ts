@@ -10,6 +10,7 @@ export interface Software {
   brandColor?: string;
   slug?: string;
   userId?: string;
+  isActive?: string;
 }
 
 export interface SoftwareReview {

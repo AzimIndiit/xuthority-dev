@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ import { useRegisterVendor, useSocialLogin } from "@/hooks/useAuth";
 import { GoogleIcon, LinkedInIcon } from "@/assets/svg";
 import { useToast } from "@/hooks/useToast";
 import { scrollToTop } from "@/utils/scrollToTop";
+import { useIndustryOptions } from "@/hooks/useIndustry";
+import { FormSelect } from "@/components/ui/FormSelect";
 
 const vendorSignupSchema = z.object({
   firstName: z.string().min(1, { message: "First name is required" }).trim().max(50, { message: "First name must be less than 50 characters" }).nonempty({ message: "First name is required" }),
@@ -99,7 +101,14 @@ export function VendorSignupForm() {
   // Use the new authentication hooks
   const registerMutation = useRegisterVendor();
   const { googleLogin, linkedInLogin } = useSocialLogin();
-  
+  const { options: industryOptions } = useIndustryOptions();
+  const methods = useForm<VendorSignupFormInputs>({
+    resolver: zodResolver(vendorSignupSchema),
+    defaultValues: {
+      updates: false,
+    },
+  });
+
   const {
     register,
     control,
@@ -108,12 +117,7 @@ export function VendorSignupForm() {
     setValue,
     trigger,
     watch,
-  } = useForm<VendorSignupFormInputs>({
-    resolver: zodResolver(vendorSignupSchema),
-    defaultValues: {
-      updates: false,
-    },
-  });
+  } = methods;
 
   // Watch the password field for real-time validation
   const watchedPassword = watch('password', '');
@@ -136,7 +140,7 @@ export function VendorSignupForm() {
         acceptedTerms: data.terms,
         acceptedMarketing: data.updates || false,
       });
-      toast.auth.success("User registration successful");
+      // toast.auth.success("User registration successful");
       closeAuthModal();
     } catch (error) {
       // Error is handled by the mutation hook
@@ -153,7 +157,8 @@ export function VendorSignupForm() {
   };
 
   return (
-    <form id="vendor-signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <FormProvider {...methods}>
+      <form id="vendor-signup-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="grid gap-2">
           <Label htmlFor="firstName">First Name</Label>
@@ -165,11 +170,13 @@ export function VendorSignupForm() {
             disabled={registerMutation.isPending}
             maxLength={50}
           />
-          {errors.firstName && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.firstName.message}
-            </p>
-          )}
+          <div className="min-h-[20px]">
+            {errors.firstName && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.firstName.message}
+              </p>
+            )}
+          </div>
         </div>
         <div className="grid gap-2">
           <Label htmlFor="lastName">Last Name</Label>
@@ -181,46 +188,46 @@ export function VendorSignupForm() {
             disabled={registerMutation.isPending}
             maxLength={50}
           />
-          {errors.lastName && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.lastName.message}
-            </p>
-          )}
+          <div className="min-h-[20px]">
+            {errors.lastName && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.lastName.message}
+              </p>
+            )}
+          </div>
         </div>
       </div>
       <div className="grid gap-2">
         <Label htmlFor="email">Email</Label>
         <Input id="email" placeholder="Enter Email" {...register("email")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} />
-        {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+        <div className="min-h-[20px]">
+          {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email.message}</p>}
+        </div>
       </div>
       <div className="grid gap-2">
         <Label htmlFor="companyName">Company Name</Label>
         <Input id="companyName" placeholder="Enter Company Name" {...register("companyName")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} maxLength={100} />
-        {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
+        <div className="min-h-[20px]">
+          {errors.companyName && <p className="text-red-500 text-xs mt-1">{errors.companyName.message}</p>}
+        </div>
       </div>
        <div className="grid gap-2">
         <Label htmlFor="companyEmail">Company Email</Label>
         <Input id="companyEmail" placeholder="Enter Company Email" {...register("companyEmail")} className="rounded-full h-14 px-4" disabled={registerMutation.isPending} maxLength={254} />
-        {errors.companyEmail && <p className="text-red-500 text-xs mt-1">{errors.companyEmail.message}</p>}
+        <div className="min-h-[20px]">
+          {errors.companyEmail && <p className="text-red-500 text-xs mt-1">{errors.companyEmail.message}</p>}
+        </div>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="grid gap-2">
-          <Label htmlFor="industry">Industry</Label>
-          <Controller
+          <FormSelect
             name="industry"
-            control={control}
-            render={({ field }) => (
-              <Select  onValueChange={field.onChange} defaultValue={field.value} disabled={registerMutation.isPending} >
-                <SelectTrigger className="rounded-full h-14 px-4 w-full"><SelectValue placeholder="Select Industry" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="tech">Technology</SelectItem>
-                  <SelectItem value="finance">Finance</SelectItem>
-                  <SelectItem value="health">Healthcare</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
+            searchable={true}
+            label="Industry"
+            placeholder="Select industry"
+            options={industryOptions}
+            disabled={registerMutation.isPending}
           />
-          {errors.industry && <p className="text-red-500 text-xs mt-1">{errors.industry.message}</p>}
         </div>
         <div className="grid gap-2">
           <Label htmlFor="companySize">Company Size</Label>
@@ -241,7 +248,9 @@ export function VendorSignupForm() {
               </Select>
             )}
           />
-          {errors.companySize && <p className="text-red-500 text-xs mt-1">{errors.companySize.message}</p>}
+          <div className="min-h-[20px]">
+            {errors.companySize && <p className="text-red-500 text-xs mt-1">{errors.companySize.message}</p>}
+          </div>
         </div>
       </div>
       <div className="grid gap-2">
@@ -379,6 +388,7 @@ export function VendorSignupForm() {
         </button>
       </div>
     
-    </form>
+      </form>
+    </FormProvider>
   );
 } 

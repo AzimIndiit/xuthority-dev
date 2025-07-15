@@ -97,7 +97,7 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
           <div className="flex items-center space-x-4">
             {/* Software Logo */}
             <div className="w-14 h-14 sm:w-16 sm:h-16 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0" onClick={() => {
-              if(software.slug){
+              if(software.slug && software.isActive === 'active'){
                 navigate(`/product/${software.slug}`)
               }
             }}>
@@ -191,19 +191,21 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
 
         {
   showAction &&    <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
-          <Button onClick={() => {
+        {  software.isActive === 'active' && <Button onClick={() => {
+          
              setSelectedSoftware({
               id: software.id,
               name: software.name,
               logoUrl: software.logoUrl,
             
              });
-             setCurrentStep(3);
-            navigate(`/write-review`);
+              setCurrentStep(3);
+              navigate(`/write-review`);
+            
           }} className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-4 py-2 !text-xs font-semibold flex items-center h-10">
             <Edit className="w-2 h-2" />
           <span className="hidden sm:block text-xs"> Edit Review</span>
-          </Button>
+          </Button>}
           <Button 
             variant="destructive" 
             className="rounded-full px-4 py-2 !text-xs font-semibold flex items-center h-10"

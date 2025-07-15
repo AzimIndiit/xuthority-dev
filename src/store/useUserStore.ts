@@ -45,11 +45,15 @@ const useUserStore = create<UserState>()(
       },
       logout: () => {
         AuthService.tokenStorage.removeToken();
-        // Aggressively clear all TanStack Query cache
-        queryClient.removeQueries();
-        queryClient.clear();
-        // If using persistence, clear localStorage
-        localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        // Clear auth-related queries more gracefully
+        setTimeout(() => {
+          queryClient.removeQueries({ queryKey: ['user'] });
+          queryClient.removeQueries({ queryKey: ['profile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfile'] });
+          queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+          // If using persistence, clear localStorage
+          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+        }, 100);
         set({ token: null, user: null, isLoggedIn: false });
       },
       updateUser: (userUpdate) => set((state) => ({
@@ -186,9 +190,14 @@ const useUserStore = create<UserState>()(
               error: null,
             });
 
-            queryClient.removeQueries();
-            queryClient.clear();
-            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+            // Clear auth-related queries more gracefully
+            setTimeout(() => {
+              queryClient.removeQueries({ queryKey: ['user'] });
+              queryClient.removeQueries({ queryKey: ['profile'] });
+              queryClient.removeQueries({ queryKey: ['publicProfile'] });
+              queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+              localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+            }, 100);
     
               // Fetch fresh profile data after successful login
             // await getProfileWithAPI();
@@ -279,9 +288,14 @@ const useUserStore = create<UserState>()(
         set({ isLoading: true });
         try {
           AuthService.tokenStorage.removeToken();
-          queryClient.removeQueries();
-          queryClient.clear();
-          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+          // Clear auth-related queries more gracefully
+          setTimeout(() => {
+            queryClient.removeQueries({ queryKey: ['user'] });
+            queryClient.removeQueries({ queryKey: ['profile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+          }, 100);
           set({
             user: null,
             token: null,
@@ -293,9 +307,14 @@ const useUserStore = create<UserState>()(
           toast.success('Successfully logged out!');
         } catch (error) {
           AuthService.tokenStorage.removeToken();
-          queryClient.removeQueries();
-          queryClient.clear();
-          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+          // Clear auth-related queries more gracefully
+          setTimeout(() => {
+            queryClient.removeQueries({ queryKey: ['user'] });
+            queryClient.removeQueries({ queryKey: ['profile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+          }, 100);
           set({
             user: null,
             token: null,

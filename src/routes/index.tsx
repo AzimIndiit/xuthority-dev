@@ -2,11 +2,13 @@ import { createBrowserRouter, Outlet } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import { ProtectedRoute, RoleRoute } from "./ProtectedRoute";
 import useUserStore from "@/store/useUserStore";
-import LottieLoader from "@/components/LottieLoader";
+import { SuspenseLoader } from "@/components/EnhancedLoader";
 import ScrollToTop from "@/components/ScrollToTop";
 import SoftwareCategoryPage from "@/pages/software/SoftwareCategoryPage";
 import SubCategoryPage from "@/pages/software/SubCategoryPage";
 import CommunityPage from "@/pages/product/CommunityPage";
+import AuthAwareWrapper from "@/components/layout/AuthAwareWrapper";
+import HookErrorBoundary from "@/components/layout/HookErrorBoundary";
 import DisputesPage from '@/pages/product/DisputesPage';
 import WriteReviewPage from '@/pages/review/WriteReviewPage';
 import ReviewCommentsPage from '@/pages/review/ReviewCommentsPage';
@@ -46,11 +48,7 @@ const PublicProfileBySlug = lazy(() => import('../pages/public-profile/PublicPro
 
 
 
-const Loader = () => (
-  <div className="w-full flex justify-center items-center min-h-[100dvh] text-lg font-semibold">
-    <LottieLoader />
-  </div>
-);
+const Loader = () => <SuspenseLoader text="Loading page..." minTime={800} />;
 
 // Guard for auth pages: redirect to home if already logged in
 const AuthGuard = ({ children }: { children: React.ReactNode }) => {
@@ -145,7 +143,11 @@ const router = createBrowserRouter([
             index: true,
             Component: (props: any) => (
               <Suspense fallback={<Loader />}>
-                <PublicProfileBySlug {...props} />
+                <HookErrorBoundary>
+                  <AuthAwareWrapper>
+                    <PublicProfileBySlug {...props} />
+                  </AuthAwareWrapper>
+                </HookErrorBoundary>
               </Suspense>
             ),
           },
@@ -229,7 +231,16 @@ const router = createBrowserRouter([
           {
             path: ":subCategory",
             children: [
-              { index: true, Component: SubCategoryPage },
+              { 
+                index: true, 
+                element: (
+                  <HookErrorBoundary>
+                    <AuthAwareWrapper>
+                      <SubCategoryPage />
+                    </AuthAwareWrapper>
+                  </HookErrorBoundary>
+                )
+              },
               {
                 path: ":productSlug",
                 

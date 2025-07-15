@@ -36,15 +36,22 @@ export function useProductsByCategory(
   limit: number,
   filters?: FilterOptions
 ) {
+  // Ensure stable parameters to prevent hook order changes
+  const stableCategory = category || '';
+  const stableSubCategory = subCategory || '';
+  const stableSearchQuery = searchQuery || '';
+  const stablePage = page || 1;
+  const stableLimit = limit || 10;
+  
   // Create a stable query key that only changes when actual values change
   const queryKey = [
     'products', 
     'category', 
-    category, 
-    subCategory, 
-    searchQuery,
-    page, 
-    limit,
+    stableCategory, 
+    stableSubCategory, 
+    stableSearchQuery,
+    stablePage, 
+    stableLimit,
     filters?.segment,
     filters?.categories?.join(','),
     filters?.industries?.join(','),
@@ -52,12 +59,10 @@ export function useProductsByCategory(
     filters?.sortBy
   ];
 
-  
-
-      return useQuery({
-      queryKey,
-      queryFn: () => fetchProductsByCategory(category, subCategory, searchQuery, page, limit, filters),
-      enabled: !!category && !!subCategory,
+  return useQuery({
+    queryKey,
+    queryFn: () => fetchProductsByCategory(stableCategory, stableSubCategory, stableSearchQuery, stablePage, stableLimit, filters),
+    enabled: !!stableCategory && !!stableSubCategory,
     // Cache configuration to prevent unnecessary API calls
     staleTime: 5 * 60 * 1000, // 5 minutes - data is considered fresh for 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache for 10 minutes
@@ -65,6 +70,14 @@ export function useProductsByCategory(
     refetchOnMount: false, // Don't refetch when component mounts if data exists
     refetchOnReconnect: false, // Don't refetch when network reconnects
     placeholderData: (previousData) => previousData, // Show previous data while new data is loading
+    // Add retry configuration to handle auth state changes gracefully
+    retry: (failureCount, error: any) => {
+      // Don't retry on auth errors during login/logout
+      if (error?.message?.includes('auth') || error?.response?.status === 401) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 } 
 

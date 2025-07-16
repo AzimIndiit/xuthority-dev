@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useReviewStore, useSelectedSoftware } from "@/store/useReviewStore";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, HelpCircle } from "lucide-react";
 import StarRating from "@/components/ui/StarRating";
 import { useMutation } from '@tanstack/react-query';
 import { createReview, updateReview, Review } from '@/services/review';
@@ -138,9 +138,28 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   const toast = useToast();
   const [isEditMode, setIsEditMode] = useState(false);
   const [existingReview, setExistingReview] = useState<Review | null>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
   console.log('selectedSoftware', selectedSoftware)
   // Check if user has already reviewed this product
   const { hasReviewed, review: userReview, isLoading: isCheckingReview } = useUserHasReviewed(selectedSoftware?.id);
+
+  // Handle click outside to close tooltip
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (showTooltip && !target.closest('[data-tooltip-container]')) {
+        setShowTooltip(false);
+      }
+    };
+
+    if (showTooltip) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showTooltip]);
 
   const {
     register,
@@ -446,9 +465,44 @@ console.log('userReview', userReview)
 
           {/* Sub Ratings */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-6">
-              Sub Ratings
-            </h3>
+            <div className="flex items-center gap-2 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Sub Ratings
+              </h3>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setShowTooltip(!showTooltip)}
+                  className="p-1 hover:bg-gray-100 rounded-full transition-colors cursor-pointer"
+                  aria-label="Rating scale information"
+                >
+                  <HelpCircle className="w-5 h-5 text-gray-500" />
+                </button>
+                
+                {showTooltip && (
+                  <div 
+                    className="absolute left-0 top-8 z-10 w-72 p-3 bg-white border border-gray-200 rounded-lg shadow-lg"
+                    data-tooltip-container
+                  >
+                    <div className="text-sm text-gray-700">
+                      <div className="font-medium mb-2">Rating Scale Guide:</div>
+                      <div className="space-y-1">
+                        <div><strong>1:</strong> Very Poor</div>
+                        <div><strong>2:</strong> Poor</div>
+                        <div><strong>3:</strong> Fair</div>
+                        <div><strong>4:</strong> Good</div>
+                        <div><strong>5:</strong> Very Good</div>
+                        <div><strong>6:</strong> Excellent</div>
+                        <div><strong>7:</strong> Outstanding</div>
+                        <div><strong>N/A:</strong> Not Applicable/No Experience</div>
+                      </div>
+                    </div>
+                    {/* Arrow pointing up */}
+                    <div className="absolute -top-2 left-4 w-4 h-4 bg-white border-l border-t border-gray-200 transform rotate-45"></div>
+                  </div>
+                )}
+              </div>
+            </div>
             <div className="space-y-4">
               {subRatingCategories.map(({ key, label }) => (
                 <SubRatingRow

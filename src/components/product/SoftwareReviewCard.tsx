@@ -268,7 +268,7 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
                 <StarRating rating={review.overallRating} />
             </div>
             <span className="text-sm text-black font-semibold">
-              {formatDate(review.updatedAt)}
+              {new Date(review.updatedAt).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}
             </span>
           </div>
 

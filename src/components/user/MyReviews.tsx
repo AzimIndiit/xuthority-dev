@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import useUserStore from '@/store/useUserStore';
 import { useUserReviews } from '@/hooks/useAuth';
-import { usePagination } from '@/hooks/usePagination';
 import SoftwareReviewCard from '@/components/product/SoftwareReviewCard';
 import Pagination from '@/components/ui/pagination';
 import { ArrowLeft, ArrowLeftIcon, Star as StarIcon } from 'lucide-react';
@@ -94,31 +93,26 @@ const MyReviews: React.FC = () => {
   const userId = user?.id || user?._id;
   const itemsPerPage = 10;
   const navigate = useNavigate();
-  // Pagination state
-  const pagination = usePagination({
-    initialPage: 1,
-    initialItemsPerPage: itemsPerPage,
-    totalItems: 0 // will update after fetch
-  });
+  
+  // Simple pagination state
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch reviews for current user
-  const { data: reviewsData, isLoading, isError, error, refetch ,isFetching} = useUserReviews(userId, {
-    page: pagination.currentPage,
-    limit: pagination.itemsPerPage,
+  const { data: reviewsData, isLoading, isError, error, refetch, isFetching } = useUserReviews(userId, {
+    page: currentPage,
+    limit: itemsPerPage,
     sortBy: 'publishedAt',
     sortOrder: 'desc',
   });
 
-  // Update total items for pagination
-  React.useEffect(() => {
-    if (reviewsData?.pagination?.totalItems) {
-      pagination.setItemsPerPage(pagination.itemsPerPage); // triggers reset
-    }
-  }, [reviewsData?.pagination?.totalItems]);
-
   const reviews = reviewsData?.reviews || [];
   const totalPages = reviewsData?.pagination?.totalPages || 1;
   const totalItems = reviewsData?.pagination?.totalItems || 0;
+
+  // Handle page change
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   if (isLoading || isFetching) {
     return <MyReviewsSkeleton />;
@@ -157,17 +151,15 @@ const MyReviews: React.FC = () => {
 
   return (
     <div className="">
-   
       <div className='flex items-center gap-2 mb-6'> 
-      <span className="block lg:hidden" onClick={() => navigate(-1)}>
-            {" "}
-            <ArrowLeftIcon className="w-6 h-6" />
-          </span>
+        <span className="block lg:hidden" onClick={() => navigate(-1)}>
+          <ArrowLeftIcon className="w-6 h-6" />
+        </span>
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
-        
-        My Reviews</h1>
-        
+          My Reviews
+        </h1>
       </div>  
+      
       <div className="space-y-6">
         {reviews.length > 0 ? (
           reviews.map((review: any) => (
@@ -185,19 +177,19 @@ const MyReviews: React.FC = () => {
           <div className="text-center py-12 flex flex-col items-center justify-center">
             <img src="/svg/no_data.svg" alt="no-reviews" className="w-1/4 mx-auto mb-6" />
             <p className="text-lg font-semibold text-gray-500 mb-2">No reviews yet</p>
-        
           </div>
         )}
       </div>
+      
       {/* Pagination */}
       {reviews.length > 0 && totalPages > 1 && (
         <div className="px-6 py-4 border-t border-gray-200">
           <Pagination
-            currentPage={pagination.currentPage}
+            currentPage={currentPage}
             totalPages={totalPages}
-            onPageChange={pagination.setCurrentPage}
+            onPageChange={handlePageChange}
             totalItems={totalItems}
-            itemsPerPage={pagination.itemsPerPage}
+            itemsPerPage={itemsPerPage}
             showInfo={true}
           />
         </div>

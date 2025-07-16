@@ -231,6 +231,16 @@ const SubCategoryPage = () => {
   const start = (page - 1) * PAGE_SIZE + 1;
   const end = Math.min(page * PAGE_SIZE, total);
 
+  // Check if any filters are applied
+  const hasFiltersApplied = useMemo(() => {
+    return (
+      appliedFilters.segment !== "all" ||
+      appliedFilters.categories.length > 0 ||
+      appliedFilters.industries.length > 0 ||
+      appliedFilters.price !== null
+    );
+  }, [appliedFilters]);
+
   // Handle local filter changes (UI only)
   const handleFilterChange = (newFilters: any) => {
     setLocalFilters(newFilters);
@@ -294,9 +304,15 @@ const SubCategoryPage = () => {
         {/* Heading and controls */}
         <div className="flex flex-col flex-wrap md:flex-row md:items-center sm:justify-between mb-6 gap-2">
           <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
-            {total} Listings in{" "}
-          <span className=" capitalize">{subCategory ? subCategory.replace(/-/g, " ") : "Category"}{" "}</span>
-            Available
+            {hasFiltersApplied ? (
+              `${total} Listing Available`
+            ) : (
+              <>
+                {total} Listings in{" "}
+                <span className="capitalize">{subCategory ? subCategory.replace(/-/g, " ") : "Category"}</span>
+                {" "}Available
+              </>
+            )}
           </h2>
           <div className="flex gap-2 sm:gap-4 items-start sm:items-center">
             <SortByDropdown value={sortValue} onChange={handleSortChange} />

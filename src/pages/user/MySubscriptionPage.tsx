@@ -400,7 +400,22 @@ const MySubscriptionPage: React.FC = () => {
                     ) : (
                       <>
                         <p className="text-sm text-blue-700 font-medium">
-                          Expires: {new Date(currentSubscription.currentPeriodEnd).toLocaleDateString()}
+                          {(() => {
+                            // Check if it's a free plan by price or if expiry is more than 50 years in future
+                            const isFreePlan = plan.isFree || 
+                                             plan.planType === 'free' || 
+                                             currentSubscription.plan?.price === 0 ||
+                                             plan.price === 0;
+                            
+                            const expiryDate = new Date(currentSubscription.currentPeriodEnd);
+                            const now = new Date();
+                            const yearsFromNow = (expiryDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24 * 365);
+                            const isLifetime = yearsFromNow > 50; // If expires more than 50 years from now, it's lifetime
+                            
+                            return isFreePlan || isLifetime 
+                              ? 'Lifetime validity' 
+                              : `Expires: ${expiryDate.toLocaleDateString()}`;
+                          })()}
                         </p>
                         {currentSubscription.isTrialing && currentSubscription.trialEnd && (
                           <p className="text-xs text-amber-600">
@@ -419,40 +434,56 @@ const MySubscriptionPage: React.FC = () => {
       </div>
 
       {/* Billing Management Actions */}
-      {activePlan && (
-        <div className="flex justify-center gap-4">
-          <Button
-            onClick={handleManageBilling}
-            disabled={createBillingPortalSession.isPending}
-            variant="outline"
-            className="text-gray-600 border-gray-300 hover:bg-gray-50 rounded-full"
-          >
-            {createBillingPortalSession.isPending ? 'Loading...' : 'Manage Billing'}
-            <ExternalLink className="w-4 h-4 ml-2" />
-          </Button>
-          
-          {!currentSubscription?.isCanceled && (
+      {(() => {
+        // Hide entire billing section for free plans
+        const isFreePlan = activePlan?.isFree || activePlan?.price === 0 || (activePlan as any)?.planType === 'free';
+        
+        // Hide if no active plan or if it's a free plan
+        if (!activePlan || isFreePlan) {
+          return null;
+        }
+        
+        // Check if subscription has expired
+        const hasExpired = currentSubscription && new Date(currentSubscription.currentPeriodEnd) < new Date();
+        if (hasExpired) {
+          return null;
+        }
+        
+        return (
+          <div className="flex justify-center gap-4">
             <Button
-              onClick={() => setShowCancelModal(true)}
+              onClick={handleManageBilling}
+              disabled={createBillingPortalSession.isPending}
               variant="outline"
-              className="text-blue-600 border-blue-600 hover:bg-blue-50 rounded-full"
+              className="text-gray-600 border-gray-300 hover:bg-gray-50 rounded-full"
             >
-              Cancel My Subscription
+              {createBillingPortalSession.isPending ? 'Loading...' : 'Manage Billing'}
+              <ExternalLink className="w-4 h-4 ml-2" />
             </Button>
-          )}
-          
-          {currentSubscription?.isCanceled && (
-            <Button
-              onClick={() => resumeSubscription.mutateAsync()}
-              disabled={resumeSubscription.isPending}
-              variant="outline"
-              className="text-green-600 border-green-600 hover:bg-green-50 rounded-full"
-            >
-              {resumeSubscription.isPending ? 'Reactivating...' : 'Reactivate Subscription'}
-            </Button>
-          )}
-        </div>
-      )}
+            
+            {!currentSubscription?.isCanceled && (
+              <Button
+                onClick={() => setShowCancelModal(true)}
+                variant="outline"
+                className="text-blue-600 border-blue-600 hover:bg-blue-50 rounded-full"
+              >
+                Cancel My Subscription
+              </Button>
+            )}
+            
+            {currentSubscription?.isCanceled && (
+              <Button
+                onClick={() => resumeSubscription.mutateAsync()}
+                disabled={resumeSubscription.isPending}
+                variant="outline"
+                className="text-green-600 border-green-600 hover:bg-green-50 rounded-full"
+              >
+                {resumeSubscription.isPending ? 'Reactivating...' : 'Reactivate Subscription'}
+              </Button>
+            )}
+          </div>
+        );
+      })()}
 
       {/* Cancel Subscription Modal */}
       <ConfirmationModal

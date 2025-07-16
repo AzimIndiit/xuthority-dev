@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useForm, useFieldArray, FormProvider, Control } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -339,6 +339,11 @@ const EditProductPage: React.FC = () => {
   const [isMediaDragActive, setIsMediaDragActive] = useState(false);
   const navigate = useNavigate();
   const toast = useToast();
+  
+  // File upload refs
+  const logoInputRef = useRef<HTMLInputElement>(null);
+  const mediaInputRef = useRef<HTMLInputElement>(null);
+  
   const methods = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues,
@@ -381,6 +386,15 @@ const EditProductPage: React.FC = () => {
   const { options: languageOptions, isLoading: languageLoading } = useLanguageOptions();
   const { options: marketSegmentOptions, isLoading: marketSegmentLoading } = useMarketSegmentOptions();
   const [mediaFiles, setMediaFiles] = useState<File[] | FileUpload[]>([]);
+
+  // Click handlers for triggering file inputs
+  const handleLogoAreaClick = () => {
+    logoInputRef.current?.click();
+  };
+
+  const handleMediaAreaClick = () => {
+    mediaInputRef.current?.click();
+  };
 
   const handleLogoChange = async (
     e: React.ChangeEvent<HTMLInputElement> | React.DragEvent<HTMLDivElement>
@@ -523,15 +537,22 @@ const EditProductPage: React.FC = () => {
                     setIsLogoDragActive(true);
                   }}
                   onDragLeave={() => setIsLogoDragActive(false)}
-                  className={`border-2 ${isLogoDragActive ? 'border-blue-500' : 'border-dashed border-gray-300'} rounded-md p-4 flex items-center justify-center  h-40`}
+                  onClick={handleLogoAreaClick}
+                  className={`border-2 ${isLogoDragActive ? 'border-blue-500' : 'border-dashed border-gray-300'} rounded-md p-4 flex items-center justify-center h-40 cursor-pointer hover:bg-gray-50 transition-colors`}
                 >
-                  <label className="cursor-pointer flex flex-col items-center text-gray-500 w-full h-full justify-center">
-                    <input type="file" accept="image/*" onChange={handleLogoChange} className="hidden" />
-                    <svg className="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0 0V8m0 4h4m-4 0H8m12 4a4 4 0 01-4 4H8a4 4 0 01-4-4V8a4 4 0 014-4h8a4 4 0 014 4v8z" />
-                    </svg>
+                  <input 
+                    ref={logoInputRef}
+                    type="file" 
+                    accept="image/*" 
+                    onChange={handleLogoChange} 
+                    className="hidden" 
+                  />
+                  <div className="flex flex-col items-center text-gray-500 w-full h-full justify-center">
+                  <svg className="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0 0V8m0 4h4m-4 0H8m12 4a4 4 0 01-4 4H8a4 4 0 01-4-4V8a4 4 0 014-4h8a4 4 0 014 4v8z" />
+                  </svg>
                     <span>Drag & drop media or <span className="text-blue-600 underline">click here</span></span>
-                  </label>
+                  </div>
                 </div>
                 {
                   watch('logoUrl') &&
@@ -560,16 +581,24 @@ const EditProductPage: React.FC = () => {
                   setIsMediaDragActive(true);
                 }}
                 onDragLeave={() => setIsMediaDragActive(false)}
-                className={`border-2 ${isMediaDragActive ? 'border-blue-500' : 'border-dashed border-gray-300'} rounded-md p-4 flex flex-col items-center justify-center text-center h-40`}
+                onClick={handleMediaAreaClick}
+                className={`border-2 ${isMediaDragActive ? 'border-blue-500' : 'border-dashed border-gray-300'} rounded-md p-4 flex flex-col items-center justify-center text-center h-40 cursor-pointer hover:bg-gray-50 transition-colors`}
               >
-                <label className="cursor-pointer flex flex-col items-center text-gray-500">
-                  <input type="file" accept="image/*,video/*" multiple onChange={handleMediaChange} className="hidden" />
+                <input 
+                  ref={mediaInputRef}
+                  type="file" 
+                  accept="image/*,video/*" 
+                  multiple 
+                  onChange={handleMediaChange} 
+                  className="hidden" 
+                />
+                <div className="flex flex-col items-center text-gray-500">
                   <svg className="w-10 h-10 mb-2 text-gray-400" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 16v-4m0 0V8m0 4h4m-4 0H8m12 4a4 4 0 01-4 4H8a4 4 0 01-4-4V8a4 4 0 014-4h8a4 4 0 014 4v8z" />
                   </svg>
                   <span>Drag & drop images/videos or <span className="text-blue-600 underline">click here</span></span>
                   <p className="text-red-500 text-sm mt-1">Max 5 files allowed (10MB each) - Images & Videos supported</p>
-                </label>
+                </div>
               </div>
               {errors.mediaUrls && <p className="text-red-500 text-sm mt-1">{errors.mediaUrls.message}</p>}
 
@@ -651,7 +680,7 @@ const EditProductPage: React.FC = () => {
               </div>
             ))}
           </div>
-
+          <hr className="my-6" />
           {/* Pricing */}
           <div>
             <div className='flex justify-between items-center mb-4'>
@@ -659,7 +688,7 @@ const EditProductPage: React.FC = () => {
               <button
                 disabled={addProductMutation.isPending}
                 type="button"
-                className="bg-blue-600 text-white rounded-full flex items-center justify-center  w-12 h-12 shadow-md hover:bg-blue-700 transition"
+                className="bg-blue-600 text-white rounded-full flex items-center justify-center  w-12 h-12 shadow-md hover:bg-blue-700 transition cursor-pointer"
                 onClick={() => appendPricing({ name: '', price: 0, seats: '', description: '', features: [{ value: '' }] })}
                 title="Add Pricing Plan"
               >

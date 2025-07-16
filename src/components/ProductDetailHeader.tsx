@@ -20,6 +20,7 @@ interface Product {
   bannerUrl: string;
   entryPrice: string;
   brandColors?: string;
+  website?: string;
 }
 
 interface ProductDetailHeaderProps {
@@ -137,6 +138,7 @@ export default function ProductDetailHeader({
                     <Button
                       size="lg"
                       variant="outline"
+                      onClick={() => window.open(`https://${product.website}`, '_blank')}
                       className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
                     >
                       <User className="w-4 h-4 mr-1" />
@@ -217,6 +219,7 @@ export default function ProductDetailHeader({
             <Button
               size="sm"
               variant="outline"
+              onClick={() => window.open(`https://${product.website}`, '_blank')}
               className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
             >
               <User className="w-4 h-4 mr-1" />

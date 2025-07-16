@@ -159,8 +159,8 @@ const UserDisputes = () => {
         explanations: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?.content : '',
         explanationsId: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?._id : null,
         // Add additional fields for ownership check
-        isOwner: user?.id === dispute.vendor?._id,
-        vendorId: dispute?.vendor?._id,
+        isOwner: user?._id === dispute.vendor,
+        vendorId: dispute?.vendor,
         reviewId: dispute?.review?._id,
       };
       return { review, dispute: transformedDispute, product };

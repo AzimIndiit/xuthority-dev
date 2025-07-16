@@ -15,7 +15,6 @@ export const FormInput: React.FC<FormInputProps> = ({ name, label, ...props }) =
   } = useFormContext();
 
   const error = errors[name];
-
   return (
     <div className="w-full">
       <Label htmlFor={name} className={error ? 'text-red-500' : ''}>

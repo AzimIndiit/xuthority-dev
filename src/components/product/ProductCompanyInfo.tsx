@@ -42,25 +42,31 @@ const DetailItem = ({
 
 const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => {
   const {user} = useUserStore();
+  
+  // Safety check for undefined companyDescription
+  if (!companyDescription) {
+    return null;
+  }
+  
   const companyData = {
-    name: companyDescription.companyName,
-    logoUrl: companyDescription.companyAvatar,
-    description: companyDescription.description,
+    name: companyDescription?.companyName,
+    logoUrl: companyDescription?.companyAvatar,
+    description: companyDescription?.description,
     seller: getUserDisplayName(companyDescription),
-    website: companyDescription.companyWebsiteUrl,
-    founded: companyDescription.yearFounded,
-    hq: companyDescription.hqLocation,
-    twitter: companyDescription.socialLinks.twitter,
-    twitterFollowers: companyDescription.twitterFollowers,
-    linkedin: companyDescription.socialLinks.linkedin,
-    linkedinEmployees: companyDescription.linkedinEmployees,
-    ownership:getUserDisplayName(companyDescription),
-    slug: companyDescription.slug,
-    sellerId: companyDescription._id,
+    website: companyDescription?.companyWebsiteUrl,
+    founded: companyDescription?.yearFounded,
+    hq: companyDescription?.hqLocation,
+    twitter: companyDescription?.socialLinks?.twitter,
+    twitterFollowers: companyDescription?.twitterFollowers,
+    linkedin: companyDescription?.socialLinks?.linkedin,
+    linkedinEmployees: companyDescription?.linkedinEmployees,
+    ownership: getUserDisplayName(companyDescription),
+    slug: companyDescription?.slug,
+    sellerId: companyDescription?._id,
   };
 
   return (
-    <div className="relative py-16 sm:py-24">
+    <div className="relative py-10 sm:py-24">
       <div
         aria-hidden="true"
         className="absolute inset-x-0 top-0 z-0 h-full"
@@ -95,19 +101,19 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
                 (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
               </DetailItem>}
               {companyData.website && <DetailItem icon={Globe} label="Company Website">
-                (<a href={companyData.website} className="text-blue-600 hover:underline">{companyData.website}</a>)
+                (<a href={companyData.website} className="text-blue-600 hover:underline">{companyData?.website?.length > 30 ? companyData.website.substring(0, 30) + "..." : companyData.website}</a>)
               </DetailItem>}
               {companyData.founded && <DetailItem icon={Calendar} label="Year Founded">({companyData.founded})</DetailItem>}
             {companyData.hq && <DetailItem icon={MapPin} label="HQ Location">({companyData.hq})</DetailItem>}
             </div>
             <div>
               {companyData.twitter && <DetailItem icon={XIcon} label="Twitter">
-                (<a href="#" className="text-blue-600 hover:underline">{companyData.twitter}</a>, {companyData.twitterFollowers} Twitter followers)
+                (<a href={`${companyData.twitter}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{companyData?.twitter?.length > 30 ? companyData.twitter.substring(0, 30) + "..." : companyData.twitter}</a>{companyData.twitterFollowers ? `, ${companyData.twitterFollowers?.length > 30 ? companyData.twitterFollowers.substring(0, 30) + "..." : companyData.twitterFollowers} Twitter followers` : ''})
               </DetailItem>}
               {companyData.linkedin && <DetailItem icon={Linkedin} label="LinkedIn Page">
-                (<a href="#" className="text-blue-600 hover:underline">{companyData.linkedin}</a>, {companyData.linkedinEmployees} employees on LinkedIn®)
+                (<a href={`${companyData.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{companyData?.linkedin?.length > 30 ? companyData.linkedin.substring(0, 30) + "..." : companyData.linkedin }</a>{companyData.linkedinEmployees ? `, ${companyData.linkedinEmployees?.length > 30 ? companyData.linkedinEmployees.substring(0, 30) + "..." : companyData.linkedinEmployees} employees on LinkedIn®` : ''})
               </DetailItem>}
-              {companyData.ownership && <DetailItem icon={UserCheck} label="Ownership">({companyData.ownership})</DetailItem>}
+              {companyData.ownership && <DetailItem icon={UserCheck} label="Ownership"> (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`}  className="text-blue-600 hover:underline">{companyData.ownership}</a>)</DetailItem>}
             </div>
           </div>
         </div>

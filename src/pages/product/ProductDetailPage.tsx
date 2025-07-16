@@ -216,7 +216,7 @@ export default function ProductDetailPage() {
     bannerUrl: imageUrls[0] || 'https://placehold.co/1200x300/6d28d9/ffffff?text=Banner',
     entryPrice: minPrice !== null ? formatCurrency(minPrice) : 'N/A',
     brandColors: product.brandColors || '#ffffff',
-
+    website: product.website || '',
   };
 
   const handleSearch = (query: string) => {

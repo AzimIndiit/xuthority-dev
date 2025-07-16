@@ -8,6 +8,9 @@ import LottieLoader from '@/components/LottieLoader';
 import useUserStore from '@/store/useUserStore';
 import { DISPUTE_REASONS } from '@/services/dispute';
 import SecondaryLoader from '@/components/ui/SecondaryLoader';
+import { ArrowLeftIcon } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import NotFoundPage from '@/components/common/NotFoundPage';
 
 // Skeleton loader component for dispute cards
 const DisputeCardSkeleton = () => (
@@ -55,17 +58,20 @@ const DisputeCardSkeleton = () => (
 const DisputesPage = () => {
   const { user, isLoggedIn } = useUserStore();
 
+  const navigate = useNavigate();
   // Only fetch disputes if user is logged in and is a vendor
   const isVendor = user?.role === 'vendor';
-  
+  const { productSlug } = useParams<{ productSlug: string }>();
   // Fetch disputes from API
-  const { data: disputesData, isLoading, refetch: refetchDisputes, isError } = useAllDisputes({
+  const { data: disputesData, isLoading, refetch: refetchDisputes, isError ,error} = useAllDisputes({
     page: 1,
     limit: 10,
     sortBy: 'createdAt',
-    sortOrder: 'desc'
+    sortOrder: 'desc',
+    productSlug: productSlug
   });
-
+const errorData = error as any;
+ console.log('errorData?.message', errorData)
   // Transform API data to match the UI structure - MOVED BEFORE CONDITIONAL RETURNS
   const transformedDisputes = useMemo(() => {
     // Check if disputesData has disputes array or if it's the array itself
@@ -94,6 +100,7 @@ const DisputesPage = () => {
         companyName: dispute.review.reviewer.companyName || '',
         companySize: dispute.review.reviewer.companySize || '',
         isVerified: dispute.review.reviewer.isVerified || false,
+        slug: dispute.review.reviewer.slug || '',
       };
 
       // Find the label for the dispute reason
@@ -145,13 +152,30 @@ const DisputesPage = () => {
       </div>
     );
   }
-
+  if (isError && errorData?.response?.data?.error?.code.includes('PRODUCT_NOT_FOUND')) {
+    return (
+      <NotFoundPage 
+        title="Oops! Product not found."
+        description="The product you're looking for doesn't exist or has been removed."
+        buttonText="Go Back Home"
+        navigateTo={`/`}
+        showBackButton={false}
+      />
+    );
+  }
   // Handle error state
   if (isError) {
     return (
       <div className="bg-white min-h-screen">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">Disputes</h1>
+        <div className="flex items-center gap-2">
+          <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span>
+            <h1 className="text-2xl sm:text-3xl font-bold">Disputes</h1>
+          </div>  
+         
           <div className="text-center py-12 text-red-500">
             <p className="text-lg font-semibold">Failed to load disputes</p>
             <p className="text-sm mt-2">Please try refreshing the page or contact support if the issue persists.</p>
@@ -164,7 +188,13 @@ const DisputesPage = () => {
   return (
     <div className="bg-white min-h-screen">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Disputes</h1>
+        <div className="flex items-center gap-2 mb-6">
+          <span className="block lg:hidden" onClick={() => navigate(-1)}>
+            {" "}
+            <ArrowLeftIcon className="w-6 h-6" />
+          </span>
+            <h1 className="text-2xl sm:text-3xl font-bold">Disputes</h1>
+          </div>
         {transformedDisputes.length === 0 ? (
           <div className="text-center py-12 text-gray-500 min-h-[60vh] flex flex-col justify-center items-center">
             <img src="/svg/no_data.svg" alt="No results" className="w-1/4 mb-4" />

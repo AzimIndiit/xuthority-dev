@@ -105,7 +105,7 @@ export const useUserReviews = (userId: string, options?: {
       throw new Error(response.error?.message || 'Failed to fetch user reviews');
     },
     enabled: !!userId,
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 0, // 5 minutes
   });
 };
 

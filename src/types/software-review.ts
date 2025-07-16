@@ -11,6 +11,7 @@ export interface Software {
   slug?: string;
   userId?: string;
   isActive?: string;
+  brandColors?: string;
 }
 
 export interface SoftwareReview {

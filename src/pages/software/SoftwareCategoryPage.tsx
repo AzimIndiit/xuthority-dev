@@ -56,6 +56,7 @@ const SoftwareCategoryPage = () => {
       navigate('/', { replace: true });
     }
   }, [category, navigate]);
+  console.log('category', category)
 
   let subCategories: { name: string; slug: string; id: string }[] = [];
   let isSoftwareLoading = false;

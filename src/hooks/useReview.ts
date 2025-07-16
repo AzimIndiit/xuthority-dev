@@ -79,8 +79,9 @@ export function useProductReviewStats(productId: string | undefined) {
   const voteMutation = useMutation({
     mutationFn: voteHelpful,
     onSuccess: () => {
-      // Invalidate and refetch product reviews
+      // Invalidate and refetch all review-related queries
       queryClient.invalidateQueries({ queryKey: ['productReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['userReviews'] });
       queryClient.invalidateQueries({ queryKey: ['userReviewsById'] });
       // toast.success('Thank you for your feedback!');
     },
@@ -94,6 +95,7 @@ export function useProductReviewStats(productId: string | undefined) {
     mutationFn: removeHelpfulVote,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productReviews'] });
+      queryClient.invalidateQueries({ queryKey: ['userReviews'] });
       queryClient.invalidateQueries({ queryKey: ['userReviewsById'] });
       // toast.success('Vote removed');
     },
@@ -134,8 +136,12 @@ export const useDeleteReview = () => {
   return useMutation({
     mutationFn: deleteReview,
     onSuccess: () => {
+      // Invalidate all review-related queries
       queryClient.invalidateQueries({ queryKey: ['productReviews'] });
       queryClient.invalidateQueries({ queryKey: ['userReview'] });
+      queryClient.invalidateQueries({ queryKey: ['userReviews'] }); // This invalidates useUserReviews
+      queryClient.invalidateQueries({ queryKey: ['userReviewsById'] });
+      queryClient.invalidateQueries({ queryKey: ['productReviewStats'] });
       success('Review deleted successfully');
     },
     onError: (err: any) => {

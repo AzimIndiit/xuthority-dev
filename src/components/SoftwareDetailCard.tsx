@@ -12,6 +12,7 @@ import { useDeleteProduct } from "@/hooks/useProducts";
 import useCompareStore from "@/store/useCompareStore";
 import { useToast } from "@/hooks/useToast";
 import { useFavoriteStatus } from "@/hooks/useFavorites";
+import useUIStore from "@/store/useUIStore";
 
 interface FeatureDescription {
   value: string;
@@ -96,6 +97,7 @@ export default function SoftwareDetailCard({
   showCompare = false,
 }: SoftwareDetailCardProps) {
   const {user, isLoggedIn} = useUserStore();
+  const {openAuthModal} = useUIStore();
   const navigate = useNavigate();
   const location = useLocation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -310,7 +312,12 @@ const deleteMutation = useDeleteProduct();
         {/* Bottom Actions */}
        {location.pathname !== '/profile/products' && <div className="flex sm:flex-row flex-col lg:items-center justify-between gap-2 mt-4 ">
          { <button
-            onClick={() => setShowAddToListModal(true)}
+            onClick={() => { 
+               if(!isLoggedIn){
+                return openAuthModal()
+               }
+              
+              setShowAddToListModal(true)}}
             className={`${user?.role==='vendor' ? 'invisible': 'flex'} items-center gap-1 !text-[11px] xl:!text-[14px] font-medium sm:px-2 py-1 rounded transition cursor-pointer ${
               isInFavorites 
                 ? 'text-red-500' 

@@ -20,6 +20,7 @@ import { ArrowLeftIcon, X } from 'lucide-react';
 import { FileUpload } from '@/types/file';
 import { useToast } from '@/hooks/useToast';
 import { useAddProduct, useFetchProductById, useUpdateProduct } from '@/hooks/useProducts';
+import { getNestedError, hasNestedError, getNestedErrorMessage } from '@/utils/formUtils';
 const fileOrString = z.union([z.instanceof(File), z.string()]);
 const MAX_FILE_SIZE_MB = 10;
 const MAX_MEDIA_FILES = 5;
@@ -100,15 +101,19 @@ const defaultValues: FormData = {
 interface PricingFeaturesFieldArrayProps {
   nestIndex: number;
   control: Control<FormData>;
+  loading: boolean;
+  errors: any;
 }
 
 interface FeaturesDescriptionFieldArrayProps {
   nestIndex: number;
   control: Control<FormData>;
+  loading: boolean;
+  errors: any;
 }
 
-const PricingFeaturesFieldArray: React.FC<PricingFeaturesFieldArrayProps> = ({ nestIndex, control }) => {
-  const addProductMutation = useAddProduct();
+const PricingFeaturesFieldArray: React.FC<PricingFeaturesFieldArrayProps> = ({ nestIndex, control, loading, errors }) => {
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: `pricing.${nestIndex}.features` as any,
@@ -116,7 +121,11 @@ const PricingFeaturesFieldArray: React.FC<PricingFeaturesFieldArrayProps> = ({ n
   
   return (
     <div>
-      {fields.map((field, fIdx) => (
+      {fields.map((field, fIdx) => {
+        const fieldPath = `pricing.${nestIndex}.features.${fIdx}.value`;
+        const fieldError = getNestedErrorMessage(errors, fieldPath);
+        
+        return (
         <div key={field.id} className="flex items-end gap-2 mb-4">
           <div className="flex-1">
             <FormInput
@@ -124,13 +133,14 @@ const PricingFeaturesFieldArray: React.FC<PricingFeaturesFieldArrayProps> = ({ n
               label={`Feature ${fIdx + 1}`}
               placeholder={`Enter plan feature ${fIdx + 1}`}
               maxLength={200}
-              disabled={addProductMutation.isPending}
+              disabled={loading}
             />
+            {fieldError && <p className="text-red-500 text-sm mt-1">{fieldError}</p>}
           </div>
           <div className="flex  gap-2 mb-1">
             {fields.length > 1 && (
               <button
-                disabled={addProductMutation.isPending}
+                disabled={loading}
                 type="button"
                 className="bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl hover:bg-red-600 transition cursor-pointer"
                 onClick={() => remove(fIdx)}
@@ -141,7 +151,7 @@ const PricingFeaturesFieldArray: React.FC<PricingFeaturesFieldArrayProps> = ({ n
             )}
             {fIdx === fields.length - 1 && (
               <button
-                disabled={addProductMutation.isPending}
+                disabled={loading}
                 type="button"
                 className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl hover:bg-blue-700 transition cursor-pointer"
                 onClick={() => append({value: ''})}
@@ -152,15 +162,18 @@ const PricingFeaturesFieldArray: React.FC<PricingFeaturesFieldArrayProps> = ({ n
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
 const FeaturesDescriptionFieldArray: React.FC<FeaturesDescriptionFieldArrayProps> = ({
   nestIndex,
   control,
+  loading,
+  errors
 }) => {
-  const addProductMutation = useAddProduct();
+
   const { fields, append, remove } = useFieldArray({
     control,
     name: `features.${nestIndex}.description`, // Now this is an array of objects
@@ -169,7 +182,11 @@ const FeaturesDescriptionFieldArray: React.FC<FeaturesDescriptionFieldArrayProps
   return (
     <div>
       <label className="block font-medium mb-2">Feature Descriptions</label>
-      {fields.map((field, fIdx) => (
+      {fields.map((field, fIdx) => {
+        const fieldPath = `features.${nestIndex}.description.${fIdx}.value`;
+        const fieldError = getNestedErrorMessage(errors, fieldPath);
+        
+        return (
         <div key={field.id} className="flex items-end gap-2 mb-4">
           <div className="flex-1">
             <FormInput
@@ -177,13 +194,14 @@ const FeaturesDescriptionFieldArray: React.FC<FeaturesDescriptionFieldArrayProps
               label={`Description ${fIdx + 1}`}
               placeholder={`Enter feature description ${fIdx + 1}`}
               maxLength={200}
-              disabled={addProductMutation.isPending}
+              disabled={loading}
             />
+            {fieldError && <p className="text-red-500 text-sm mt-1">{fieldError}</p>}
           </div>
           <div className="flex  gap-2 mb-1">
             {fields.length > 1 &&  (
               <button
-                disabled={addProductMutation.isPending}
+                disabled={loading}
                 type="button"
                 className="bg-red-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl hover:bg-red-600 transition cursor-pointer"
                 onClick={() => remove(fIdx)}
@@ -194,7 +212,7 @@ const FeaturesDescriptionFieldArray: React.FC<FeaturesDescriptionFieldArrayProps
             )}
             {fIdx === fields.length - 1 && (
               <button
-                disabled={addProductMutation.isPending}
+                disabled={loading}
                 type="button"
                 className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl hover:bg-blue-700 transition cursor-pointer  "
                 onClick={() => append({ value: '' })}
@@ -205,7 +223,8 @@ const FeaturesDescriptionFieldArray: React.FC<FeaturesDescriptionFieldArrayProps
             )}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
@@ -507,7 +526,10 @@ console.log('mediaUrls', mediaFiles)
                   {/* )} */}
                 </div>
                 <FormInput name={`features.${idx}.title`} label="Feature Title" maxLength={100} placeholder='Enter feature title' disabled={addProductMutation.isPending} />
-                <FeaturesDescriptionFieldArray nestIndex={idx} control={control} />
+                {getNestedErrorMessage(errors, `features.${idx}.title`) && (
+                  <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `features.${idx}.title`)}</p>
+                )}
+                <FeaturesDescriptionFieldArray nestIndex={idx} control={control} loading={addProductMutation.isPending} errors={errors} />
               </div>
             ))}
           </div>
@@ -543,58 +565,78 @@ console.log('mediaUrls', mediaFiles)
                   {/* )} */}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <FormInput name={`pricing.${idx}.name`} label="Plan Name" maxLength={100} placeholder="Enter plan name" disabled={addProductMutation.isPending} />
-                  <FormInput 
-                    name={`pricing.${idx}.price`} 
-                    label="Price" 
-                    type="number" 
-                    min={0} 
-                    max={1000} 
-                    step={1}
-                 
-                    onKeyDown={(e) => {
-                      // Prevent minus and plus signs
-                      if (e.key === '-' || e.key === '+') {
-                        e.preventDefault();
-                        return;
-                      }
-                      
-                      // Allow only numbers and decimal point
-                      if ((e.key >= '0' && e.key <= '9') || e.key === '.') {
-                        const currentValue = (e.target as HTMLInputElement).value;
-                        
-                        // Prevent multiple decimal points
-                        if (e.key === '.' && currentValue.includes('.')) {
+                  <div>
+                    <FormInput name={`pricing.${idx}.name`} label="Plan Name" maxLength={100} placeholder="Enter plan name" disabled={addProductMutation.isPending} />
+                    {getNestedErrorMessage(errors, `pricing.${idx}.name`) && (
+                      <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.name`)}</p>
+                    )}
+                  </div>
+                  <div>
+                    <FormInput 
+                      name={`pricing.${idx}.price`} 
+                      label="Price" 
+                      type="number" 
+                      min={0} 
+                      max={1000} 
+                      step={1}
+                   
+                      onKeyDown={(e) => {
+                        // Prevent minus and plus signs
+                        if (e.key === '-' || e.key === '+') {
                           e.preventDefault();
                           return;
                         }
                         
-                        // Check decimal places
-                        if (currentValue.includes('.')) {
-                          const decimalPlaces = currentValue.split('.')[1]?.length || 0;
-                          if (decimalPlaces >= 2 && e.key !== '.') {
+                        // Allow only numbers and decimal point
+                        if ((e.key >= '0' && e.key <= '9') || e.key === '.') {
+                          const currentValue = (e.target as HTMLInputElement).value;
+                          
+                          // Prevent multiple decimal points
+                          if (e.key === '.' && currentValue.includes('.')) {
                             e.preventDefault();
                             return;
                           }
-                        }
-                        
-                        const newValue = currentValue + e.key;
-                        if (parseFloat(newValue) > 1000) {
+                          
+                          // Check decimal places
+                          if (currentValue.includes('.')) {
+                            const decimalPlaces = currentValue.split('.')[1]?.length || 0;
+                            if (decimalPlaces >= 2 && e.key !== '.') {
+                              e.preventDefault();
+                              return;
+                            }
+                          }
+                          
+                          const newValue = currentValue + e.key;
+                          if (parseFloat(newValue) > 1000) {
+                            e.preventDefault();
+                          }
+                        } else if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
                           e.preventDefault();
                         }
-                      } else if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {
-                        e.preventDefault();
-                      }
-                    }}
-                    placeholder="Enter price" 
-                    disabled={addProductMutation.isPending} 
-                  />
-                  <FormInput name={`pricing.${idx}.seats`} label="No of Seats" maxLength={100} placeholder="Enter no of seats" disabled={addProductMutation.isPending} />
+                      }}
+                      placeholder="Enter price" 
+                      disabled={addProductMutation.isPending} 
+                    />
+                    {getNestedErrorMessage(errors, `pricing.${idx}.price`) && (
+                      <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.price`)}</p>
+                    )}
+                  </div>
+                  <div>
+                    <FormInput name={`pricing.${idx}.seats`} label="No of Seats" maxLength={100} placeholder="Enter no of seats" disabled={addProductMutation.isPending} />
+                    {getNestedErrorMessage(errors, `pricing.${idx}.seats`) && (
+                      <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.seats`)}</p>
+                    )}
+                  </div>
                 </div>
-                <FormTextarea name={`pricing.${idx}.description`} className="mb-6" label="Plan Description" rows={3} maxLength={500} placeholder="Enter plan description" disabled={addProductMutation.isPending} />
+                <div>
+                  <FormTextarea name={`pricing.${idx}.description`} className="mb-6" label="Plan Description" rows={3} maxLength={500} placeholder="Enter plan description" disabled={addProductMutation.isPending} />
+                  {getNestedErrorMessage(errors, `pricing.${idx}.description`) && (
+                    <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.description`)}</p>
+                  )}
+                </div>
                 <div className="mb-2 mt-2">
                   <h4 className="font-semibold text-lg mb-2">Plan Features</h4>
-                  <PricingFeaturesFieldArray nestIndex={idx} control={control} />
+                  <PricingFeaturesFieldArray nestIndex={idx} control={control} loading={addProductMutation.isPending} errors={errors} />
                 </div>
               </div>
             ))}

@@ -91,10 +91,10 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
     }
   };
   const handleCommentClick = () => {
-      if (!isLoggedIn) {
-        openAuthModal();
-        return;
-      }
+      // if (!isLoggedIn) {
+      //   openAuthModal();
+      //   return;
+      // }
       navigate(`/product-detail/${software.slug}/reviews`, {
         state: {
           reviewId: review.id,
@@ -127,13 +127,13 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
       {/* Header Section */}
       <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-4">
-          <div className="flex items-center space-x-4">
-            {/* Software Logo */}
-            <div className={`w-14 h-14 sm:w-16 sm:h-16 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0  ${software.slug && software.isActive === 'active' ? 'cursor-pointer' : 'cursor-not-allowed'}`} onClick={() => {
+          <div className={`flex items-center space-x-4 ${software.slug && software.isActive === 'active' ? 'cursor-pointer' : 'cursor-not-allowed'}`}  onClick={() => {
               if(software.slug && software.isActive === 'active'){
                 navigate(`/product-detail/${software.slug}`)
               }
             }}>
+            {/* Software Logo */}
+            <div className={`w-14 h-14 sm:w-16 sm:h-16  rounded-lg flex items-center justify-center flex-shrink-0 `} style={{ backgroundColor: software.brandColors }}>
               {software.logoUrl ? (
                 <img 
                   src={software.logoUrl} 

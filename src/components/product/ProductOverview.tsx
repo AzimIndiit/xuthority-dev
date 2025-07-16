@@ -76,9 +76,9 @@ const ProductOverview = ({product}: {product: any}) => {
                   href={`https://${productDetails.website}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-blue-600 hover:underline break-all "
                 >
-                  {productDetails.website}
+                  {productDetails.website.length > 30 ? productDetails.website.substring(0, 30) + "..." : productDetails.website}
                 </a>
                 )
               </p>

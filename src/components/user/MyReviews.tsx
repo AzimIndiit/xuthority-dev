@@ -102,7 +102,7 @@ const MyReviews: React.FC = () => {
   });
 
   // Fetch reviews for current user
-  const { data: reviewsData, isLoading, isError, error, refetch } = useUserReviews(userId, {
+  const { data: reviewsData, isLoading, isError, error, refetch ,isFetching} = useUserReviews(userId, {
     page: pagination.currentPage,
     limit: pagination.itemsPerPage,
     sortBy: 'publishedAt',
@@ -120,7 +120,7 @@ const MyReviews: React.FC = () => {
   const totalPages = reviewsData?.pagination?.totalPages || 1;
   const totalItems = reviewsData?.pagination?.totalItems || 0;
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return <MyReviewsSkeleton />;
   }
 

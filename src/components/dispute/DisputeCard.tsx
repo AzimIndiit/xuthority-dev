@@ -129,6 +129,8 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       }
     });
   };
+
+  console.log('dispute', dispute)
   return (
     <div className="bg-white p-4  rounded-lg border border-gray-200 shadow-sm">
       {/* Review Section */}
@@ -267,7 +269,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       </div>
 
       {/* Explanation Section */}
-      {dispute.explanations && user?.role === 'user' && dispute.status === 'active' && (
+      {dispute.explanations && dispute.status === 'active' && (
         <div className='mt-4'>
           <h3 className="text-lg sm:text-xl font-bold text-gray-900">Explanation</h3>
           <div className="mt-2 flex justify-between items-start text-gray-700 text-sm bg-gray-50 p-3 rounded-lg border border-gray-20 gap-4">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { ArrowLeft, ThumbsUp, MoreVertical, Edit2, Trash2 } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -249,7 +249,7 @@ const ReviewCommentsPage: React.FC = () => {
   const [loadedPages, setLoadedPages] = useState<Set<number>>(new Set());
 
   // Read more/less utility functions
-  const checkReplyTruncation = (replyId: string, contentElement: HTMLParagraphElement | null) => {
+  const checkReplyTruncation = useCallback((replyId: string, contentElement: HTMLParagraphElement | null) => {
     if (contentElement) {
       // Temporarily remove truncation to measure full height
       const originalStyle = contentElement.style.cssText;
@@ -272,14 +272,14 @@ const ReviewCommentsPage: React.FC = () => {
         [replyId]: actualHeight > maxHeight
       }));
     }
-  };
+  }, []);
 
-  const toggleReplyExpanded = (replyId: string) => {
+  const toggleReplyExpanded = useCallback((replyId: string) => {
     setExpandedReplies(prev => ({
       ...prev,
       [replyId]: !prev[replyId]
     }));
-  };
+  }, []);
 
   // Redirect if no reviewId in state
   useEffect(() => {
@@ -325,7 +325,7 @@ const ReviewCommentsPage: React.FC = () => {
       setHasMoreReplies(pagination?.hasNext || false);
       setTotalComments(repliesResponse.meta?.total || 0);
     }
-  }, [repliesResponse, page, loadedPages]);
+  }, [repliesResponse, page]);
 
   // Mutations
   const createReplyMutation = useCreateReply();
@@ -336,7 +336,7 @@ const ReviewCommentsPage: React.FC = () => {
   // Use review from state if available, otherwise from API
   const review = reviewFromState || (reviewResponse?.data ? transformBackendReview(reviewResponse.data as any) : null);
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!isLoggedIn) {
@@ -379,14 +379,14 @@ const ReviewCommentsPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to create reply:', error);
     }
-  };
+  }, [isLoggedIn, openAuthModal, comment, reviewId, createReplyMutation, user, allReplies.length]);
 
-  const handleEdit = (replyId: string, content: string) => {
+  const handleEdit = useCallback((replyId: string, content: string) => {
     setEditingReplyId(replyId);
     setEditingContent(content);
-  };
+  }, []);
 
-  const handleUpdate = async () => {
+  const handleUpdate = useCallback(async () => {
     if (!editingContent.trim() || !editingReplyId) return;
 
     try {
@@ -405,14 +405,14 @@ const ReviewCommentsPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to update reply:', error);
     }
-  };
+  }, [editingContent, editingReplyId, updateReplyMutation]);
 
-  const handleDeleteClick = (replyId: string) => {
+  const handleDeleteClick = useCallback((replyId: string) => {
     setReplyToDelete(replyId);
     setShowDeleteModal(true);
-  };
+  }, []);
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = useCallback(async () => {
     if (!replyToDelete) return;
 
     try {
@@ -425,9 +425,9 @@ const ReviewCommentsPage: React.FC = () => {
     } catch (error) {
       console.error('Failed to delete reply:', error);
     }
-  };
+  }, [replyToDelete, deleteReplyMutation]);
 
-  const handleHelpfulClick = async (reply: any) => {
+  const handleHelpfulClick = useCallback(async (reply: any) => {
     if (!isLoggedIn) {
       openAuthModal();
       return;
@@ -474,12 +474,12 @@ const ReviewCommentsPage: React.FC = () => {
       // Revert on error
       setAllReplies(prev => prev.map(r => r._id === reply._id ? reply : r));
     }
-  };
+  }, [isLoggedIn, openAuthModal, hasVoted, user?.id, removeVote, voteHelpful]);
   
 
-  const handleLoadMore = () => {
+  const handleLoadMore = useCallback(() => {
     setPage(prev => prev + 1);
-  };
+  }, []);
 
   // Show skeleton loader when loading initial data
   if (!reviewId || (reviewLoading && !reviewFromState) || (!review && !reviewLoading)) {
@@ -526,19 +526,21 @@ console.log(allReplies,'allReplies');
           {/* Comment Form */}
           <div className="p-6 border-b border-gray-200">
             <form onSubmit={handleSubmit}>
-              <Textarea
+            <Textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder={isLoggedIn ? "Write your comment here..." : "Please log in to comment"}
+                placeholder={"Write your comment here..." }
                 className="w-full mb-4 min-h-[200px] max-h-[300px] rounded-lg resize-none break-all"
-                disabled={!isLoggedIn}
+                disabled={createReplyMutation.isPending}
                 maxLength={2000}
                 required={true}
               />
-              <div className="flex justify-end">
+              <div className="flex justify-end gap-2 items-center">
+            
+
                 <Button
                   type="submit"
-                  disabled={!comment.trim() || createReplyMutation.isPending}
+                  disabled={createReplyMutation.isPending}
                   className="bg-red-600 hover:bg-red-700 text-white"
                   loading={createReplyMutation.isPending}
                 >
@@ -582,9 +584,16 @@ console.log(allReplies,'allReplies');
                     console.log('reply', reply.author?._id,user)
                     return (
                     <div key={reply._id} className="flex items-start gap-3 animate-fadeIn border border-gray-200 p-4 rounded-md shadow-sm bg-white">
-                      <Avatar className="w-14 h-14 cursor-pointer" onClick={() => {  if(reply.author.id !== user?.id){ navigate(`/public-profile/${reply.author.slug}`)}else{
-                        navigate(`/profile`)
-                      }}}>
+                      <Avatar 
+                        className="w-14 h-14 cursor-pointer" 
+                        onClick={() => {  
+                          if(reply.author.id !== user?.id){ 
+                            navigate(`/public-profile/${reply.author.slug}`)
+                          } else {
+                            navigate(`/profile`)
+                          }
+                        }}
+                      >
                         <AvatarImage 
                         className='object-cover'
                           src={reply.author.avatar || reply.author.profilePicture} 

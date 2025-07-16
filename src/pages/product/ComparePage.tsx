@@ -101,7 +101,7 @@ export default function ComparePage() {
                       </button>
                     </div>
                     <h3 className="font-semibold text-sm sm:text-lg mb-1 line-clamp-2">{product.name}</h3>
-                    <a href={product.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-1 hover:underline hover:text-blue-600">{product.websiteUrl}</a>
+                    <a href={product.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-1 hover:underline hover:text-blue-600 ">{product.websiteUrl.length > 30 ? product.websiteUrl.substring(0, 30) + "..." : product.websiteUrl}</a>
                   
                     <Button
                       variant="default"

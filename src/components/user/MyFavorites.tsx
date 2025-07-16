@@ -318,8 +318,12 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
                     <div className="grid grid-cols-3 gap-4 ">
                       {(expandedLists.has(list.listName) ? list.products : list.products.slice(0, 3)).map((product) => (
                         <div key={product.productId} className="flex flex-col items-center">
-                          {/* Product Icon with soft background */}
-                          <div className=" cursor-pointer" >
+                          {/* Product Icon with soft back ground */}
+                          <div className=" cursor-pointer"  onClick={() => {
+                            if (product.slug && product.isActive==='active') {
+                              navigate(`/product-detail/${product.slug}`);
+                            } 
+                          }}>
                             <div className={`w-14 h-14 rounded-md  flex items-center justify-center  border border-white`} style={{ backgroundColor: product.brandColors }}>
                               <img src={product.logoUrl} alt={product.name} className="w-10 h-10 sm:w-12 sm:h-12 object-contain rounded-md" />
                             </div>

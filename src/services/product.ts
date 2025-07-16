@@ -35,7 +35,7 @@ export interface Product {
     currency: string;
     features: string[];
   }[];
-  
+  website?: string;
 
 }
 

@@ -50,10 +50,10 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
     }
   };
   const handleCommentClick = () => {
-      if (!isLoggedIn) {
-        openAuthModal();
-        return;
-      }
+      // if (!isLoggedIn) {
+      //   openAuthModal();
+      //   return;
+      // }
       navigate(`/product-detail/${productSlug}/reviews`, {
         state: {
           reviewId: review.id,

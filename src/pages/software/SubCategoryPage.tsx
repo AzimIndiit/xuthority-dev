@@ -176,6 +176,13 @@ const SubCategoryPage = () => {
     apiPayload
   );
 
+  // Validate category parameter and redirect if invalid
+  React.useEffect(() => {
+    if (category && !['software', 'solutions'].includes(category.toLowerCase())) {
+      navigate('/', { replace: true });
+    }
+  }, [category, navigate]);
+
   // Reset filter loading state when products finish loading
   React.useEffect(() => {
     if (!isLoading && isApplyingFilters) {

@@ -81,6 +81,8 @@ const SelectSoftware = ({
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query);
   }, []);
+  console.log('isLoading', isLoading)
+  console.log('isFetching', isFetching)
 
   return (
     <div className="space-y-8">
@@ -134,7 +136,7 @@ const SelectSoftware = ({
           <p className="text-sm text-gray-400 mt-2">Try searching with different keywords</p>
         </div>
       )}
-      {(!isLoading || !isFetching) && products.length > 0 && (
+      {!(isLoading || isFetching) && products.length > 0 && (
         <RadioGroup
           value={localSelectedSoftware?.id || ""}
           onValueChange={(value) => {

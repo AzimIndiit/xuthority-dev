@@ -24,6 +24,7 @@ export interface GetDisputesParams {
   status?: 'active' | 'resolved';
   sortBy?: 'createdAt' | 'updatedAt' | 'status';
   sortOrder?: 'asc' | 'desc';
+  productSlug?: string;
 }
 
 export interface DisputeReview {

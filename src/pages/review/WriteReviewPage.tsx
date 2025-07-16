@@ -115,9 +115,44 @@ const WriteReviewPage = () => {
   const [showStepper, setShowStepper] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = useCurrentStep();
-  const { setCurrentStep, setVerificationData ,selectedSoftware} = useReviewStore();
+  const { setCurrentStep, setVerificationData, selectedSoftware, resetReview, setSelectedSoftware } = useReviewStore();
   const toast = useToast();
-  const { hasReviewed, review, isLoading } = useUserHasReviewed(selectedSoftware?.id); 
+  const { hasReviewed, review, isLoading } = useUserHasReviewed(selectedSoftware?.id);
+
+  // Clear review data when user selects a different software (but preserve the software selection)
+  useEffect(() => {
+    // Keep track of the last software ID we processed
+    const lastSoftwareId = sessionStorage.getItem('lastReviewSoftwareId');
+    const currentSoftwareId = selectedSoftware?.id;
+
+    if (currentSoftwareId && lastSoftwareId && lastSoftwareId !== currentSoftwareId) {
+      // Different software selected - clear only the review data, keep the software
+      resetReview();
+      // Re-set the software since resetReview clears everything
+      if (selectedSoftware) {
+        setTimeout(() => {
+          // Use a small timeout to ensure the reset completed first
+          setSelectedSoftware(selectedSoftware);
+          setCurrentStep(currentStep || 2);
+        }, 0);
+      }
+    }
+
+    // Update the stored software ID
+    if (currentSoftwareId) {
+      sessionStorage.setItem('lastReviewSoftwareId', currentSoftwareId);
+         }
+   }, [selectedSoftware?.id, resetReview, setSelectedSoftware, setCurrentStep, currentStep]);
+
+   // Cleanup when user leaves the site entirely
+   useEffect(() => {
+     const handleBeforeUnload = () => {
+       sessionStorage.removeItem('lastReviewSoftwareId');
+     };
+
+     window.addEventListener('beforeunload', handleBeforeUnload);
+     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+   }, []); 
 
   // Handle existing review redirect to edit mode
   useEffect(() => {
@@ -133,13 +168,15 @@ const WriteReviewPage = () => {
     }
   }, [currentStep, selectedSoftware]);
 
-  // Scroll to top when reaching step 4 (ReviewComplete)
+  // Scroll to top when reaching step 4 (ReviewComplete) and cleanup sessionStorage
   useEffect(() => {
     if (currentStep === 4) {
       window.scrollTo({
         top: 0,
         behavior: 'smooth'
       });
+      // Clear the session storage since review is completed
+      sessionStorage.removeItem('lastReviewSoftwareId');
     }
   }, [currentStep]);
 

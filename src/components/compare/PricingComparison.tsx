@@ -287,7 +287,7 @@ export default function PricingComparison({ products, className }: PricingCompar
                           {pricingData.planName}
                         </div>
                         <div className="text-sm text-gray-600">
-                          For {pricingData.seats}
+                          For {pricingData.seats} Seats
                         </div>
                         <div className="text-lg font-bold text-blue-600">
                           {formatCurrency(Number(pricingData.price) || 0)}

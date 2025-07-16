@@ -14,7 +14,7 @@ import { useToast } from './useToast';
         toast.otp.success('OTP sent successfully! Please check your email.');
       },
       onError: (error: any) => {
-        const message = error?.response?.data?.message || 'Failed to create OTP. Please try again.';
+        const message = error?.response?.data?.errors?.message || 'Failed to create OTP. Please try again.';
         toast.otp.error(message);
       },
     });

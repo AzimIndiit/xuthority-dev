@@ -247,8 +247,8 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
                   key={follower._id}
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"
                 >
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="w-12 h-12 cursor-pointer" onClick={() => navigate(`/public-profile/${follower.slug}`)}>
+                  <div className="flex items-center space-x-4" onClick={() => navigate(`/public-profile/${follower.slug}`)}>
+                    <Avatar className="w-12 h-12 cursor-pointer">
                       <AvatarImage className='object-cover' src={follower.avatar || ''} alt={follower.name} />
                       <AvatarFallback className="text-sm">
                         {getUserInitials(follower)}
@@ -315,8 +315,8 @@ const followersDataArray = Array.isArray(followersData) ? followersData : follow
                   key={following._id}
                   className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200"
                 >
-                  <div className="flex items-center space-x-4">
-                    <Avatar className="w-12 h-12 cursor-pointer" onClick={() => navigate(`/public-profile/${following.slug}`)}>
+                  <div className="flex items-center space-x-4" onClick={() => navigate(`/public-profile/${following.slug}`)}>
+                    <Avatar className="w-12 h-12 cursor-pointer" >
                       <AvatarImage className='object-cover' src={following.avatar || ''} alt={following.name} />
                       <AvatarFallback className="text-sm">
                         {getUserInitials(following)}

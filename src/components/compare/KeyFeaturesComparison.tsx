@@ -43,36 +43,67 @@ export default function KeyFeaturesComparison({ products, className }: KeyFeatur
               <td className="p-3 sm:p-4 font-medium text-gray-700 align-top w-1/4">
                 Features
               </td>
-              {visibleProducts.map((product) => (
-                <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4">
-                  {product.features && product.features.length > 0 ? (
-                    <ul className="space-y-2">
-                      {product.features.map((category, catIdx) => (
-                        <li key={catIdx}>
-                          <div className="font-semibold text-gray-900 mb-1 text-sm">
-                            {category.title}
-                          </div>
-                          <ul className="ml-3 list-disc space-y-1">
-                            {category.description.map((feature, featureIdx) => (
-                              <li
-                                key={featureIdx}
-                                className="text-gray-700 text-sm"
-                                style={{ listStyleType: "disc" }}
-                              >
-                                {feature.value}
-                              </li>
-                            ))}
-                          </ul>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <span className="text-gray-400 italic text-sm">
-                      No features available
-                    </span>
-                  )}
-                </td>
-              ))}
+              {visibleProducts.map((product,index) => {
+                console.log('product features', product.features, 'type:', typeof product.features, 'length:', product.features?.length, 'index:', index)
+                
+                // Check if features exist and have valid data
+                const hasValidFeatures = product.features && 
+                  Array.isArray(product.features) && 
+                  product.features.length > 0 &&
+                  product.features.some(category => 
+                    category?.title && 
+                    category?.description && 
+                    Array.isArray(category.description) && 
+                    category.description.length > 0
+                  );
+
+                return (
+                  <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4">
+                    {hasValidFeatures ? (
+                      <ul className="space-y-2">
+                        {product.features.map((category, catIdx) => {
+                          // Skip categories without valid data
+                          if (!category?.title || !category?.description || !Array.isArray(category.description) || category.description.length === 0) {
+                            return null;
+                          }
+                          
+                          return (
+                            <li key={catIdx}>
+                              <div className="font-semibold text-gray-900 mb-1 text-sm">
+                                {category.title}
+                              </div>
+                              <ul className="ml-3 list-disc space-y-1">
+                                {category.description.map((feature, featureIdx) => {
+                                  // Skip features without value
+                                  if (!feature?.value) {
+                                    return null;
+                                  }
+                                  
+                                  return (
+                                    <li
+                                      key={featureIdx}
+                                      className="text-gray-700 text-sm"
+                                      style={{ listStyleType: "disc" }}
+                                    >
+                                      {feature.value}
+                                    </li>
+                                  );
+                                })}
+                              </ul>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <div className="flex items-center justify-center ">
+                        <span className="text-gray-300  italic text-sm font-medium">
+                          No features available
+                        </span>
+                      </div>
+                    )}
+                  </td>
+                )
+              })}
               {/* Empty columns for up to 2 products */}
               {visibleProducts.length < 3 &&
                 [...Array(3 - visibleProducts.length)].map((_, idx) => (

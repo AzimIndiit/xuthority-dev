@@ -136,6 +136,7 @@ export function useAddProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['myProducts'] });
       toast.success("Product added successfully!");
     },
     onError: (error: any) => {
@@ -215,7 +216,7 @@ export function useUpdateProduct() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
-      queryClient.invalidateQueries({ queryKey: ['my-products'] });
+      queryClient.invalidateQueries({ queryKey: ['myProducts'] });
       toast.success("Product updated successfully!");
     },
     onError: (error: any) => {

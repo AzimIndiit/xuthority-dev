@@ -334,7 +334,7 @@ const ReviewCommentsPage: React.FC = () => {
   const { voteHelpful, removeVote, isVoting, isRemoving, hasVoted } = useReplyHelpfulVote();
 
   // Use review from state if available, otherwise from API
-  const review = reviewFromState || (reviewResponse?.data ? transformBackendReview(reviewResponse.data as any) : null);
+  const review = {...reviewFromState, ...reviewResponse?.data}
   
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -493,7 +493,7 @@ const ReviewCommentsPage: React.FC = () => {
 
   const isLoadingInitial = repliesLoading && page === 1 && allReplies.length === 0;
   const isLoadingMore = repliesLoading && page > 1;
-console.log(allReplies,'allReplies');
+console.log(review,'allReplies');
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">

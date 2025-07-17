@@ -369,6 +369,7 @@ const SubCategoryPage = () => {
                     marketSegmentAll={product.marketSegment}
                     whoCanUseAll={product.whoCanUse}
                     showCompare={true}
+                    hasUserReviewed={product.hasUserReviewed}
                   />
                 </div>
               ))}

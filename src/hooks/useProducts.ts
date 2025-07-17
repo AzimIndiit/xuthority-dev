@@ -3,17 +3,31 @@ import FileUploadService from '@/services/fileUpload';
 import { addProduct, deleteProduct, getMyProducts, fetchProductById, fetchProducts, fetchProductsByCategory, fetchProductBySlug, updateProduct, getUserProductsById, FilterOptions, Product } from '@/services/product';
 import { queryClient } from '@/lib/queryClient';
 import useToast from './useToast';
+import { useAuth } from './useAuth';
 
 export const queryKeys = {
   products: ['products'] as const,
+  product: (identifier: string, userState?: string) => ['product', identifier, userState] as const,
+};
+
+// Utility function to invalidate product queries when auth state changes
+export const useInvalidateProductQueries = () => {
+  const queryClient = useQueryClient();
+  
+  const invalidateProductQueries = () => {
+    queryClient.invalidateQueries({ queryKey: ['product'] });
+  };
+  
+  return { invalidateProductQueries };
 };
 
 export function useProducts(page: number, limit: number) {
-      return useQuery({
-      queryKey: ['products', page, limit],
-      queryFn: () => fetchProducts(page, limit),
-
-    });
+  const { isLoggedIn, user } = useAuth();
+  
+  return useQuery({
+    queryKey: ['products', page, limit, isLoggedIn ? user?.id : 'anonymous'],
+    queryFn: () => fetchProducts(page, limit),
+  });
 }
 
 export interface PaginatedProducts {
@@ -36,6 +50,8 @@ export function useProductsByCategory(
   limit: number,
   filters?: FilterOptions
 ) {
+  const { isLoggedIn, user } = useAuth();
+  
   // Ensure stable parameters to prevent hook order changes
   const stableCategory = category || '';
   const stableSubCategory = subCategory || '';
@@ -56,7 +72,8 @@ export function useProductsByCategory(
     filters?.categories?.join(','),
     filters?.industries?.join(','),
     filters?.price?.join(','),
-    filters?.sortBy
+    filters?.sortBy,
+    isLoggedIn ? user?.id : 'anonymous'
   ];
 
   return useQuery({
@@ -147,11 +164,13 @@ export function useAddProduct() {
 }
 
 export function useFetchProductById(id: string) {
-      return useQuery({
-      queryKey: ['product', id],
-      queryFn: () => fetchProductById(id),
-      enabled: !!id,
-    });
+  const { isLoggedIn, user } = useAuth();
+  
+  return useQuery({
+    queryKey: queryKeys.product(id, isLoggedIn ? user?.id : 'anonymous'),
+    queryFn: () => fetchProductById(id),
+    enabled: !!id,
+  });
 }
 
 // export function useUpdateProduct() {
@@ -226,11 +245,13 @@ export function useUpdateProduct() {
   });
 }
 export function useProductBySlug(slug: string) {
-      return useQuery({
-      queryKey: ['product', slug],
-      queryFn: () => fetchProductBySlug(slug),
-      staleTime: 1000 * 60 * 5,
-      gcTime: 1000 * 60 * 5,
+  const { isLoggedIn, user } = useAuth();
+  
+  return useQuery({
+    queryKey: queryKeys.product(slug, isLoggedIn ? user?.id : 'anonymous'),
+    queryFn: () => fetchProductBySlug(slug),
+    staleTime: 1000 * 60 * 5,
+    gcTime: 1000 * 60 * 5,
     enabled: !!slug,
   });
 }

@@ -149,7 +149,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
           <div>
             <p className="font-semibold text-gray-900 text-[13px] leading-tight">{getUserDisplayName(review as any)}</p>
             <p className="text-xs text-gray-600 leading-tight">
-              {review.userTitle?.split(' ').slice(0, 2).join(' ') || 'Verified User'}
+              {review.userTitle?.split(' ').slice(0, 2).join(' ') || ''}
               {review.companyName && (
                 <>
                   , <span className="font-normal">{review.companyName}</span>

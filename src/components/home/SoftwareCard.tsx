@@ -14,9 +14,10 @@ interface SoftwareCardProps {
   reviewCount: number;
   slug?: string;
   logoBackground?: string;
+  hasUserReviewed?: boolean;
 }
 
-export default function SoftwareCard({id, name, logo, rating, reviewCount, logoBackground = "bg-white",slug }: SoftwareCardProps) {
+export default function SoftwareCard({id, name, logo, rating, reviewCount, logoBackground = "bg-white",slug, hasUserReviewed }: SoftwareCardProps) {
   const { isLoggedIn ,user  } = useUserStore();
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const { setSelectedSoftware, setCurrentStep } = useReviewStore();
@@ -68,7 +69,7 @@ export default function SoftwareCard({id, name, logo, rating, reviewCount, logoB
             variant="default" 
             className="w-full max-w-[180px]  bg-red-600 hover:bg-red-700 text-white font-semibold rounded-none py-2 shadow-none "
           >
-            Write A Review
+            {hasUserReviewed ? 'Edit Review' : 'Write A Review'}
           </Button>
         </div>}
       </Card>

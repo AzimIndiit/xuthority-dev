@@ -282,6 +282,7 @@ export default function SoftwareGrid() {
                     rating={product.avgRating || 0}
                     reviewCount={product.totalReviews || 0}
                     logoBackground={product.brandColors || "bg-white"}
+                    hasUserReviewed={product.hasUserReviewed}
                   />
                 ))}
               </div>

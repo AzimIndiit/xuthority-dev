@@ -128,7 +128,7 @@ export function transformBackendReview(backendReview: BackendReview): Review {
         firstName: firstName,
         lastName: lastName,
         avatar: reviewer.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reviewerName)}&background=f3f4f6&color=374151`,
-        title: reviewer.title || 'Verified User',
+        title: reviewer.title || '',
         isVerified: Boolean(reviewer.isVerified),
         companyName: reviewer.companyName || '',
         companySize: reviewer.companySize || '',

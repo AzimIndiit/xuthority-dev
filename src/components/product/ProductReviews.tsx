@@ -326,7 +326,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
             </div>
           </div>
        { (!isLoggedIn ||  user?.role !== 'vendor') &&   <Button onClick={onWriteReview} className="bg-red-600 text-white hover:bg-red-700 mt-4 md:mt-0 px-8 py-4 text-lg rounded-none">
-            Write A Review
+          {product.hasUserReviewed ? 'Edit Review' : 'Write A Review'}
           </Button>}
         </div>
 

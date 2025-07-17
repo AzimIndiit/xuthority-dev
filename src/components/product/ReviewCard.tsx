@@ -9,7 +9,7 @@ import { useHelpfulVote } from '@/hooks/useReview';
 import useUserStore from '@/store/useUserStore';
 import useUIStore from '@/store/useUIStore';
 import { cn } from '@/lib/utils';
-import { getUserDisplayName } from '@/utils/userHelpers';
+import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import DisputeModal from './DisputeModal';
 import { highlightText } from '@/utils/textHighlight';
@@ -217,7 +217,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
               navigate(`/profile`)
             }}}>
               <AvatarImage src={review.reviewer.avatar} alt={getUserDisplayName(review.reviewer as any)} />
-              <AvatarFallback>{getUserDisplayName(review.reviewer as any)}</AvatarFallback>
+              <AvatarFallback>{getUserInitials(review.reviewer as any)}</AvatarFallback>
             </Avatar>
             {review.reviewer.isVerified && (
               <VerifiedBadge className="absolute bottom-0 -right-2 w-5 h-5 text-blue-600" />

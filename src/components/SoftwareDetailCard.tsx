@@ -48,7 +48,8 @@ interface SoftwareDetailCardProps {
   marketSegmentAll?: any[];
   whoCanUseAll?: any[];
   showCompare?: boolean;
-}
+  hasUserReviewed?: boolean;
+  }
 
 function renderStars(rating: number) {
   const fullStars = Math.floor(rating);
@@ -95,6 +96,7 @@ export default function SoftwareDetailCard({
   industriesAll,
   marketSegmentAll,
   showCompare = false,
+  hasUserReviewed = false,
 }: SoftwareDetailCardProps) {
   const {user, isLoggedIn} = useUserStore();
   const {openAuthModal} = useUIStore();
@@ -238,10 +240,10 @@ const deleteMutation = useDeleteProduct();
             </div>
           </div>
         {(!isLoggedIn ||  user?.role !== 'vendor') ?  <Button
-            className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-none px-4 py-2 text-xs sm:text-sm shadow"
+            className="bg-red-500 hover:bg-red-600 text-white font-semibold rounded-none px-4 py-2 text-xs sm:text-sm shadow min-w-[134px]"
             onClick={onWriteReview}
           >
-            Write A Review
+            {hasUserReviewed ? 'Edit Review' : 'Write A Review'}
           </Button> :
            location.pathname === '/profile/products' && 
 

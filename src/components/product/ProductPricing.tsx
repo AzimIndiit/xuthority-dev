@@ -88,7 +88,13 @@ const ProductPricing = ({pricing, product}: {pricing: any, product: any}) => {
            {product?.name} Pricing
           </h2>
        
-        <div className="flex items-stretch gap-x-4 sm:gap-x-8 overflow-x-auto py-4 custom-scrollbar">
+        <div 
+          className="flex items-stretch gap-x-4 sm:gap-x-8 overflow-x-auto py-4 custom-scrollbar"
+          style={{
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#cbd5e1 #f1f5f9'
+          }}
+        >
             {pricing?.map((plan: any) => (
             <div key={plan.planName} className="w-80 sm:w-96 flex-shrink-0">
               <PricingCard {...plan} icon={<img src="/svg/pricing.svg" alt="pricing" className="w-10 h-10" />} />

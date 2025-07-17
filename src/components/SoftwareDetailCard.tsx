@@ -271,7 +271,7 @@ const deleteMutation = useDeleteProduct();
           <div className="font-semibold text-gray-900 text-sm sm:text-base ">
             Product Description
           </div>
-          <div className="text-gray-700 text-xs sm:text-sm mt-1 line-clamp-4">
+          <div className="text-gray-700 text-xs sm:text-sm mt-1 line-clamp-4 min-h-[100px]">
             {description}{" "}
            
           </div>
@@ -287,16 +287,16 @@ const deleteMutation = useDeleteProduct();
               <span className="font-medium text-gray-900 text-xs sm:text-sm">
                 Users
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1">
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1  max-w-[80%]">
                 ({users})
               </span>
             </div>
             <div className="flex items-center gap-2 py-2">
               <Building2 className="w-5 h-5 text-gray-500" />
-              <span className="font-medium text-gray-900 text-xs sm:text-sm">
+              <span className="font-medium text-gray-900 text-xs sm:text-sm ">
                 Industries
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1">
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1  max-w-[80%]">
                 ({industries})
               </span>
             </div>
@@ -305,7 +305,7 @@ const deleteMutation = useDeleteProduct();
               <span className="font-medium text-gray-900 text-xs sm:text-sm">
                 Market Segment
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1">
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1  max-w-[80%]">
                 ({marketSegment})
               </span>
             </div>

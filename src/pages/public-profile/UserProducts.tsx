@@ -81,7 +81,7 @@ const UserProducts = ({publicProfile}) => {
     const { isLoggedIn, user } = useUserStore();
     const navigate = useNavigate();
     const { openAuthModal } = useUIStore();
-    const { setSelectedSoftware } = useReviewStore();
+    const { setSelectedSoftware, setCurrentStep } = useReviewStore();
     const [currentPage, setCurrentPage] = React.useState(1);
     const itemsPerPage = 6;
 
@@ -161,9 +161,11 @@ const UserProducts = ({publicProfile}) => {
                                         }
                                         setSelectedSoftware({id:product._id,name:product.name,logoUrl:product.logoUrl   });
                                         navigate('/write-review');
+                                        setCurrentStep(2);
                                     }}
                                     onSave={handleSave}
                                     onTry={handleTry}
+                                    hasUserReviewed={product.hasUserReviewed}
                                 />
                             ))}
                         </div>

@@ -120,12 +120,16 @@ export default function FilterDropdown({ filters, onFilterChange, onApply, onCle
             <h4 className="font-bold text-base sm:text-lg mb-2">Segments</h4>
             <div className="grid grid-cols-2 gap-2">
               {marketSegmentOptions.map(({ value, label }: any) => (
-                <label key={value} className="flex items-center gap-2 cursor-pointer">
+                <label 
+                  key={value} 
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() => handleSegmentChange(value)}
+                >
+                  <input type="radio" name="segment" checked={filters.segment === value} onChange={() => handleSegmentChange(value)} className="hidden" />
                   <span className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${filters.segment === value ? 'border-red-500' : 'border-gray-300'}`}>
                     {filters.segment === value && <span className="w-2.5 h-2.5 rounded-full bg-red-500" />}
                   </span>
                   <span className="text-gray-800">{label}</span>
-                  <input type="radio" name="segment" checked={filters.segment === value} onChange={() => handleSegmentChange(value)} className="hidden" />
                 </label>
               ))}
             </div>

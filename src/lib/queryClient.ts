@@ -14,8 +14,10 @@ export const queryClient = new QueryClient({
     mutations: {
       // Add global mutation timeout
       retry: (failureCount, error: any) => {
-        // Don't retry auth errors, timeout errors, or validation errors
-        if (error?.response?.status === 401 || 
+        // Don't retry 4xx client errors (including 400, 401, 403, 404, etc.)
+        // These are client errors that won't succeed on retry
+        const status = error?.response?.status;
+        if ((status >= 400 && status < 500) || 
             error?.message?.includes('timeout') || 
             error?.message?.includes('validation')) {
           return false;

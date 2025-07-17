@@ -364,7 +364,7 @@ const MySubscriptionPage: React.FC = () => {
 
               {/* Action Button */}
               <div className="space-y-3">
-                <Button
+                {!plan.isFree && <Button
                   onClick={() => handlePlanAction(plan.id)}
                   disabled={createCheckoutSession.isPending || (isActivePlan && !currentSubscription?.isCanceled)}
                   className={`w-full rounded-full text-white ${
@@ -384,7 +384,7 @@ const MySubscriptionPage: React.FC = () => {
                     ? 'Processing...' 
                     : plan.buttonText
                   }
-                </Button>
+                </Button>}
                 
                 {isActivePlan && currentSubscription && (
                   <div className="text-center space-y-1">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useNotificationSettings, NotificationPreferences } from '@/hooks/useNotificationSettings';
+import useUserStore from '@/store/useUserStore';
 
 interface NotificationSettingsProps {
   className?: string;
@@ -17,22 +18,12 @@ interface NotificationSettingsProps {
 export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
   className,
 }) => {
-  const { preferences, isLoading, error, savePreferences } = useNotificationSettings();
-  const [localPreferences, setLocalPreferences] = useState<NotificationPreferences>(preferences);
-
-  // Update local preferences when the hook preferences change
-  useEffect(() => {
-    setLocalPreferences(preferences);
-  }, [preferences]);
+  const {user} = useUserStore();
+  const { preferences, isLoading, error, updatePreference } = useNotificationSettings();
 
   const handlePreferenceChange = (type: keyof NotificationPreferences, value: boolean) => {
-    const newPreferences = {
-      ...localPreferences,
-      [type]: value,
-    };
-    setLocalPreferences(newPreferences);
-    // Save immediately when changed
-    savePreferences(newPreferences);
+    // Use the hook's updatePreference for immediate, synchronous updates
+    updatePreference(type, value);
   };
 
   return (
@@ -55,7 +46,7 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
           <div className="flex items-center justify-between">
             <div className="font-medium text-gray-900">Reviews Notifications</div>
             <Switch
-              checked={localPreferences.reviews}
+              checked={preferences.reviews}
               onCheckedChange={(checked) => handlePreferenceChange('reviews', checked)}
             />
           </div>
@@ -63,23 +54,23 @@ export const NotificationSettings: React.FC<NotificationSettingsProps> = ({
           <div className="flex items-center justify-between">
             <div className="font-medium text-gray-900">Comments Notifications</div>
             <Switch
-              checked={localPreferences.comments}
+              checked={preferences.comments}
               onCheckedChange={(checked) => handlePreferenceChange('comments', checked)}
             />
           </div>
-
+{user?.role === 'vendor' &&
           <div className="flex items-center justify-between">
             <div className="font-medium text-gray-900">Badges Notifications</div>
             <Switch
-              checked={localPreferences.badges}
+              checked={preferences.badges}
               onCheckedChange={(checked) => handlePreferenceChange('badges', checked)}
             />
-          </div>
+          </div>}
 
           <div className="flex items-center justify-between">
             <div className="font-medium text-gray-900">Followers Notifications</div>
             <Switch
-              checked={localPreferences.followers}
+              checked={preferences.followers}
               onCheckedChange={(checked) => handlePreferenceChange('followers', checked)}
             />
           </div>

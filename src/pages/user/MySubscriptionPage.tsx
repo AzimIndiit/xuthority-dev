@@ -109,6 +109,7 @@ const MySubscriptionPageSkeleton = () => {
 const MySubscriptionPage: React.FC = () => {
   const navigate = useNavigate();
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showReactivateModal, setShowReactivateModal] = useState(false);
   
   // API hooks
   const { data: subscriptionPlans, isLoading: plansLoading ,error: plansError} = useSubscriptionPlans();
@@ -184,13 +185,8 @@ const MySubscriptionPage: React.FC = () => {
 
     // Check if this is a reactivation of a cancelled subscription
     if (activePlan?.id === plan.id && currentSubscription?.isCanceled) {
-      try {
-        await resumeSubscription.mutateAsync();
-        return;
-      } catch (error) {
-        console.error('Error reactivating subscription:', error);
-        return;
-      }
+      setShowReactivateModal(true);
+      return;
     }
 
     // For free plans, handle locally or redirect to signup
@@ -216,6 +212,15 @@ const MySubscriptionPage: React.FC = () => {
       setShowCancelModal(false);
     } catch (error) {
       console.error('Error cancelling subscription:', error);
+    }
+  };
+
+  const handleReactivateSubscription = async () => {
+    try {
+      await resumeSubscription.mutateAsync();
+      setShowReactivateModal(false);
+    } catch (error) {
+      console.error('Error reactivating subscription:', error);
     }
   };
 
@@ -473,12 +478,11 @@ const MySubscriptionPage: React.FC = () => {
             
             {currentSubscription?.isCanceled && (
               <Button
-                onClick={() => resumeSubscription.mutateAsync()}
-                disabled={resumeSubscription.isPending}
+                onClick={() => setShowReactivateModal(true)}
                 variant="outline"
                 className="text-green-600 border-green-600 hover:bg-green-50 rounded-full"
               >
-                {resumeSubscription.isPending ? 'Reactivating...' : 'Reactivate Subscription'}
+                Reactivate Subscription
               </Button>
             )}
           </div>
@@ -496,6 +500,19 @@ const MySubscriptionPage: React.FC = () => {
         cancelText="Keep Subscription"
         confirmVariant="destructive"
         isLoading={cancelSubscription.isPending}
+      />
+
+      {/* Reactivate Subscription Modal */}
+      <ConfirmationModal
+        isOpen={showReactivateModal}
+        onOpenChange={setShowReactivateModal}
+        onConfirm={handleReactivateSubscription}
+        title="Reactivate Subscription"
+        description="Are you sure you want to reactivate your subscription? You'll regain access to all premium features and billing will resume."
+        confirmText="Yes, Reactivate"
+        cancelText="Keep Cancelled"
+        confirmVariant="default"
+        isLoading={resumeSubscription.isPending}
       />
     </div>
   );

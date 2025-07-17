@@ -252,41 +252,35 @@
   --radix-dialog-content-transform: none !important;
 }
 
-/* Custom Scrollbar Styles */
+/* Custom Scrollbar Styles - Minimal Design */
 .custom-scrollbar {
-  /* For WebKit browsers (Chrome, Safari, Edge) */
+  /* For Firefox browsers */
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db #f3f4f6;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
+  height: 4px;
+  width: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #f3f4f6;
-  border-radius: 10px;
+  background: transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #d1d5db;
-  border-radius: 10px;
-  transition: background-color 0.2s ease;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  transition: all 0.2s ease;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: rgba(0, 0, 0, 0.4);
 }
 
 /* For horizontal scrolling */
 .custom-scrollbar::-webkit-scrollbar:horizontal {
-  height: 8px;
-}
-
-/* Hide scrollbar for Firefox when not needed */
-.custom-scrollbar {
-  scrollbar-gutter: stable;
+  height: 4px;
 }
 
 /* Smooth scrolling behavior */

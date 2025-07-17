@@ -75,7 +75,7 @@ export const useAddToFavorites = () => {
     mutationFn: ({ productId, listName }: { productId: string; listName?: string }) =>
       FavoriteService.addToFavorites(productId, listName),
     onSuccess: (data, variables) => {
-      // toast.success('Product added to favorites!');
+      toast.success('Product added to favorites!');
       
       // Invalidate related queries
       queryClient.invalidateQueries({ queryKey: favoriteQueryKeys.lists() });

@@ -5,26 +5,21 @@
  * @returns Formatted date string
  */
 export function formatDate(
-  date: string | Date,
-  options?: Intl.DateTimeFormatOptions
+  date: string | Date
 ): string {
   try {
     const dateObj = typeof date === 'string' ? new Date(date) : date;
-    
+
     // Check if date is valid
     if (isNaN(dateObj.getTime())) {
       return 'Invalid date';
     }
 
-    // Default options if not provided
-    const defaultOptions: Intl.DateTimeFormatOptions = {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      ...options
-    };
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = String(dateObj.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+    const year = dateObj.getFullYear();
 
-    return dateObj.toLocaleDateString('en-US', defaultOptions);
+    return `${day}/${month}/${year}`;
   } catch (error) {
     console.error('Error formatting date:', error);
     return 'Invalid date';

@@ -6,7 +6,8 @@ import { FileUploadService } from '../services/fileUpload';
 
 import { queryClient } from '@/lib/queryClient';
 import useToast from './useToast';
-
+import { withMutationTimeout, getDefaultMutationRetry } from '@/utils/mutationTimeout';
+import { withMutationMonitoring } from '@/utils/mutationMonitor';
 
 
 // Query keys
@@ -183,39 +184,50 @@ export const useLogin = () => {
   const { loginWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
-    mutationFn: async (credentials: LoginRequest) => {
-      const success = await loginWithAPI(credentials);
-      if (success) {
-        // Clear auth-related queries more gracefully
-        setTimeout(() => {
-          queryClient.removeQueries({ queryKey: ['user'] });
-          queryClient.removeQueries({ queryKey: ['profile'] });
-          queryClient.removeQueries({ queryKey: ['publicProfile'] });
-          queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
-          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
-        }, 100);
-
-        // Wait a bit to ensure token is properly set in headers
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        // Fetch fresh profile data after successful login
-        await getProfileWithAPI();
+    mutationFn: withMutationMonitoring(
+      async (credentials: LoginRequest) => {
+        const success = await withMutationTimeout(
+          loginWithAPI(credentials),
+          45000,
+          'Login request timed out'
+        );
         
-        // Set fresh query data with updated profile
-        const user = useUserStore.getState().user;
-        if (user) {
-          queryClient.setQueryData(queryKeys.user, user);
-          queryClient.setQueryData(queryKeys.profile, user);
+        if (success) {
+          // Clear auth-related queries more gracefully
+          setTimeout(() => {
+            queryClient.removeQueries({ queryKey: ['user'] });
+            queryClient.removeQueries({ queryKey: ['profile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+          }, 100);
+
+          // Wait a bit to ensure token is properly set in headers
+          await new Promise(resolve => setTimeout(resolve, 200));
+
+          // Fetch fresh profile data after successful login
+          await getProfileWithAPI();
+          
+          // Set fresh query data with updated profile
+          const user = useUserStore.getState().user;
+          if (user) {
+            queryClient.setQueryData(queryKeys.user, user);
+            queryClient.setQueryData(queryKeys.profile, user);
+          }
+           
+          return success;
+        } else {
+          // The error is already handled in the store with toast, just throw to mark as failed
+          throw new Error('Login failed');
         }
-         
-        return success;
-      } else {
-        // Throw error if login failed so React Query treats it as failure
-        throw new Error('Login failed');
-      }
-    },
+      },
+      'user-login',
+      50000 // 50 second timeout for monitoring
+    ),
+    retry: getDefaultMutationRetry(),
     onError: (error: any) => {
       console.error('Login error:', error);
+      // Don't show additional toast here as the store already handles it
     },
   });
 };
@@ -226,41 +238,52 @@ export const useRegisterUser = () => {
   const { registerUserWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
-    mutationFn: async (data: UserRegisterRequest) => {
-      const success = await registerUserWithAPI(data);
-      if (success) {
-        // Clear auth-related queries more gracefully
-        setTimeout(() => {
-          queryClient.removeQueries({ queryKey: ['user'] });
-          queryClient.removeQueries({ queryKey: ['profile'] });
-          queryClient.removeQueries({ queryKey: ['publicProfile'] });
-          queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
-          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
-        }, 100);
+    mutationFn: withMutationMonitoring(
+      async (data: UserRegisterRequest) => {
+        const success = await withMutationTimeout(
+          registerUserWithAPI(data),
+          45000,
+          'Registration request timed out'
+        );
         
-        // Wait a bit to ensure token is properly set in headers
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Fetch fresh profile data after successful registration
-        await getProfileWithAPI();
-        
-        // Set fresh query data with updated profile
-        const user = useUserStore.getState().user;
-        if (user) {
-          queryClient.setQueryData(queryKeys.user, user);
-          queryClient.setQueryData(queryKeys.profile, user);
+        if (success) {
+          // Clear auth-related queries more gracefully
+          setTimeout(() => {
+            queryClient.removeQueries({ queryKey: ['user'] });
+            queryClient.removeQueries({ queryKey: ['profile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+          }, 100);
+          
+          // Wait a bit to ensure token is properly set in headers
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          // Fetch fresh profile data after successful registration
+          await getProfileWithAPI();
+          
+          // Set fresh query data with updated profile
+          const user = useUserStore.getState().user;
+          if (user) {
+            queryClient.setQueryData(queryKeys.user, user);
+            queryClient.setQueryData(queryKeys.profile, user);
+          }
+          
+          // Navigate to dashboard or home
+          navigate('/');
+          return success;
+        } else {
+          // The error is already handled in the store with toast, just throw to mark as failed
+          throw new Error('Registration failed');
         }
-        
-        // Navigate to dashboard or home
-        navigate('/');
-        return success;
-      } else {
-        // Throw error if registration failed so React Query treats it as failure
-        throw new Error('Registration failed');
-      }
-    },
+      },
+      'user-registration',
+      50000 // 50 second timeout for monitoring
+    ),
+    retry: getDefaultMutationRetry(),
     onError: (err: any) => {
       console.error('Registration error:', err);
+      // Don't show additional toast here as the store already handles it
     },
   });
 };
@@ -271,41 +294,52 @@ export const useRegisterVendor = () => {
   const { registerVendorWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
-    mutationFn: async (data: VendorRegisterRequest) => {
-      const success = await registerVendorWithAPI(data);
-      if (success) {
-        // Clear auth-related queries more gracefully
-        setTimeout(() => {
-          queryClient.removeQueries({ queryKey: ['user'] });
-          queryClient.removeQueries({ queryKey: ['profile'] });
-          queryClient.removeQueries({ queryKey: ['publicProfile'] });
-          queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
-          localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
-        }, 100);
+    mutationFn: withMutationMonitoring(
+      async (data: VendorRegisterRequest) => {
+        const success = await withMutationTimeout(
+          registerVendorWithAPI(data),
+          45000,
+          'Vendor registration request timed out'
+        );
         
-        // Wait a bit to ensure token is properly set in headers
-        await new Promise(resolve => setTimeout(resolve, 200));
-        
-        // Fetch fresh profile data after successful registration
-        await getProfileWithAPI();
-        
-        // Set fresh query data with updated profile
-        const user = useUserStore.getState().user;
-        if (user) {
-          queryClient.setQueryData(queryKeys.user, user);
-          queryClient.setQueryData(queryKeys.profile, user);
+        if (success) {
+          // Clear auth-related queries more gracefully
+          setTimeout(() => {
+            queryClient.removeQueries({ queryKey: ['user'] });
+            queryClient.removeQueries({ queryKey: ['profile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfile'] });
+            queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+            localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+          }, 100);
+          
+          // Wait a bit to ensure token is properly set in headers
+          await new Promise(resolve => setTimeout(resolve, 200));
+          
+          // Fetch fresh profile data after successful registration
+          await getProfileWithAPI();
+          
+          // Set fresh query data with updated profile
+          const user = useUserStore.getState().user;
+          if (user) {
+            queryClient.setQueryData(queryKeys.user, user);
+            queryClient.setQueryData(queryKeys.profile, user);
+          }
+          
+          // Navigate to dashboard or home
+          navigate('/');
+          return success;
+        } else {
+          // The error is already handled in the store with toast, just throw to mark as failed
+          throw new Error('Vendor registration failed');
         }
-        
-        // Navigate to dashboard or home
-        navigate('/');
-        return success;
-      } else {
-        // Throw error if vendor registration failed so React Query treats it as failure
-        throw new Error('Vendor registration failed');
-      }
-    },
+      },
+      'vendor-registration',
+      50000 // 50 second timeout for monitoring
+    ),
+    retry: getDefaultMutationRetry(),
     onError: (err: any) => {
       console.error('Vendor registration error:', err);
+      // Don't show additional toast here as the store already handles it
     },
   });
 };

@@ -29,6 +29,7 @@ export interface DisputedReview {
   companySize?: string;
   isVerified?: boolean;
   slug?: string;  
+  userTitle?: string;
 }
 
 export interface Dispute {

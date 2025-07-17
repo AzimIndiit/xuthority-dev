@@ -69,7 +69,7 @@ interface ProductReviewsProps {
 
 const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
   const { openAuthModal } = useUIStore();
-  const { setSelectedSoftware } = useReviewStore();
+  const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const { isLoggedIn,user } = useUserStore();
   const navigate = useNavigate();
 
@@ -225,6 +225,7 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
       });
     }
     setSelectedSoftware({id: product._id, name: product.name,logoUrl: product.logoUrl});
+    setCurrentStep(2);
     navigate('/write-review');
     
   };

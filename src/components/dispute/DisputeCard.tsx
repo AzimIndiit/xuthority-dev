@@ -113,6 +113,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
     }, {
       onSuccess: () => {
         refetchDisputes();
+        setEditExplanation(false);
       }
     });
   };
@@ -148,7 +149,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
           <div>
             <p className="font-semibold text-gray-900 text-[13px] leading-tight">{getUserDisplayName(review as any)}</p>
             <p className="text-xs text-gray-600 leading-tight">
-              {review.title.split(' ').slice(0, 2).join(' ')}
+              {review.userTitle?.split(' ').slice(0, 2).join(' ') || 'Verified User'}
               {review.companyName && (
                 <>
                   , <span className="font-normal">{review.companyName}</span>
@@ -167,7 +168,9 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
           <h2 className="text-lg sm:text-xl font-bold text-gray-900">"{review.title}"</h2>
           <div className="flex items-center gap-4 mt-2">
             <StarRating rating={review.rating} />
-            <span className="text-gray-600 text-xs sm:text-sm">{review.date}</span>
+            <span className="text-gray-600 text-xs sm:text-sm">
+              {review.date}
+            </span>
           </div>
           <p 
               ref={contentRef}
@@ -231,7 +234,24 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       {/* Dispute Section */}
       <div className='mt-4'>
         <h3 className="text-lg sm:text-xl font-bold text-gray-900">Dispute</h3>
-  
+        <div className="flex items-center gap-3 my-4  cursor-pointer"  onClick={() => {
+              navigate(`/product-detail/${product.slug}`)
+            }}>
+          <div className="relative w-12 h-12" >
+            <Avatar className="h-12 w-12 ">
+              <AvatarImage src={product.logoUrl} alt={product.name} />
+              <AvatarFallback>{product.name.split(' ').slice(0, 2).join(' ')}</AvatarFallback>
+            </Avatar>
+    
+          </div>
+          <div>
+            <p className="font-semibold text-gray-900 text-[16px] leading-tight capitalize">{product.name}</p>
+            <p className="text-xs text-gray-600 leading-tight">
+              {formatDate(product.createdAt)}
+              
+            </p>
+          </div>
+        </div>
         <div className="mt-2">
           <div className="flex items-center gap-2 justify-between w-full">
         <div className='flex items-center gap-2 '>
@@ -276,24 +296,26 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
             <p className="0">
               {dispute.explanations}
             </p>
-           { review.isOwnReview &&  <button className='text-blue-600 text-sm cursor-pointer' onClick={() => {
+           { review.isOwnReview &&  <button className='text-blue-600 text-sm cursor-pointer flex gap-2 items-center justify-center' onClick={() => {
               setEditExplanation(prev => !prev)
               setExplanation(dispute.explanations)
-            }}>Edit</button>}
+            }}><Edit className="w-3 h-3" /> Edit</button>}
           </div>
         </div>
       )}
 
       {/* Add/Edit Explanation Section */}
-      {  editExplanation && dispute.status === 'active' && review.isOwnReview  && <div className="mt-8">
+      {  editExplanation  && <div className="mt-8">
         <h3 className="text-xl font-bold text-gray-900">
           {dispute.explanations ? 'Edit' : 'Add'} Explanation
         </h3>
         <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
-          <Input
+          <Textarea
             placeholder="Type here..."
-            className="w-full sm:flex-1 rounded-full border-gray-300 focus:ring-blue-500 focus:border-blue-500 h-12"
+            className="w-full sm:flex-1 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 h-12 min-h-[100px] max-h-40"
             value={explanation}
+            rows={3}
+            maxLength={1000}
             onChange={(e) => setExplanation(e.target.value)}
             disabled={addExplanationMutation.isPending || updateExplanationMutation.isPending}
           />

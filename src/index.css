@@ -214,16 +214,29 @@
 }
 
 /* Override Radix UI animations for vendor modal */
-.vendor-modal-no-animation * {
-  animation-duration: 0s !important;
+/* .vendor-modal-no-animation * { */
+  /* animation-duration: 0s !important;
   animation-delay: 0s !important;
   animation-iteration-count: 1 !important;
   animation-fill-mode: none !important;
   transition-duration: 0s !important;
   transition-delay: 0s !important;
-  transform: none !important;
   opacity: 1 !important;
-  scale: 1 !important;
+  scale: 1 !important; */
+/* } */
+
+/* Allow button loading animations to work */
+/* .vendor-modal-no-animation button .animate-spin,
+.vendor-modal-no-animation [data-slot="button"] .animate-spin {
+  animation: spin 1s linear infinite !important;
+  transform: rotate(0deg) !important;
+} */
+
+/* Define the spin keyframes if not already defined */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* Specifically disable zoom animations */

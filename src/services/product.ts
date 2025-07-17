@@ -36,6 +36,7 @@ export interface Product {
     features: string[];
   }[];
   website?: string;
+  createdAt?: string;
 
 }
 

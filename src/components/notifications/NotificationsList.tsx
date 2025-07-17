@@ -167,13 +167,13 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
           >
             {markAllAsReadMutation.isPending ? 'Marking...' : 'Mark All Read'}
           </Button>
-          <NotificationSettings />
+          {/* <NotificationSettings /> */}
         </div>
       </div>
 
       {/* Notifications List */}
       {isError ? (
-        <div className='w-full min-h-[60vh] flex items-center justify-center min-h-[50vh]'>
+        <div className='w-full flex items-center justify-center min-h-[50vh]'>
           <div className="p-8 flex flex-col items-center justify-center">
  
             <p className="text-gray-500 text-center">

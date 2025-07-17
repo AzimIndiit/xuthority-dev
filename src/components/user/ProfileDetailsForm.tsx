@@ -133,24 +133,36 @@ export const profileSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters").trim().max(50, "First name must be less than 50 characters").nonempty("First name is required"),
   lastName: z.string().min(2, "Last name must be at least 2 characters").trim().max(50, "Last name must be less than 50 characters").nonempty("Last name is required"),
   email: z.string().email("Invalid email address"),
-  region: z.string().min(1, "Please select a region"),
+  region: z.string().optional().refine((val) => !val || val.length >= 1, "Please select a region"),
   description: z.string().optional().refine((val) => !val || val.length <= 1000, "Description must be less than 1000 characters"),
-  industry: z.string().min(1, "Please select an industry"),
-  title: z.string().min(2, "Title must be at least 2 characters").trim().max(100, "Title must be less than 100 characters").nonempty("Title is required"),
-  companyName: z.string().min(2, "Company name must be at least 2 characters").trim().max(100, "Company name must be less than 100 characters").nonempty("Company name is required"),
-  companySize: z.string().min(1, "Please select company size"),
+  industry: z.string().optional().refine((val) => !val || val.length >= 1, "Please select an industry"),
+  title: z.string().optional().refine((val) => !val || (val.trim().length >= 2 && val.trim().length <= 100), "Title must be between 2-100 characters"),
+  companyName: z.string().optional().refine((val) => !val || (val.trim().length >= 2 && val.trim().length <= 100), "Company name must be between 2-100 characters"),
+  companySize: z.string().optional().refine((val) => !val || val.length >= 1, "Please select company size"),
   linkedinUrl: z
     .string()
-    .url("Invalid LinkedIn URL")
     .optional()
-    .or(z.literal(""))
-    .refine((val) => !val || val.length <= 200, "LinkedIn URL must be less than 200 characters"),
+    .refine((val) => {
+      if (!val || val === "") return true;
+      try {
+        new URL(val);
+        return val.length <= 200;
+      } catch {
+        return false;
+      }
+    }, "Invalid LinkedIn URL or URL too long (max 200 characters)"),
   twitterUrl: z
     .string()
-    .url("Invalid Twitter URL")
     .optional()
-    .or(z.literal(""))
-    .refine((val) => !val || val.length <= 200, "Twitter URL must be less than 200 characters"),
+    .refine((val) => {
+      if (!val || val === "") return true;
+      try {
+        new URL(val);
+        return val.length <= 200;
+      } catch {
+        return false;
+      }
+    }, "Invalid Twitter URL or URL too long (max 200 characters)"),
   
 });
 

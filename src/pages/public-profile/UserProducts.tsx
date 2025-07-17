@@ -2,7 +2,7 @@ import Pagination from '@/components/ui/pagination';
 import { useUserProductsById } from '@/hooks/useProducts';
 import { usePagination } from '@/hooks/usePagination';
 import useUserStore from '@/store/useUserStore';
-import { getTruncatedDisplayName } from '@/utils/userHelpers';
+import { getFirstName, getTruncatedDisplayName } from '@/utils/userHelpers';
 import { Package } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -124,7 +124,7 @@ const UserProducts = ({publicProfile}) => {
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <h2 className="sm:text-xl lg:text-2xl font-bold text-gray-900">
-                        {getTruncatedDisplayName(publicProfile, 10)}'s Products
+                          {getFirstName(publicProfile)}'s Products
                     </h2>
                 </div>
                 

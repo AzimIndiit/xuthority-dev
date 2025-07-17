@@ -254,7 +254,7 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
         </div>
         }
         </div>
-
+<hr className='my-4'/>
         {/* Review Content */}
         <div className="space-y-3">
           {/* Review Title */}

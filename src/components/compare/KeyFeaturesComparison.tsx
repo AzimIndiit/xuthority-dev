@@ -9,21 +9,21 @@ interface KeyFeaturesComparisonProps {
 
 export default function KeyFeaturesComparison({ products, className }: KeyFeaturesComparisonProps) {
   // Only show up to 2 products for side-by-side comparison
-  const visibleProducts = products.slice(0, 2);
+  const visibleProducts = products;
 
   return (
-    <div className={cn("bg-blue-50 rounded-lg overflow-hidden", className)}>
+    <div className={cn("bg-blue-50 rounded-lg border overflow-hidden", className)}>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[500px] border ">
+        <table className="w-full min-w-[500px]">
           <thead>
             <tr>
-              <th className="text-left p-3 sm:p-4 font-medium text-gray-700 w-1/4 bg-blue-50 border-b border-blue-100 ">
+              <th className="text-left p-3 sm:p-4 font-medium text-gray-700 w-1/4 bg-blue-50 border-b border-blue-100 border-r">
                 Key Features
               </th>
               {visibleProducts.map((product) => (
                 <th
                   key={product.id}
-                  className="text-center p-3 sm:p-4 font-semibold bg-blue-50 border-b border-blue-100 w-1/4"
+                  className="text-center p-3 sm:p-4 font-semibold bg-blue-50 border-b border-blue-100 w-1/4 border-r"
                 >
                   {product.name}
                 </th>
@@ -33,14 +33,14 @@ export default function KeyFeaturesComparison({ products, className }: KeyFeatur
                 [...Array(2 - visibleProducts.length)].map((_, idx) => (
                   <th
                     key={`empty-header-${idx}`}
-                    className="text-center p-3 sm:p-4 bg-blue-50 border-b border-blue-100 w-1/4"
+                    className="text-center p-3 sm:p-4 bg-blue-50 border-b border-blue-100 w-1/4 border-r"
                   ></th>
                 ))}
             </tr>
           </thead>
           <tbody className="bg-white">
             <tr className="border-t">
-              <td className="p-3 sm:p-4 font-medium text-gray-700 align-top w-1/4">
+              <td className="p-3 sm:p-4 font-medium text-gray-700 align-top w-1/4 border-r">
                 Features
               </td>
               {visibleProducts.map((product,index) => {
@@ -58,7 +58,7 @@ export default function KeyFeaturesComparison({ products, className }: KeyFeatur
                   );
 
                 return (
-                  <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4">
+                  <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4 border-r">
                     {hasValidFeatures ? (
                       <ul className="space-y-2">
                         {product.features.map((category, catIdx) => {
@@ -104,9 +104,16 @@ export default function KeyFeaturesComparison({ products, className }: KeyFeatur
                   </td>
                 )
               })}
+               {visibleProducts.length < 3 && [...Array(3 - visibleProducts.length)].map((_, index) => (
+                <td key={`empty-pricing-${index}`} className="p-3 sm:p-4 text-center align-top w-1/4 border-r">
+                  <span className="text-gray-300 italic text-sm">
+                    No product selected
+                  </span>
+                </td>
+              ))}
               {/* Empty columns for up to 2 products */}
               {visibleProducts.length < 3 &&
-                [...Array(3 - visibleProducts.length)].map((_, idx) => (
+                [...Array(2 - visibleProducts.length)].map((_, idx) => (
                   <td
                     key={`empty-features-${idx}`}
                     className="p-3 sm:p-4 text-center align-top w-1/4 "

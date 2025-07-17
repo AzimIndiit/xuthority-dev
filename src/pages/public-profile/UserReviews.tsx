@@ -5,7 +5,7 @@ import SecondaryLoader from '@/components/ui/SecondaryLoader';
 import { useUserReviewsById } from '@/hooks/useAuth';
 import { usePagination } from '@/hooks/usePagination';
 import useUserStore from '@/store/useUserStore';
-import { getTruncatedDisplayName } from '@/utils/userHelpers';
+import { getFirstName, getTruncatedDisplayName } from '@/utils/userHelpers';
 import { StarIcon } from 'lucide-react';
 import React, { useEffect } from 'react'
 
@@ -99,7 +99,7 @@ const UserReviews = ({publicProfile}) => {
         
                     <div className="flex items-center justify-between">
                         <h2 className="sm:text-xl lg:text-2xl font-bold text-gray-900">
-                            {getTruncatedDisplayName(publicProfile, 10)}'s Reviews
+                            {getFirstName(publicProfile)}'s Reviews
                         </h2>
                 
                     </div>

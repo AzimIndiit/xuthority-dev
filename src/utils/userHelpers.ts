@@ -35,3 +35,8 @@ export const getTruncatedDisplayName = (user: User | null, maxLength: number = 2
   }
   return displayName;
 }; 
+
+export const getFirstName = (user: User | null): string => {
+  const displayName = getUserDisplayName(user);
+  return displayName.split(' ')[0];
+}; 

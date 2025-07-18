@@ -35,7 +35,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
   const { setSelectedSoftware } = useReviewStore();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [explanation, setExplanation] = useState(dispute.explanations || '');
-  const [editExplanation, setEditExplanation] = useState(dispute.explanations ? false : true);
+  const [editExplanation, setEditExplanation] = useState(false);
   const [isDeleteDisputeModalOpen, setIsDeleteDisputeModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -306,31 +306,70 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
         </div>
       )}
 
-      {/* Add/Edit Explanation Section */}
-      {((editExplanation || !dispute.explanations) && dispute.status === 'active' && review.isOwnReview) && <div className="mt-8">
-        <h3 className="text-xl font-bold text-gray-900">
-          {dispute.explanations ? 'Edit' : 'Add'} Explanation
-        </h3>
-        <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
-          <Textarea
-            placeholder="Type here..."
-            className="w-full sm:flex-1 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 h-12 min-h-[100px] max-h-40"
-            value={explanation}
-            rows={3}
-            maxLength={1000}
-            onChange={(e) => setExplanation(e.target.value)}
-            disabled={addExplanationMutation.isPending || updateExplanationMutation.isPending}
-          />
-          <Button 
-            className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-6 py-3 font-semibold self-end sm:self-auto"
-            onClick={dispute.explanations ? handleUpdateExplanation : handleSubmitExplanation}
-            disabled={addExplanationMutation.isPending || updateExplanationMutation.isPending || !explanation.trim()}
-            loading={addExplanationMutation.isPending || updateExplanationMutation.isPending}
-          >
-            {dispute.explanations ? 'Update' : 'Submit'}
-          </Button>
+      {/* Add Explanation Section - First Time */}
+      {(!dispute.explanations && dispute.status === 'active' && review.isOwnReview) && (
+        <div className="mt-8">
+          <h3 className="text-xl font-bold text-gray-900">Add Explanation</h3>
+          <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
+            <Textarea
+              placeholder="Type here..."
+              className="w-full sm:flex-1 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 h-12 min-h-[100px] max-h-40"
+              value={explanation}
+              rows={3}
+              maxLength={1000}
+              onChange={(e) => setExplanation(e.target.value)}
+              disabled={addExplanationMutation.isPending}
+            />
+            <Button 
+              className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-6 py-3 font-semibold self-end sm:self-auto"
+              onClick={handleSubmitExplanation}
+              disabled={addExplanationMutation.isPending || !explanation.trim()}
+              loading={addExplanationMutation.isPending}
+            >
+              Submit
+            </Button>
+          </div>
         </div>
-      </div>}
+      )}
+
+      {/* Edit Explanation Section - When Editing Existing */}
+      {(editExplanation ) && (
+        <div className="mt-8">
+          <h3 className="text-xl font-bold text-gray-900">Edit Explanation</h3>
+          <div className="mt-4 flex flex-col sm:flex-row items-start gap-4">
+            <Textarea
+              placeholder="Type here..."
+              className="w-full sm:flex-1 rounded-md border-gray-300 focus:ring-blue-500 focus:border-blue-500 h-12 min-h-[100px] max-h-40"
+              value={explanation}
+              rows={3}
+              maxLength={1000}
+              onChange={(e) => setExplanation(e.target.value)}
+              disabled={updateExplanationMutation.isPending}
+            />
+            <div className="flex gap-2 self-end sm:self-auto">
+              <Button 
+                variant="outline"
+                className="border-gray-300 text-gray-700 rounded-full hover:bg-gray-50 px-6 py-3 font-semibold"
+                onClick={() => {
+                  setEditExplanation(false);
+                  setExplanation(dispute.explanations);
+                }}
+                disabled={updateExplanationMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button 
+                className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-6 py-3 font-semibold"
+                onClick={handleUpdateExplanation}
+                disabled={updateExplanationMutation.isPending || !explanation.trim()}
+                loading={updateExplanationMutation.isPending}
+              >
+                Update
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       {/* Delete Review Confirmation Modal */}
       <ConfirmationModal

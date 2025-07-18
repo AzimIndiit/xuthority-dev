@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import type { CompareProduct } from "@/store/useCompareStore";
 
 interface TargetUsersComparisonProps {
@@ -8,6 +10,50 @@ interface TargetUsersComparisonProps {
 }
 
 export default function TargetUsersComparison({ products, className }: TargetUsersComparisonProps) {
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (productId: string, section: string) => {
+    const key = `${productId}-${section}`;
+    setExpandedSections(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const renderDataWithViewAll = (
+    data: any[], 
+    productId: string, 
+    section: string, 
+    maxItems: number = 20
+  ) => {
+    const key = `${productId}-${section}`;
+    const isExpanded = expandedSections[key];
+    const displayData = isExpanded ? data : data.slice(0, maxItems);
+    const hasMore = data.length > maxItems;
+
+    return (
+      <div className="space-y-2">
+        <div className="flex flex-wrap gap-2">
+          {displayData.map((item: any, index: number) => (
+            <Badge key={index} variant="secondary" className="bg-gray-100 text-xs">
+              {typeof item === 'string' ? item : item?.name || 'Unknown'}
+            </Badge>
+          ))}
+        </div>
+        {hasMore && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => toggleSection(productId, section)}
+            className="!text-xs  p-4 rounded-full"
+          >
+            {isExpanded ? 'Show Less' : `View All (+${data.length-maxItems})`}
+          </Button>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className={cn("bg-blue-50 rounded-lg border overflow-hidden", className)}>
       <div className="overflow-x-auto">
@@ -40,19 +86,13 @@ export default function TargetUsersComparison({ products, className }: TargetUse
               </td>
               {products.map((product) => (
                 <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4 border-r">
-                  <div className="flex flex-wrap gap-2">
-                    {product?.whoCanUse && Array.isArray(product.whoCanUse) && product.whoCanUse.length > 0 ? (
-                      product.whoCanUse.map((user: any, index: number) => (
-                        <Badge key={index} variant="secondary" className="bg-gray-100 text-xs">
-                          {typeof user === 'string' ? user : user?.name || 'Unknown'}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 italic text-sm">
-                        No data available
-                      </span>
-                    )}
-                  </div>
+                  {product?.whoCanUse && Array.isArray(product.whoCanUse) && product.whoCanUse.length > 0 ? (
+                    renderDataWithViewAll(product.whoCanUse, product.id, 'whoCanUse')
+                  ) : (
+                    <span className="text-gray-400 italic text-sm">
+                      No data available
+                    </span>
+                  )}
                 </td>
               ))}
               {products.length < 3 && [...Array(3 - products.length)].map((_, index) => (
@@ -71,19 +111,13 @@ export default function TargetUsersComparison({ products, className }: TargetUse
               </td>
               {products.map((product) => (
                 <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4 border-r">
-                  <div className="flex flex-wrap gap-2">
-                    {product?.industries && Array.isArray(product.industries) && product.industries.length > 0 ? (
-                      product.industries.map((industry: any, index: number) => (
-                        <Badge key={index} variant="secondary" className="bg-gray-100 text-xs">
-                          {typeof industry === 'string' ? industry : industry?.name || 'Unknown'}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 italic text-sm">
-                        No data available
-                      </span>
-                    )}
-                  </div>
+                  {product?.industries && Array.isArray(product.industries) && product.industries.length > 0 ? (
+                    renderDataWithViewAll(product.industries, product.id, 'industries')
+                  ) : (
+                    <span className="text-gray-400 italic text-sm">
+                      No data available
+                    </span>
+                  )}
                 </td>
               ))}
               {products.length < 3 && [...Array(3 - products.length)].map((_, index) => (
@@ -102,19 +136,13 @@ export default function TargetUsersComparison({ products, className }: TargetUse
               </td>
               {products.map((product) => (
                 <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4 border-r">
-                  <div className="flex flex-wrap gap-2">
-                    {product?.marketSegment && Array.isArray(product.marketSegment) && product.marketSegment.length > 0 ? (
-                      product.marketSegment.map((segment: any, index: number) => (
-                        <Badge key={index} variant="secondary" className="bg-gray-100 text-xs">
-                          {typeof segment === 'string' ? segment : segment?.name || 'Unknown'}
-                        </Badge>
-                      ))
-                    ) : (
-                      <span className="text-gray-400 italic text-sm">
-                        No data available
-                      </span>
-                    )}
-                  </div>
+                  {product?.marketSegment && Array.isArray(product.marketSegment) && product.marketSegment.length > 0 ? (
+                    renderDataWithViewAll(product.marketSegment, product.id, 'marketSegment')
+                  ) : (
+                    <span className="text-gray-400 italic text-sm">
+                      No data available
+                    </span>
+                  )}
                 </td>
               ))}
               {products.length < 3 && [...Array(3 - products.length)].map((_, index) => (

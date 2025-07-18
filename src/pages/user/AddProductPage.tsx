@@ -21,6 +21,7 @@ import { FileUpload } from '@/types/file';
 import { useToast } from '@/hooks/useToast';
 import { useAddProduct, useFetchProductById, useUpdateProduct } from '@/hooks/useProducts';
 import { getNestedError, hasNestedError, getNestedErrorMessage } from '@/utils/formUtils';
+import { Switch } from '@/components/ui/switch';
 const fileOrString = z.union([z.instanceof(File), z.string()]);
 const MAX_FILE_SIZE_MB = 10;
 const MAX_MEDIA_FILES = 5;
@@ -37,6 +38,7 @@ const schema = z.object({
   brandColors: z.string().min(1, 'Brand color is required').trim().nonempty('Brand color is required'),
   description: z.string().min(10, 'Description is required').trim().nonempty('Description is required'),
   logoUrl: fileOrString, // Required, single File or URL
+  isFree: z.boolean().default(false),
 
   mediaUrls: z
     .array(fileOrString) // Array of File or URL
@@ -56,14 +58,14 @@ const schema = z.object({
     })
   )
   .optional()
-  .default([]), 
+  .default([]),
 
 pricing: z
   .array(
     z.object({
       name: z.string().min(1, 'Pricing name is required') .trim().nonempty('Pricing name is required'),
       price: z.coerce.number().min(0, 'Price must be a positive number'),
-      seats: z.string().min(1, 'No of seats is required') .trim().nonempty('No of seats is required'),
+      seats: z.coerce.number().min(1, 'No of seats must be at least 1').max(10000, 'No of seats cannot exceed 10,000'),
       description: z.string().min(1, 'Pricing description is required') .trim().nonempty('Pricing description is required'),
       features: z
         .array(
@@ -76,6 +78,19 @@ pricing: z
   )
   .optional()
   .default([]),
+}).superRefine((data, ctx) => {
+  // Validate pricing based on product's isFree status
+  if (!data.isFree && data.pricing) {
+    data.pricing.forEach((plan, index) => {
+      if (plan.price <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['pricing', index, 'price'],
+          message: 'Price must be greater than 0 for paid products',
+        });
+      }
+    });
+  }
 });
 
 type FormData = z.infer<typeof schema>;
@@ -93,6 +108,7 @@ const defaultValues: FormData = {
   brandColors: '',
   description: '',
   logoUrl: '',
+  isFree: false,
   mediaUrls: [],
   features: [],
   pricing: [],
@@ -290,7 +306,7 @@ const AddProductPage: React.FC = () => {
     if (!file) return;
   
     if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
-      alert(`File size must be less than ${MAX_FILE_SIZE_MB}MB`);
+      toast.error(`File size must be less than ${MAX_FILE_SIZE_MB}MB`);
       return;
     }
   
@@ -424,6 +440,22 @@ console.log('mediaUrls', mediaFiles)
           </div>
           <FormTextarea name="description" label="Description" rows={8} maxLength={2000} className="w-full" disabled={addProductMutation.isPending} placeholder='Enter product description' />
           
+          {/* Product Free Toggle */}
+          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
+            <div>
+              <h3 className="font-medium text-gray-900">Product Pricing</h3>
+              <p className="text-sm text-gray-600">Is this product available for free?</p>
+            </div>
+            <label className="flex items-center gap-3">
+              <span className="text-sm font-medium">Available for Free</span>
+              <Switch
+                checked={watch('isFree')}
+                onCheckedChange={(checked) => setValue('isFree', checked)}
+                disabled={addProductMutation.isPending}
+              />
+            </label>
+          </div>
+
           {/* Logo and Media Uploads */}
           <div className="grid grid-cols-1  gap-6">
       {/* Logo Upload */}
@@ -590,7 +622,7 @@ console.log('mediaUrls', mediaFiles)
                 disabled={addProductMutation.isPending}
                 type="button"
                 className="bg-blue-600 text-white rounded-full flex items-center justify-center  w-12 h-12 shadow-md hover:bg-blue-700 transition cursor-pointer"
-                onClick={() => appendPricing({ name: '', price:0, seats: '', description: '', features: [{value: ''}] })}
+                onClick={() => appendPricing({ name: '', price: 0, seats: 1, description: '', features: [{value: ''}] })}
                 title="Add Pricing Plan"
               >
                 +
@@ -613,12 +645,14 @@ console.log('mediaUrls', mediaFiles)
                   {/* )} */}
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+        
                   <div>
                     <FormInput name={`pricing.${idx}.name`} label="Plan Name" maxLength={100} placeholder="Enter plan name" disabled={addProductMutation.isPending} />
                     {getNestedErrorMessage(errors, `pricing.${idx}.name`) && (
                       <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.name`)}</p>
                     )}
                   </div>
+        
                   <div>
                     <FormInput 
                       name={`pricing.${idx}.price`} 
@@ -627,7 +661,7 @@ console.log('mediaUrls', mediaFiles)
                       min={0} 
                       max={1000} 
                       step={1}
-                   
+                      disabled={addProductMutation.isPending}
                       onKeyDown={(e) => {
                         // Prevent minus and plus signs
                         if (e.key === '-' || e.key === '+') {
@@ -663,14 +697,21 @@ console.log('mediaUrls', mediaFiles)
                         }
                       }}
                       placeholder="Enter price" 
-                      disabled={addProductMutation.isPending} 
                     />
                     {getNestedErrorMessage(errors, `pricing.${idx}.price`) && (
                       <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.price`)}</p>
                     )}
                   </div>
                   <div>
-                    <FormInput name={`pricing.${idx}.seats`} label="No of Seats" maxLength={100} placeholder="Enter no of seats" disabled={addProductMutation.isPending} />
+                    <FormInput 
+                      name={`pricing.${idx}.seats`} 
+                      label="No of Seats" 
+                      type="number"
+                      min={1}
+                      max={10000}
+                      placeholder="Enter no of seats" 
+                      disabled={addProductMutation.isPending} 
+                    />
                     {getNestedErrorMessage(errors, `pricing.${idx}.seats`) && (
                       <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.seats`)}</p>
                     )}

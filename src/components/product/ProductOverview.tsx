@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Newspaper, Globe, Users, Building2, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import ProductFeatures from "./ProductFeatures";
 import ProductIntegrations from "./ProductIntegrations";
 
@@ -28,6 +29,52 @@ const DetailItem: React.FC<DetailItemProps> = ({
 
 const ProductOverview = ({product}: {product: any}) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (sectionKey: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [sectionKey]: !prev[sectionKey]
+    }));
+  };
+
+  const renderDetailWithViewAll = (
+    data: string, 
+    sectionKey: string, 
+    maxItems: number = 20
+  ) => {
+    if (data === 'N/A' || !data) {
+      return data;
+    }
+
+    const items = data.split(',').map(item => item.trim()).filter(item => item.length > 0);
+    
+    if (items.length <= maxItems) {
+      return data;
+    }
+
+    const isExpanded = expandedSections[sectionKey];
+    const displayItems = isExpanded ? items : items.slice(0, maxItems);
+    const hasMore = items.length > maxItems;
+
+    return (
+      <div className="space-y-2">
+        <span>{displayItems.join(', ')}</span>
+        {hasMore && (
+          <div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => toggleSection(sectionKey)}
+              className="!text-xs p-2 h-6 rounded-full mt-1"
+            >
+              {isExpanded ? 'Show Less' : `View All (+${items.length - maxItems})`}
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   const fullText = product.description;
   const truncatedText = fullText.substring(0, 350) + "...";
@@ -84,31 +131,35 @@ const ProductOverview = ({product}: {product: any}) => {
               </p>
             </DetailItem>
             <DetailItem icon={Globe}>
-              <p>
+              <div>
                 <span className="font-semibold">Languages</span> (
-                {productDetails.languages})
-              </p>
+                {renderDetailWithViewAll(productDetails.languages, 'languages')}
+                )
+              </div>
             </DetailItem>
             <DetailItem icon={Building2}>
-              <p>
+              <div>
                 <span className="font-semibold">Industries</span> (
-                {productDetails.industries})
-              </p>
+                {renderDetailWithViewAll(productDetails.industries, 'industries')}
+                )
+              </div>
             </DetailItem>
           </div>
           {/* Right Column */}
           <div>
             <DetailItem icon={Users}>
-              <p>
+              <div>
                 <span className="font-semibold">Users</span> (
-                {productDetails.users})
-              </p>
+                {renderDetailWithViewAll(productDetails.users, 'users')}
+                )
+              </div>
             </DetailItem>
             <DetailItem icon={TrendingUp}>
-              <p>
+              <div>
                 <span className="font-semibold">Market Segment</span> (
-                {productDetails.marketSegment})
-              </p>
+                {renderDetailWithViewAll(productDetails.marketSegment, 'marketSegment')}
+                )
+              </div>
             </DetailItem>
           </div>
         </div>

@@ -33,6 +33,7 @@ interface CompareProduct {
   slug?: string;
   features?: ProductFeature[]; // Add features array
   whoCanUse?: any[];
+  isFree?: boolean;
   [key: string]: any;
 
 }

@@ -49,6 +49,7 @@ interface SoftwareDetailCardProps {
   whoCanUseAll?: any[];
   showCompare?: boolean;
   hasUserReviewed?: boolean;
+  isFree?: boolean;
   }
 
 function renderStars(rating: number) {
@@ -97,6 +98,7 @@ export default function SoftwareDetailCard({
   marketSegmentAll,
   showCompare = false,
   hasUserReviewed = false,
+  isFree = false
 }: SoftwareDetailCardProps) {
   const {user, isLoggedIn} = useUserStore();
   const {openAuthModal} = useUIStore();
@@ -135,7 +137,7 @@ const deleteMutation = useDeleteProduct();
         error("You can only compare up to 3 products at a time");
         return;
       }
-      
+      console.log('isFree', isFree)
       // Add product to compare
       addProduct({
         id,
@@ -152,7 +154,8 @@ const deleteMutation = useDeleteProduct();
         slug,
         features,
         websiteUrl,
-        whoCanUse
+        whoCanUse,
+        isFree: isFree
       });
       
       success(`${name} has been added to comparison (${compareProducts.length + 1}/3)`);

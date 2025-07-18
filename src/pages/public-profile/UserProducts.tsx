@@ -166,6 +166,7 @@ const UserProducts = ({publicProfile}) => {
                                     onSave={handleSave}
                                     onTry={handleTry}
                                     hasUserReviewed={product.hasUserReviewed}
+                                    isFree={product.isFree}
                                 />
                             ))}
                         </div>

@@ -204,6 +204,7 @@ const ProductsPage: React.FC = () => {
               entryPrice={item.pricing as any}
               slug={item.slug}
               features={item.features}
+              isFree={item.isFree}
             />
           ))}
         </div>

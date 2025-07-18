@@ -220,7 +220,7 @@ const SubCategoryPage = () => {
   const products = useMemo(() => {
     return Array.isArray(productsResult?.data) ? productsResult?.data : [];
   }, [productsResult?.data]);
-
+console.log('products', products)
   // NOW ALL HOOKS ARE CALLED - WE CAN DO CONDITIONAL LOGIC AND EARLY RETURNS
   // Ensure we have valid category and subCategory values
   const validCategory = category || '';
@@ -370,6 +370,7 @@ const SubCategoryPage = () => {
                     whoCanUseAll={product.whoCanUse}
                     showCompare={true}
                     hasUserReviewed={product.hasUserReviewed}
+                    isFree={product.isFree}
                   />
                 </div>
               ))}

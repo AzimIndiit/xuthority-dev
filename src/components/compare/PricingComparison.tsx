@@ -196,6 +196,7 @@ interface PricingPlan {
   billingPeriod?: string;
   features?: string[] | { value: string }[];
   currency?: string;
+  isFree?: boolean;
 }
 
 interface PricingComparisonProps {
@@ -321,13 +322,13 @@ export default function PricingComparison({ products, className }: PricingCompar
               <td className="p-3 sm:p-4 font-medium text-gray-700 align-top w-1/4 border-r">
                 Free Trial
               </td>
-              {products.map((product) => {
-                 const pricingData = getPricingData(product);
+              {products.map((product,index) => {
+             console.log(product,"produc11t",index);
                 return (
                 <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4 border-r">
                   <div className="flex items-center gap-2">
-                  {pricingData ? pricingData?.price===0 ? <Check className="w-4 h-4 text-green-600" /> : <X className="w-4 h-4 text-red-600" /> : <span className="text-gray-300 italic text-sm">No Pricing Available</span>}
-                    <span className="text-sm text-gray-700">{pricingData ? pricingData?.price===0 ? 'Available' : 'Not Available' : ''}</span>
+                  {product ? product?.isFree ? <Check className="w-4 h-4 text-green-600" /> : <X className="w-4 h-4 text-red-600" /> : <span className="text-gray-300 italic text-sm">No Free Trial Available</span>}
+                    <span className="text-sm text-gray-700">{product ? product?.isFree ? 'Available' : 'Not Available' : ''}</span>
                   </div>
                 </td>
               )})}

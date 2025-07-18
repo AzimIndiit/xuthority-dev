@@ -33,9 +33,10 @@ export default function ComparePage() {
     whoCanUse: Array.isArray(product.whoCanUse) ? product.whoCanUse : [],
     features: Array.isArray(product.features) ? product.features : [],
     // Ensure entryPrice is properly structured
-    entryPrice: product.entryPrice || []
+    entryPrice: product.entryPrice || [],
+    isFree: product.isFree || false
   }));
-
+console.log(products,"sanitizedProducts");
   const handleAddProduct = () => {
     setIsAddProductModalOpen(true);
   };

@@ -39,6 +39,7 @@ export interface Product {
   createdAt?: string;
   hasUserReviewed?: boolean;
   isActive?: string;
+  isFree?: boolean;
 }
 
 

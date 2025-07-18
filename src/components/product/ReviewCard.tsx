@@ -13,6 +13,7 @@ import { getUserDisplayName, getUserInitials } from '@/utils/userHelpers';
 import { useNavigate, useParams } from 'react-router-dom';
 import DisputeModal from './DisputeModal';
 import { highlightText } from '@/utils/textHighlight';
+import ReadMoreText from '@/components/ui/ReadMoreText';
 
 interface ReviewCardProps {
   review: Review;
@@ -29,9 +30,6 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
   const { voteHelpful, removeVote, isVoting, isRemoving, hasVoted } = useHelpfulVote();
   const navigate = useNavigate();
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [showReadMore, setShowReadMore] = useState(false);
-  const contentRef = React.useRef<HTMLParagraphElement>(null);
   const isUserVoted = backendReview ? hasVoted(backendReview) : false;
   const helpfulCount = backendReview?.helpfulVotes.count || 0;
 
@@ -76,39 +74,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
     setIsDisputeModalOpen(true);
   };
 
-  // Check if content needs truncation
-  React.useEffect(() => {
-    const checkTruncation = () => {
-      if (contentRef.current) {
-        // Temporarily remove truncation to measure full height
-        const element = contentRef.current;
-        const originalStyle = element.style.cssText;
-        
-        // Set to full display to measure actual height
-        element.style.display = 'block';
-        element.style.webkitLineClamp = 'none';
-        element.style.overflow = 'visible';
-        element.style.whiteSpace = 'pre-line';
-        
-        const lineHeight = parseFloat(getComputedStyle(element).lineHeight) || 24;
-        const maxHeight = lineHeight * 4; // 4 lines
-        const actualHeight = element.scrollHeight;
-        
-        // Restore original style
-        element.style.cssText = originalStyle;
-        
-        setShowReadMore(actualHeight > maxHeight);
-      }
-    };
 
-    // Use setTimeout to ensure the content is rendered
-    const timer = setTimeout(checkTruncation, 0);
-    return () => clearTimeout(timer);
-  }, [review.content]);
-
-  const toggleExpanded = () => {
-    setIsExpanded(!isExpanded);
-  };
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -184,30 +150,14 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
       </div>
       {/* Review Content */}
       <div className="px-4 mb-2 mt-2">
-        <p 
-          ref={contentRef}
+        <ReadMoreText
+          content={review.content}
+          maxLines={4}
           className="text-gray-700 text-[16px] leading-relaxed"
-          style={{
-            display: !isExpanded && showReadMore ? '-webkit-box' : 'block',
-            WebkitLineClamp: !isExpanded && showReadMore ? 4 : 'none',
-            WebkitBoxOrient: 'vertical' as const,
-            overflow: !isExpanded && showReadMore ? 'hidden' : 'visible',
-            whiteSpace: !isExpanded && showReadMore ? 'normal' : 'pre-line'
-          }}
+          buttonClassName="text-blue-600 hover:text-blue-800"
         >
-          {highlightText(review.content, searchQuery)}
-        </p>
-        {showReadMore && (
-          <button
-            onClick={toggleExpanded}
-            className="text-blue-600 hover:text-blue-800 text-sm font-medium mt-2 transition-colors inline-flex items-center gap-1 hover:underline cursor-pointer"
-          >
-            {isExpanded ? "Read less" : "Read more"}
-            <span className="text-xs">
-              {isExpanded ? "▲" : "▼"}
-            </span>
-          </button>
-        )}
+          {(content) => highlightText(content, searchQuery)}
+        </ReadMoreText>
       </div>
       {/* Footer: Reviewer Info and Verification */}
       <div className="bg-pink-50 px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-pink-100">

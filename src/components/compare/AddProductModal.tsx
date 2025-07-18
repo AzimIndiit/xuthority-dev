@@ -41,6 +41,7 @@ interface Product {
     description: Array<{ value: string }>;
   }>;
   whoCanUse?: any[];
+  isFree?: boolean;
   userId?: {
     firstName?: string;
     lastName?: string;
@@ -108,6 +109,7 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
       slug: product.slug,
       features: product.features || [],
       whoCanUse: product.whoCanUse || [],
+      isFree: product.isFree || false
     };
 
     addProduct(compareProduct);

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatCurrency } from '@/utils/formatCurrency';
+import ReadMoreText from '@/components/ui/ReadMoreText';
 
 interface PricingCardProps {
   name: string;
@@ -55,9 +56,16 @@ const PricingCard: React.FC<PricingCardProps> = ({
         </div>
       </div>
 
-      <p className={cn('mt-6 text-base leading-relaxed', isPopular ? 'text-blue-100' : 'text-gray-600')}>
-        {description}
-      </p>
+      <div className="mt-6">
+        <ReadMoreText
+          content={description}
+          maxLines={3}
+          className={cn('text-base leading-relaxed', isPopular ? 'text-blue-100' : 'text-gray-600')}
+          buttonClassName={cn(
+            isPopular ? "text-blue-200 hover:text-white" : "text-blue-600 hover:text-blue-800"
+          )}
+        />
+      </div>
 
       <div className="mt-6 flex items-baseline gap-1">
         <span className="text-5xl font-bold tracking-tight">

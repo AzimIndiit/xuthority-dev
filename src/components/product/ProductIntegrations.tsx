@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 
 const integrations = [
   { name: 'Slack', logoUrl: 'https://www.vectorlogo.zone/logos/slack/slack-icon.svg' },
@@ -17,7 +18,7 @@ const integrations = [
   { name: 'Zapier', logoUrl: 'https://www.vectorlogo.zone/logos/zapier/zapier-icon.svg' },
 ];
 
-const   IntegrationCard = ({ name, image }: { name: string, image: string }) => (
+const IntegrationCard = ({ name, image }: { name: string, image: string }) => (
   <div className="flex flex-col items-center text-center gap-2">
     <div className="w-16 h-16  bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-3 transition-all duration-300 hover:shadow-md hover:border-gray-300">
       <img
@@ -30,8 +31,15 @@ const   IntegrationCard = ({ name, image }: { name: string, image: string }) => 
   </div>
 );
 
-
 const ProductIntegrations = ({integrations}: {integrations: any}) => {
+  const [showAll, setShowAll] = useState(false);
+  
+  // Calculate items to show for 2 rows based on different screen sizes
+  // Using 8 items which shows ~2 rows on small+ screens, 4 rows on mobile
+  const itemsPerTwoRows = 24;
+  const hasMoreItems = integrations.length > itemsPerTwoRows;
+  const displayedIntegrations = showAll ? integrations : integrations.slice(0, itemsPerTwoRows);
+
   return (
     <div className="">
       <h2 className="text-2xl font-bold text-gray-900 mb-8">
@@ -39,10 +47,22 @@ const ProductIntegrations = ({integrations}: {integrations: any}) => {
       </h2>
       <div className="border bg-white rounded-2xl p-8">
         <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7 xl:grid-cols-12 gap-x-6 gap-y-8 place-items-center">
-          {integrations.map((integration: any) => (
+          {displayedIntegrations.map((integration: any) => (
             <IntegrationCard key={integration.name} {...integration} />
           ))}
         </div>
+        
+        {hasMoreItems && (
+          <div className="flex justify-center mt-8">
+            <Button
+              variant="outline"
+              onClick={() => setShowAll(!showAll)}
+              className="!text-sm px-6 py-2 rounded-full"
+            >
+              {showAll ? 'Show Less' : `View All Integrations (+${integrations.length - itemsPerTwoRows})`}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

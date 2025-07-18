@@ -307,7 +307,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       )}
 
       {/* Add/Edit Explanation Section */}
-      {  editExplanation  && dispute.status === 'active' && review.isOwnReview  && <div className="mt-8">
+      {((editExplanation || !dispute.explanations) && dispute.status === 'active' && review.isOwnReview) && <div className="mt-8">
         <h3 className="text-xl font-bold text-gray-900">
           {dispute.explanations ? 'Edit' : 'Add'} Explanation
         </h3>

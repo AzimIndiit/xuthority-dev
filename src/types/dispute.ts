@@ -30,6 +30,7 @@ export interface DisputedReview {
   isVerified?: boolean;
   slug?: string;  
   userTitle?: string;
+  isActive?: boolean;
 }
 
 export interface Dispute {

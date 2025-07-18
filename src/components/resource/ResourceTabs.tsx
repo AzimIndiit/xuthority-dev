@@ -24,15 +24,16 @@ const ResourceTabs: React.FC<ResourceTabsProps> = ({
             {tabs.map((tab, index) => (
               <button
                 key={tab.id}
+                data-tab={tab.slug}
                 onClick={() => onTabChange(tab.slug)}
                 className={cn(
-                  'px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 whitespace-nowrap cursor-pointer flex-shrink-0 touch-manipulation',
+                  'px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-300 ease-in-out whitespace-nowrap cursor-pointer flex-shrink-0 touch-manipulation',
                   // Add extra margin to first and last items for better mobile UX
                   index === 0 && 'ml-1',
                   index === tabs.length - 1 && 'mr-1',
                   activeTab === tab.slug
-                    ? 'bg-red-600 text-white shadow-md'
-                    : 'text-gray-600 hover:text-gray-900 active:bg-gray-200'
+                    ? 'bg-red-600 text-white shadow-md transform scale-105'
+                    : 'text-gray-600 hover:text-gray-900 active:bg-gray-200 hover:scale-102'
                 )}
               >
                 {tab.label}
@@ -48,12 +49,13 @@ const ResourceTabs: React.FC<ResourceTabsProps> = ({
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              data-tab={tab.slug}
               onClick={() => onTabChange(tab.slug)}
               className={cn(
-                'px-4 py-4 text-sm font-semibold rounded-lg transition-all duration-200 whitespace-nowrap cursor-pointer',
+                'px-4 py-4 text-sm font-semibold rounded-lg transition-all duration-300 ease-in-out whitespace-nowrap cursor-pointer',
                 activeTab === tab.slug
-                  ? 'bg-red-600 text-white shadow-md'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-red-600 text-white shadow-md transform scale-105'
+                  : 'text-gray-600 hover:text-gray-900 hover:scale-102'
               )}
             >
               {tab.label}

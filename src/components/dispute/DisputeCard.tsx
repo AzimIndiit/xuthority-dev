@@ -25,8 +25,8 @@ interface DisputeCardProps {
 }
 
 const statusStyles = {
-  active: 'bg-green-100 text-green-800',
-  resolved: 'bg-blue-100 text-blue-800',
+  active: 'bg-yellow-100 text-yellow-800',
+  resolved: 'bg-green-100 text-green-800',
 };
 
 const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, refetchDisputes }) => {
@@ -235,7 +235,9 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       <div className='mt-4'>
         <h3 className="text-lg sm:text-xl font-bold text-gray-900">Dispute</h3>
         <div className="flex items-center gap-3 my-4  cursor-pointer"  onClick={() => {
-              navigate(`/product-detail/${product.slug}`)
+          if(product.isActive==='active'){
+            navigate(`/product-detail/${product.slug}`)
+          }
             }}>
           <div className="relative w-12 h-12" >
             <Avatar className="h-12 w-12 ">

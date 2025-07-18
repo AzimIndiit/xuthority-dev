@@ -38,6 +38,7 @@ export interface Product {
   website?: string;
   createdAt?: string;
   hasUserReviewed?: boolean;
+  isActive?: string;
 }
 
 

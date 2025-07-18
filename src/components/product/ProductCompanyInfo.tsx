@@ -31,7 +31,7 @@ const DetailItem = ({
   label: string;
   children: React.ReactNode;
 }) => (
-  <div className="flex items-start gap-3 border-t border-gray-200 py-4">
+  <div className="flex items-start gap-3 border-b border-gray-200 py-4">
     <Icon className="h-5 w-5 flex-shrink-0 text-gray-500 " />
     <div className="flex-grow text-sm text-gray-800">
       <span className="font-semibold">{label}</span>
@@ -66,7 +66,7 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
   };
 
   return (
-    <div className="relative py-10 sm:py-24">
+    <div className="relative pb-10 sm:pb-24 sm:pt-12">
       <div
         aria-hidden="true"
         className="absolute inset-x-0 top-0 z-0 h-full"
@@ -95,8 +95,8 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
 
         <div className="mt-5">
           <h3 className="text-2xl font-bold text-gray-900">Seller Details</h3>
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 md:gap-x-12">
-            <div className="max-w-md ">
+          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 md:gap-x-44">
+            <div className="">
               {companyData.seller && <DetailItem icon={User} label="Seller">
                 (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
               </DetailItem>}

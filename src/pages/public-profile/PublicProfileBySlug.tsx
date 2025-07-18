@@ -378,7 +378,8 @@ const PublicProfileBySlugPage: React.FC = () => {
                 <div className="flex flex-col items-center">
                   <div 
                   key={badge?._id}
-                    className="w-12 h-12 rounded-full flex items-center justify-center mb-2 flex-col"
+                  onClick={() => handleBadgeClick(badge)}
+                    className="w-12 h-12 rounded-full flex items-center justify-center mb-2 flex-col cursor-pointer"
                     style={{backgroundColor: badge?.badgeId?.colorCode}}
                   >
                     <img

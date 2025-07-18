@@ -66,9 +66,9 @@ const ProductOverview = ({product}: {product: any}) => {
 
       <div className="mt-10">
         <h3 className="text-2xl font-bold text-gray-900">Other Details</h3>
-        <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-12">
+        <div className="my-4 grid grid-cols-1 sm:grid-cols-2 gap-x-44">
           {/* Left Column */}
-          <div className="max-w-md">
+          <div>
             <DetailItem icon={Newspaper}>
               <p>
                 <span className="font-semibold">Product Website</span> (
@@ -83,30 +83,28 @@ const ProductOverview = ({product}: {product: any}) => {
                 )
               </p>
             </DetailItem>
-            <DetailItem icon={Globe} >
-            <p>
+            <DetailItem icon={Globe}>
+              <p>
                 <span className="font-semibold">Languages</span> (
                 {productDetails.languages})
               </p>
-             
             </DetailItem>
-            <DetailItem icon={Users}>
-              <p>
-                <span className="font-semibold">Users</span> (
-                {productDetails.users})
-              </p>
-            </DetailItem>
-          </div>
-          {/* Right Column */}
-          <div>
-          
             <DetailItem icon={Building2}>
               <p>
                 <span className="font-semibold">Industries</span> (
                 {productDetails.industries})
               </p>
             </DetailItem>
-            <DetailItem icon={TrendingUp} >
+          </div>
+          {/* Right Column */}
+          <div>
+            <DetailItem icon={Users}>
+              <p>
+                <span className="font-semibold">Users</span> (
+                {productDetails.users})
+              </p>
+            </DetailItem>
+            <DetailItem icon={TrendingUp}>
               <p>
                 <span className="font-semibold">Market Segment</span> (
                 {productDetails.marketSegment})

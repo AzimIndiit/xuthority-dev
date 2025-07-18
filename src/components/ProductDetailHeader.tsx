@@ -107,7 +107,7 @@ export default function ProductDetailHeader({
                 <div className="flex justify-between items-start gap-4 w-full">
                   <div className="w-full">
                     <div className="flex items-start gap-4 w-full">
-                      <h1 className="text-base lg:text-2xl font-bold text-gray-900">
+                      <h1 className="text-base lg:text-2xl font-bold text-gray-900 capitalize">
                         {product.name}
                       </h1>
                     {user?.role !== 'vendor' &&  <Button

@@ -188,11 +188,11 @@ export default function AddProductModal({ isOpen, onClose }: AddProductModalProp
 
                     {/* Product Info */}
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-gray-900 truncate">
+                      <h3 className="font-semibold text-gray-900 truncate capitalize">
                         {product.name}
                       </h3>
-                      <div className="flex items-center gap-4 mt-1">
-                        <div className="flex items-center gap-1">
+                      <div className="flex flex-col items-start ">
+                        <div className="flex  items-center gap-1">
                           <StarRating rating={product.avgRating || 0} size="sm" />
                           <span className="text-sm text-gray-600">
                             ({product.totalReviews || 0})

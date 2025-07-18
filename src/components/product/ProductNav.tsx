@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Users, MessageSquareWarning } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useParams } from "react-router-dom";
@@ -15,31 +15,146 @@ const ProductNav = () => {
   ];
 
   const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const isScrollingRef = useRef(false);
+  const scrollTimeoutRef = useRef<number | null>(null);
+
+  // Function to scroll tab into view
+  const scrollTabIntoView = (tabId: string) => {
+    // Small delay to ensure DOM is ready and avoid conflicts
+    setTimeout(() => {
+      const tabElement = document.querySelector(`a[href="#${tabId}"]`) as HTMLElement;
+      if (tabElement) {
+        // Check if tab is already in view to avoid unnecessary scrolling
+        const container = tabElement.parentElement?.parentElement;
+        if (container) {
+          const containerRect = container.getBoundingClientRect();
+          const tabRect = tabElement.getBoundingClientRect();
+          
+          // Only scroll if tab is not fully visible
+          if (tabRect.left < containerRect.left || tabRect.right > containerRect.right) {
+            tabElement.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+              inline: "center"
+            });
+          }
+        }
+      }
+    }, 50);
+  };
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = tabs.map((tab) => document.getElementById(tab.id));
-      const scrollPosition = window.scrollY + 150; // Offset for nav height
+      // Don't update activeTab if we're in the middle of a programmatic scroll
+      if (isScrollingRef.current) return;
 
-      for (let i = sections.length - 1; i >= 0; i--) {
+      const sections = tabs.map((tab) => document.getElementById(tab.id)).filter(Boolean);
+      if (sections.length === 0) return;
+
+      const scrollPosition = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const navOffset = 150; // Navigation height offset
+
+      let newActiveTab = tabs[0].id; // Default to first tab
+
+      // Find which section is most visible in the viewport
+      for (let i = 0; i < sections.length; i++) {
         const section = sections[i];
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveTab(tabs[i].id);
-          break;
+        if (!section) continue;
+
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top + scrollPosition;
+        const sectionBottom = sectionTop + rect.height;
+
+        // Check if section is in viewport or if we've scrolled past the start
+        if (scrollPosition + navOffset >= sectionTop - 100) {
+          newActiveTab = tabs[i].id;
         }
+      }
+
+      // Only update if the active tab actually changed
+      if (newActiveTab !== activeTab) {
+        setActiveTab(newActiveTab);
+        // Scroll the newly active tab into view on mobile
+        scrollTabIntoView(newActiveTab);
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [tabs]);
+    // Throttle scroll events for better performance
+    let ticking = false;
+    const throttledScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener("scroll", throttledScroll, { passive: true });
+    // Also listen for resize to recalculate on orientation change
+    window.addEventListener("resize", throttledScroll, { passive: true });
+    
+    return () => {
+      window.removeEventListener("scroll", throttledScroll);
+      window.removeEventListener("resize", throttledScroll);
+      if (scrollTimeoutRef.current) {
+        window.clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [tabs, activeTab]);
+
+  // Initial check on mount to set correct active tab
+  useEffect(() => {
+    const checkInitialActiveTab = () => {
+      const sections = tabs.map((tab) => document.getElementById(tab.id)).filter(Boolean);
+      if (sections.length === 0) return;
+
+      const scrollPosition = window.scrollY;
+      const navOffset = 150;
+
+      let newActiveTab = tabs[0].id;
+
+      for (let i = 0; i < sections.length; i++) {
+        const section = sections[i];
+        if (!section) continue;
+
+        const rect = section.getBoundingClientRect();
+        const sectionTop = rect.top + scrollPosition;
+
+        if (scrollPosition + navOffset >= sectionTop - 100) {
+          newActiveTab = tabs[i].id;
+        }
+      }
+
+      setActiveTab(newActiveTab);
+    };
+
+    // Wait a bit for sections to render
+    setTimeout(checkInitialActiveTab, 100);
+  }, []);
 
   const handleTabClick = (
     e: React.MouseEvent<HTMLAnchorElement>,
     tabId: string
   ) => {
     e.preventDefault();
+    
+    // Immediately set the active tab for instant visual feedback
     setActiveTab(tabId);
+    
+    // Scroll the clicked tab into view (especially important on mobile)
+    scrollTabIntoView(tabId);
+    
+    // Flag that we're doing a programmatic scroll
+    isScrollingRef.current = true;
+    
+    // Clear any existing timeout
+    if (scrollTimeoutRef.current) {
+      window.clearTimeout(scrollTimeoutRef.current);
+    }
+    
     const element = document.getElementById(tabId);
     if (element) {
       const offset = 120; // Nav height offset
@@ -52,11 +167,18 @@ const ProductNav = () => {
         top: offsetPosition,
         behavior: "smooth",
       });
+      
+      // Re-enable scroll listener after scroll animation completes
+      scrollTimeoutRef.current = window.setTimeout(() => {
+        isScrollingRef.current = false;
+      }, 600); // Allow 600ms for smooth scroll to complete
+    } else {
+      isScrollingRef.current = false;
     }
   };
 
   return (
-    <div className=" bg-white/80 backdrop-blur-sm">
+    <div className=" bg-white/80 backdrop-blur-sm ">
       <div className="my-3 w-full lg:max-w-screen-xl mx-auto sm:px-6">
         <div className="flex w-full flex-col items-start sm:flex-row sm:items-center sm:justify-between ">
           <div className="w-full overflow-x-auto sm:w-auto">
@@ -67,10 +189,10 @@ const ProductNav = () => {
                   href={`#${tab.id}`}
                   onClick={(e) => handleTabClick(e, tab.id)}
                   className={cn(
-                    "whitespace-nowrap rounded-lg px-4 py-4 text-xs lg:text-sm font-semibold text-gray-600 transition-colors duration-200",
+                    "whitespace-nowrap rounded-lg px-4 py-4 text-xs lg:text-sm font-semibold text-gray-600 transition-all duration-300 ease-in-out",
                     activeTab === tab.id
-                      ? "bg-[#E91515] text-white shadow-md"
-                      : "hover:bg-gray-200"
+                      ? "bg-[#E91515] text-white shadow-md transform scale-105"
+                      : "hover:bg-gray-200 hover:scale-102"
                   )}
                 >
                   {tab.label}

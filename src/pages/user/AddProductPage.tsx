@@ -368,6 +368,20 @@ const AddProductPage: React.FC = () => {
     navigate('/profile/products');
   };
 
+  // Function to capitalize each word in the product name
+  const capitalizeProductName = (value: string) => {
+    return value
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  };
+
+  // Handle product name change with capitalization
+  const handleProductNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const capitalizedValue = capitalizeProductName(e.target.value);
+    setValue('name', capitalizedValue);
+  };
+
   const onError = (errors: any) => {
     const firstErrorKey = Object.keys(errors)[0];
     const targetId = firstErrorKey === "mediaUrls" ? "mediaUrlsLabel" : firstErrorKey === "logoUrl" ? "logoUrlLabel" : firstErrorKey;
@@ -390,7 +404,14 @@ console.log('mediaUrls', mediaFiles)
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit,onError)} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput name="name" label="Product Name" maxLength={100} disabled={addProductMutation.isPending} placeholder='Enter product name' />
+            <FormInput 
+              name="name" 
+              label="Product Name" 
+              maxLength={100} 
+              disabled={addProductMutation.isPending} 
+              placeholder='Enter product name'
+              onChange={handleProductNameChange}
+            />
             <FormInput name="websiteUrl" label="Product Website" maxLength={200} placeholder='Enter product website' disabled={addProductMutation.isPending} />
             <FormSelect name="softwareIds" label="Software" placeholder="Select software" options={softwareOptions} searchable disabled={softwareLoading || addProductMutation.isPending} multiple  />
             <FormSelect name="solutionIds" label="Solutions" placeholder="Select solutions" options={solutionOptions} searchable disabled={solutionLoading || addProductMutation.isPending} multiple  />

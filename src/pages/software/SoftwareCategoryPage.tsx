@@ -142,7 +142,7 @@ const SoftwareCategoryPage = () => {
           {/* <div className="mt-6 border-t border-yellow-400 w-24 mx-auto sm:mx-0" /> */}
         </div>
 
-<div className="sm:min-h-[48vh]">
+<div className="sm:min-h-[40vh]">
         <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3  ">
           {subCategories.map((subCategory: any) => {
             console.log('subCategory', subCategory)

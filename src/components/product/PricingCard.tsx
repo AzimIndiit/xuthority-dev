@@ -13,6 +13,7 @@ interface PricingCardProps {
   features: string[];
   isPopular?: boolean;
   icon: React.ReactNode;
+  product: any;
 }
 
 const PricingCard: React.FC<PricingCardProps> = ({
@@ -24,6 +25,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
   features,
   isPopular = false,
   icon,
+  product,
 }) => {
   return (
     <div
@@ -77,6 +79,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
 
       <div className="mt-auto pt-8">
         <Button
+          onClick={() => window.open(`https://${product.website}`, '_blank')}
           className={cn(
             'w-full rounded-full py-3 text-base font-semibold transition-transform duration-200 hover:scale-105',
             isPopular

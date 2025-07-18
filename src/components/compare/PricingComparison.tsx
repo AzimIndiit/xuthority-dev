@@ -184,7 +184,7 @@
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Check, X } from "lucide-react";
 import { formatCurrency } from "@/utils/formatCurrency";
 import type { CompareProduct } from "@/store/useCompareStore";
 
@@ -278,7 +278,7 @@ export default function PricingComparison({ products, className }: PricingCompar
               </td>
               {products.map((product) => {
                 const pricingData = getPricingData(product);
-                
+                console.log(pricingData,"pricingData");
                 return (
                   <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4 border-r">
                     {pricingData ? (
@@ -321,14 +321,16 @@ export default function PricingComparison({ products, className }: PricingCompar
               <td className="p-3 sm:p-4 font-medium text-gray-700 align-top w-1/4 border-r">
                 Free Trial
               </td>
-              {products.map((product) => (
+              {products.map((product) => {
+                 const pricingData = getPricingData(product);
+                return (
                 <td key={product.id} className="p-3 sm:p-4 text-left align-top w-1/4 border-r">
                   <div className="flex items-center gap-2">
-                    <Check className="w-4 h-4 text-green-600" />
-                    <span className="text-sm text-gray-700">Available</span>
+                  {pricingData ? pricingData?.price===0 ? <Check className="w-4 h-4 text-green-600" /> : <X className="w-4 h-4 text-red-600" /> : <span className="text-gray-300 italic text-sm">No Pricing Available</span>}
+                    <span className="text-sm text-gray-700">{pricingData ? pricingData?.price===0 ? 'Available' : 'Not Available' : ''}</span>
                   </div>
                 </td>
-              ))}
+              )})}
               {products.length < 3 && [...Array(3 - products.length)].map((_, index) => (
                 <td key={`empty-trial-${index}`} className="p-3 sm:p-4 text-center align-top w-1/4 border-r">
                   <span className="text-gray-300 italic text-sm">

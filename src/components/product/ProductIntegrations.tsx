@@ -33,7 +33,7 @@ const   IntegrationCard = ({ name, image }: { name: string, image: string }) => 
 
 const ProductIntegrations = ({integrations}: {integrations: any}) => {
   return (
-    <div className="pb-10">
+    <div className="">
       <h2 className="text-2xl font-bold text-gray-900 mb-8">
         Integrations
       </h2>

@@ -117,11 +117,19 @@ const MediaPreviewModal = ({
             ref={videoRef}
             src={currentMedia}
             className="max-w-full max-h-full object-contain"
+            controlsList="nodownload noplaybackrate nopictureinpicture"
+            autoPlay={true}
             controls
-            autoPlay
             onPlay={() => setIsVideoPlaying(true)}
             onPause={() => setIsVideoPlaying(false)}
             onEnded={() => setIsVideoPlaying(false)}
+            disablePictureInPicture
+            style={{
+              // Attempt to hide the native "3 dot" overflow menu in Chromium browsers
+              // and further restrict PiP via attribute above
+              // @ts-ignore
+              WebkitMediaControlsEnclosure: { overflow: 'hidden' }
+            } as React.CSSProperties}
           />
         ) : (
           <img
@@ -208,7 +216,11 @@ const MediaCard = ({
           <video
             src={mediaSrc}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            controlsList="nodownload noplaybackrate nopictureinpicture"
+            autoPlay={true}
             controls
+     
+            disablePictureInPicture
             preload="metadata"
             onPlay={handlePlay}
             onPause={handlePause}

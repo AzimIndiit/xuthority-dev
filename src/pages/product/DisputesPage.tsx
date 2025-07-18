@@ -102,7 +102,6 @@ const errorData = error as any;
         isVerified: dispute.review.reviewer.isVerified || false,
         slug: dispute.review.reviewer.slug || '',
         userTitle: dispute.review.reviewer.title || '',
-        
       };
 
       // Find the label for the dispute reason

@@ -136,10 +136,15 @@ const UploadScreenshotModal: React.FC<UploadScreenshotModalProps> = ({
     ["image/jpeg", "image/png", "image/jpg", "image/webp"].includes(
       fileValue.type
     );
+  const handleClose = () => {
+    reset(); // Clear the form and selected file
+    onClose();
+  };
+
   return (
     <Dialog
       open={open}
-      onOpenChange={(open) => (!open ? onClose() : undefined)}
+      onOpenChange={(open) => (!open ? handleClose() : undefined)}
     >
       <DialogContent className="max-w-lg p-8 rounded-2xl">
         <DialogHeader>
@@ -240,14 +245,13 @@ const UploadScreenshotModal: React.FC<UploadScreenshotModalProps> = ({
           </Button>
         </form>
         <DialogFooter className="flex flex-col items-center mt-2 w-full  text-center">
-          <DialogClose asChild className="w-full">
-            <Button
-              variant="link"
-              className="text-blue-600 underline text-base hover:text-blue-800 p-0 h-auto"
-            >
-              Or Choose a Different Option
-            </Button>
-          </DialogClose>
+          <Button
+            variant="link"
+            className="text-blue-600 underline text-base hover:text-blue-800 p-0 h-auto w-full"
+            onClick={handleClose}
+          >
+            Or Choose a Different Option
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

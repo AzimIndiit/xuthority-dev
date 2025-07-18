@@ -64,7 +64,7 @@ export const StyledAccordion = ({
                 <li 
                   key={`${item.value}-${index}`} 
                   className={cn(
-                    "transition-colors",
+                    "transition-colors capitalize",
                     item.slug 
                       ? "hover:text-blue-600 cursor-pointer" 
                       : "hover:text-gray-800"

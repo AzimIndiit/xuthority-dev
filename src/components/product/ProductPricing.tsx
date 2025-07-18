@@ -97,7 +97,7 @@ const ProductPricing = ({pricing, product}: {pricing: any, product: any}) => {
         >
             {pricing?.map((plan: any) => (
             <div key={plan.planName} className="w-80 sm:w-96 flex-shrink-0">
-              <PricingCard {...plan} icon={<img src="/svg/pricing.svg" alt="pricing" className="w-10 h-10" />} />
+              <PricingCard {...plan} icon={<img src="/svg/pricing.svg" alt="pricing" className="w-10 h-10" />} product={product} />
             </div>
           ))}
         </div>

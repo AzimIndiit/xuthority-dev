@@ -29,7 +29,7 @@ import MyFavorites from '@/components/user/MyFavorites';
 import { NotificationsList } from '@/components/notifications';
 import UserDisputes from './UserDisputes';
 import MyBadgesPage from './MyBadgesPage';
-import MySubscriptionPage from './MySubscriptionPage';
+  // import MySubscriptionPage from './MySubscriptionPage';
 import useUserStore from '@/store/useUserStore';
 
 // Skeleton component for the profile sidebar
@@ -162,7 +162,7 @@ const ProfilePage: React.FC = () => {
     if (!user || !tab) return; // Only validate if user is loaded and tab exists
 
     const validTabs = user.role === 'vendor' 
-      ? ['profile-details', 'products', 'my-subscription', 'dispute-management', 'my-badges', 'notifications', 'logout', 'followers', 'following']
+      ? ['profile-details', 'products', 'dispute-management', 'my-badges', 'notifications', 'logout', 'followers', 'following']
       : ['profile-details', 'my-reviews', 'my-favourites', 'notifications', 'logout', 'followers', 'following'];
 
     // Check if tab is valid for the user's role
@@ -280,11 +280,11 @@ const ProfilePage: React.FC = () => {
           icon: <Grid className="w-5 h-5" />,
          
         },
-        {
-          id: 'my-subscription',
-          label: 'My Subscription',
-          icon: <CreditCard className="w-5 h-5" />,
-        },
+        // {
+        //   id: 'my-subscription',
+        //   label: 'My Subscription',
+        //   icon: <CreditCard className="w-5 h-5" />,
+        // },
         {
           id: 'dispute-management',
           label: 'Dispute Management',
@@ -374,12 +374,12 @@ const ProfilePage: React.FC = () => {
         current: 'Profile / My Badges',
       };
     }
-    if (activeTab === 'my-subscription') {
-      return {
-        home: 'Home',
-        current: 'Profile / My Subscription',
-      };
-    }
+    // if (activeTab === 'my-subscription') {
+    //   return {
+    //     home: 'Home',
+    //     current: 'Profile / My Subscription',
+    //   };
+    // }
     return {
       home: 'Home',
       current: 'My Profile',
@@ -467,8 +467,8 @@ const ProfilePage: React.FC = () => {
         return <MyFavorites />;
       case 'my-badges':
         return <MyBadgesPage />;
-      case 'my-subscription':
-        return <MySubscriptionPage />;
+      // case 'my-subscription':
+      //   return <MySubscriptionPage />;
       case 'notifications':
         return <NotificationsList />;
       case 'dispute-management':

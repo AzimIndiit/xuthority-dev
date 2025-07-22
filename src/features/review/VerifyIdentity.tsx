@@ -30,14 +30,14 @@ const options = [
       <img src="/svg/review/linkedin.svg" alt="linkedin" className="w-16 h-16" />
     ),
   },
-  {
-    label: "Continue with unique vendor invitation link",
-    bg: "bg-[#CCDAFA]",
-    border: "border-[#CCDAFA]",
-    icon: (
-      <img src="/svg/review/link.svg" alt="vendor-invitation" className="w-16 h-16" />
-    ),
-  },
+  // {
+  //   label: "Continue with unique vendor invitation link",
+  //   bg: "bg-[#CCDAFA]",
+  //   border: "border-[#CCDAFA]",
+  //   icon: (
+  //     <img src="/svg/review/link.svg" alt="vendor-invitation" className="w-16 h-16" />
+  //   ),
+  // },
   {
     label: "Upload a screenshot of your software",
     bg: "bg-[#FFF5D4]",
@@ -174,7 +174,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
         At XUTHORITY, we prioritize authentic reviews from users with real-world experience using the software in a professional environment.
       </p>
       <p className="text-gray-700 mb-8">Choose one of the following options:</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
         {options.map((option, idx) => (
           <button
             key={option.label}
@@ -183,8 +183,8 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
             onClick={() => {
               if (idx === 0) setCompanyModalOpen(true);
               if (idx === 1) handleLinkedInVerification();
-              if (idx === 2) handleVendorInvitationClick();
-              if (idx === 3) setScreenshotModalOpen(true);
+              // if (idx === 2) handleVendorInvitationClick();
+              if (idx === 2) setScreenshotModalOpen(true);
             }}
           >
             <div className="mb-4 sm:mb-6">{option.icon}</div>

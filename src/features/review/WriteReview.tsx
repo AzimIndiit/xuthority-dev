@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -13,6 +13,7 @@ import { createReview, updateReview, Review } from '@/services/review';
 import { useToast } from '@/hooks/useToast';
 import { useUserHasReviewed } from '@/hooks/useReview';
 import { queryClient } from "@/lib/queryClient";
+import { FileUploadService } from '@/services/fileUpload';
 
 // Skeleton loader component for WriteReview
 const WriteReviewSkeleton = () => (
@@ -121,6 +122,28 @@ const schema = z.object({
       message: "Please select a valid rating"
     }),
   }),
+  file: z
+    .instanceof(File)
+    .optional()
+    .refine(
+      (file) => {
+        if (!file) return true; // Optional file
+        return file.size <= 5 * 1024 * 1024; // 5MB limit
+      },
+      {
+        message: "File size must be less than 5MB",
+      }
+    )
+    .refine(
+      (file) => {
+        if (!file) return true; // Optional file
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+        return allowedTypes.includes(file.type);
+      },
+      {
+        message: "Only JPG, JPEG, PNG, and GIF images are allowed",
+      }
+    ),
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -139,6 +162,11 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [existingReview, setExistingReview] = useState<Review | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [existingFileUrl, setExistingFileUrl] = useState<string | null>(null);
+  const [isUploadingFile, setIsUploadingFile] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
   console.log('selectedSoftware', selectedSoftware)
   // Check if user has already reviewed this product
   const { hasReviewed, review: userReview, isLoading: isCheckingReview } = useUserHasReviewed(selectedSoftware?.id);
@@ -181,17 +209,44 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
         pricing: '',
         technicalSupport: '',
       },
+      file: undefined,
     },
   });
 
   const watchedRating = watch("rating");
   const watchedSubRatings = watch("subRatings");
-console.log('userReview', userReview)
+  const watchedFile = watch("file");
+
+  console.log('userReview', userReview)
+
+  // File handling functions
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setValue("file", file, { shouldValidate: true });
+    }
+  };
+
+  const clearFile = () => {
+    setSelectedFile(null);
+    setExistingFileUrl(null);
+    setValue("file", undefined);
+    if (inputRef.current) {
+      inputRef.current.value = '';
+    }
+  };
   // Set edit mode and populate form when existing review is found
   useEffect(() => {
     if (userReview !== null) {
       setIsEditMode(true);
       setExistingReview(userReview);
+      
+      // Handle existing file attachments
+      if (userReview.metaData?.attachments && userReview.metaData.attachments.length > 0) {
+        const firstAttachment = userReview.metaData.attachments[0];
+        setExistingFileUrl(firstAttachment.fileUrl);
+      }
       
       // Populate form with existing review data
       const formData = {
@@ -205,6 +260,7 @@ console.log('userReview', userReview)
           pricing: userReview.subRatings?.pricing ? userReview.subRatings.pricing.toString() : 'N/A',
           technicalSupport: userReview.subRatings?.technicalSupport ? userReview.subRatings.technicalSupport.toString() : 'N/A',
         },
+        file: undefined, // Don't populate file in form, we'll handle display separately
       };
       
       reset(formData);
@@ -263,6 +319,42 @@ console.log('userReview', userReview)
         Object.entries(data.subRatings).map(([k, v]) => [k, v === 'N/A' ? 0 : parseInt(v)])
       );
 
+      // Handle file upload if present
+      let metaData: any = {
+        reviewVersion: '1.0',
+        attachments: []
+      };
+
+      // If we have a new file, upload it
+      if (data.file) {
+        setIsUploadingFile(true);
+        toast.loading('Uploading image...');
+        try {
+          const fileUploadResponse = await FileUploadService.uploadFile(data.file);
+          
+          if (fileUploadResponse.success && fileUploadResponse.data) {
+            metaData.attachments.push({
+              fileName: fileUploadResponse.data.originalName || data.file.name,
+              fileUrl: FileUploadService.getFileUrl(fileUploadResponse.data),
+              fileType: data.file.type,
+              fileSize: data.file.size,
+              uploadedAt: new Date().toISOString()
+            });
+          }
+          toast.dismiss();
+        } catch (uploadError) {
+          toast.dismiss();
+          toast.review.error('Failed to upload image. Please try again.');
+          return;
+        } finally {
+          setIsUploadingFile(false);
+        }
+      } 
+      // If we're in edit mode and have an existing file but no new file, preserve existing metaData
+      else if (isEditMode && existingReview?.metaData && existingFileUrl) {
+        metaData = existingReview.metaData;
+      }
+
       if (isEditMode && existingReview) {
         // Update existing review
         const updatePayload = {
@@ -270,6 +362,7 @@ console.log('userReview', userReview)
           title: data.title,
           content: data.description,
           subRatings: subRatingsPayload,
+          ...(metaData.attachments.length > 0 && { metaData })
         };
         
         updateMutation.mutate({ 
@@ -309,6 +402,7 @@ console.log('userReview', userReview)
           content: data.description,
           subRatings: subRatingsPayload,
           verification,
+          ...(metaData.attachments.length > 0 && { metaData })
         };
         
         createMutation.mutate(createPayload);
@@ -514,15 +608,111 @@ console.log('userReview', userReview)
             </div>
           </div>
 
+          {/* File Upload Section - Hidden if verification type is screenshot */}
+          {verificationData?.method !== 'screenshot' && (
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                Attach Image (Optional)
+              </h3>
+              <p className="text-gray-500 text-sm mb-4">Confirm that you are a current user of {selectedSoftware?.name} by uploading a screenshot showing you logged into {selectedSoftware?.name}.</p>
+            <div
+              className="border-2 border-dashed border-blue-400 rounded-xl p-8 flex flex-col items-center justify-center cursor-pointer bg-gray-50 hover:bg-blue-50 transition"
+              onClick={() => inputRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={(e) => {
+                e.preventDefault();
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                  const file = files[0];
+                  setSelectedFile(file);
+                  setValue("file", file, { shouldValidate: true });
+                }
+              }}
+            >
+              <input
+                {...register("file")}
+                ref={inputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+              {selectedFile || watchedFile || existingFileUrl ? (
+                <div className="w-full max-w-sm relative">
+                  <img
+                    src={
+                      selectedFile || watchedFile 
+                        ? URL.createObjectURL(selectedFile || watchedFile!)
+                        : existingFileUrl!
+                    }
+                    alt="Uploaded file preview"
+                    className="w-full h-48 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      clearFile();
+                    }}
+                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                  {existingFileUrl && !selectedFile && !watchedFile && (
+                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                      Existing attachment
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center">
+                  <svg width="48" height="48" fill="none" viewBox="0 0 48 48">
+                    <path
+                      d="M24 34V14m0 0l-7 7m7-7l7 7"
+                      stroke="#2563EB"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                    <rect
+                      x="8"
+                      y="34"
+                      width="32"
+                      height="6"
+                      rx="3"
+                      fill="#2563EB"
+                      fillOpacity=".1"
+                    />
+                  </svg>
+                  <div className="mt-2 text-base">
+                    <span className="text-blue-600 underline cursor-pointer">
+                      Click here
+                    </span>{" "}
+                    to upload or drop image here
+                  </div>
+                  <div className="text-gray-500 text-sm mt-1">
+                    Support JPG, PNG, GIF (Max 5MB)
+                  </div>
+                </div>
+              )}
+            </div>
+            {errors.file && (
+              <p className="text-red-500 text-sm mt-2">{errors.file.message}</p>
+            )}
+          </div>
+          )}
+          
           {/* Submit Button */}
           <div className="flex justify-end pt-4">
             <Button
               type="submit"
-              disabled={createMutation.isPending || updateMutation.isPending}
+              disabled={createMutation.isPending || updateMutation.isPending || isUploadingFile}
               className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-full text-lg font-semibold min-w-32"
-              loading={createMutation.isPending || updateMutation.isPending}
+              loading={createMutation.isPending || updateMutation.isPending || isUploadingFile}
             >
-              {isEditMode ? "Update" : "Submit"}
+              {isUploadingFile ? "Uploading..." : isEditMode ? "Update" : "Submit"}
             </Button>
           </div>
         </form>

@@ -21,6 +21,18 @@ export interface CreateReviewPayload {
   };
   reviewSource?: string;
   verification?: ReviewVerification;
+  metaData?: {
+    attachments: Array<{
+      fileName: string;
+      fileUrl: string;
+      fileType: string;
+      fileSize: number;
+      uploadedAt: string;
+    }>;
+    reviewVersion?: string;
+    sourceInfo?: any;
+    customFields?: any;
+  };
 }
 
 export interface UpdateReviewPayload {
@@ -33,6 +45,18 @@ export interface UpdateReviewPayload {
     features?: number;
     pricing?: number;
     technicalSupport?: number;
+  };
+  metaData?: {
+    attachments: Array<{
+      fileName: string;
+      fileUrl: string;
+      fileType: string;
+      fileSize: number;
+      uploadedAt: string;
+    }>;
+    reviewVersion?: string;
+    sourceInfo?: any;
+    customFields?: any;
   };
 }
 
@@ -52,6 +76,20 @@ export interface Review {
   };
   status: 'pending' | 'approved' | 'rejected' | 'flagged';
   verification?: ReviewVerification;
+  metaData?: {
+    attachments: Array<{
+      fileName: string;
+      fileUrl: string;
+      fileType: string;
+      fileSize: number;
+      uploadedAt: string;
+      id?: string;
+      _id?: string;
+    }>;
+    reviewVersion?: string;
+    sourceInfo?: any;
+    customFields?: any;
+  };
   submittedAt: string;
   publishedAt?: string;
 }

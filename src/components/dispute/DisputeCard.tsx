@@ -242,7 +242,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
           <div className="relative w-12 h-12" >
             <Avatar className="h-12 w-12 ">
               <AvatarImage src={product.logoUrl} alt={product.name} />
-              <AvatarFallback>{product.name.split(' ').slice(0, 2).join(' ')}</AvatarFallback>
+              <AvatarFallback>{getUserInitials(product as any) || 'UN'}</AvatarFallback>
             </Avatar>
     
           </div>

@@ -119,7 +119,7 @@ const UserDisputes = () => {
 
       // Transform review data with proper null checks
       const review: DisputedReview = {
-        id: dispute.review?._id,
+        id: dispute.review?._id || '',
         title: dispute.review?.title || '',
         rating: dispute.review?.overallRating || 0,
         date: formatDate(dispute.review?.createdAt || dispute.createdAt),
@@ -142,14 +142,22 @@ const UserDisputes = () => {
       const descriptionLines = (dispute.description || '').split('\n').filter(line => line.trim());
       const description = descriptionLines[0] || dispute.description || '';
       const claims = descriptionLines.slice(1).filter(line => line.trim());
-      const product = dispute.product || {};
+      
+      // Transform product data with proper defaults
+      const product = {
+        _id: dispute.product?._id || '',
+        name: dispute.product?.name || 'Unknown Product',
+        slug: dispute.product?.slug || '',
+        logoUrl: dispute.product?.logoUrl || '',
+        ...dispute.product
+      };
       
       // Transform dispute data with proper null checks
       const transformedDispute: Dispute = {
-        id: dispute?._id,
+        id: dispute?._id || '',
         disputer: {
-          name: getUserDisplayName(dispute.vendor),
-          avatarUrl: dispute.vendor?.avatar || `https://ui-avatars.com/api/?name=${getUserDisplayName(dispute.vendor)}`,
+          name: getUserDisplayName(dispute.vendor) || 'Unknown User',
+          avatarUrl: dispute.vendor?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(getUserDisplayName(dispute.vendor) || 'Unknown User')}`,
         },
         date: formatDate(dispute.createdAt),
         reason: reasonLabel,
@@ -157,12 +165,12 @@ const UserDisputes = () => {
         status: dispute.status ? dispute.status.toLowerCase() : 'pending',
         description: description,
         claims: claims,
-        explanations: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?.content : '',
-        explanationsId: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?._id : null,
+        explanations: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?.content || '' : '',
+        explanationsId: dispute.explanations && dispute.explanations.length > 0 ? dispute.explanations[0]?._id || null : null,
         // Add additional fields for ownership check
-        isOwner: user?._id === dispute.vendor,
-        vendorId: dispute?.vendor,
-        reviewId: dispute?.review?._id,
+        isOwner: [dispute?.vendor?._id,dispute?.vendor].includes(user?._id),
+        vendorId: dispute?.vendor?._id || dispute?.vendor || '',
+        reviewId: dispute?.review?._id || '',
       };
       return { review, dispute: transformedDispute, product };
     }).filter(Boolean); // Remove any null entries

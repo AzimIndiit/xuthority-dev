@@ -139,7 +139,7 @@ export function VendorSignupForm() {
         password: data.password,
         companyName: data.companyName,
         companyEmail: data.companyEmail,
-        industry: data.industry,
+        industry: industryOptions.find(option => option.value === data.industry)?.label || data.industry,
         companySize: data.companySize,
         acceptedTerms: data.terms,
         acceptedMarketing: data.updates || false,

@@ -262,7 +262,7 @@ const ProfileDetailsFormVendor: React.FC<ProfileDetailsFormProps> = ({
           lastName: data.lastName,
           region: data.region,
           description: cleanValue(data.description),
-          industry: data.industry,
+          industry: industryOptions.find(option => option.value === data.industry)?.label || data.industry,
           companyName: data.companyName,
           companySize: data.companySize,
           socialLinks: {

@@ -169,7 +169,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
           Back
         </button>
       </div>
-      <h2 className="text-3xl font-bold mb-2">4 ways to verify with XUTHORITY</h2>
+      <h2 className="text-3xl font-bold mb-2">3 ways to verify with XUTHORITY</h2>
       <p className="text-gray-700 mb-1">
         At XUTHORITY, we prioritize authentic reviews from users with real-world experience using the software in a professional environment.
       </p>

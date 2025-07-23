@@ -31,6 +31,7 @@ import UserDisputes from './UserDisputes';
 import MyBadgesPage from './MyBadgesPage';
   // import MySubscriptionPage from './MySubscriptionPage';
 import useUserStore from '@/store/useUserStore';
+import { useIndustryOptions } from '@/hooks/useIndustry';
 
 // Skeleton component for the profile sidebar
 const ProfileSidebarSkeleton = () => (
@@ -156,6 +157,7 @@ const ProfilePage: React.FC = () => {
 
   // Use the useProfile hook to trigger React Query
   const { data: user, isLoading, error } = useProfile();
+  const { options: industryOptions } = useIndustryOptions();
 
   // Validate tab and subTab parameters and redirect if invalid
   useEffect(() => {
@@ -254,7 +256,7 @@ const ProfilePage: React.FC = () => {
     email: user?.email || '',
     region: user?.region || '',
     description: user?.description || '',
-    industry: user?.industry || '',
+    industry: industryOptions.find(option => option.label === user?.industry)?.value || user?.industry || '',
     companyName: user?.companyName || '',
     companyEmail: user?.companyEmail || '',
     companySize: user?.companySize || '',

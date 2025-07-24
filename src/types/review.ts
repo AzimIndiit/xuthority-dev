@@ -139,7 +139,7 @@ export function transformBackendReview(backendReview: BackendReview): Review {
         _id: product._id || '',
         name: product.name || '',
         slug: product.slug || '',
-        userId: product.userId || '',
+        userId: product.userId || product.user?._id || '',
       },
       verification: {
         isVerified: Boolean(verification.isVerified),

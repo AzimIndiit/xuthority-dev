@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import BadgeCard from '@/components/badges/BadgeCard';
+import BadgeRequestModal from '@/components/badges/BadgeRequestModal';
 import { useAllBadges, useUserBadges, useRequestBadge } from '@/hooks/useBadges';
 import SecondaryLoader from '@/components/ui/SecondaryLoader';
 import { useAuth } from '@/hooks/useAuth';
@@ -68,6 +69,13 @@ const MyBadgesPage: React.FC = () => {
   const { data: allBadges, isLoading: isLoadingAll } = useAllBadges();
   const { data: userBadges, isLoading: isLoadingUser } = useUserBadges();
 
+  // Modal state
+  const [selectedBadge, setSelectedBadge] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   // Check if user is a vendor
   if (user && user.role !== 'vendor') {
     return <Navigate to="/profile" replace />;
@@ -83,6 +91,18 @@ const MyBadgesPage: React.FC = () => {
   const userBadgesData = Array.isArray(userBadges.data) ? userBadges.data : [];
 
   console.log(userBadgesData,'userBadgesData');
+
+  // Handle badge request
+  const handleBadgeRequest = (badgeId: string, badgeTitle: string) => {
+    setSelectedBadge({ id: badgeId, title: badgeTitle });
+    setIsModalOpen(true);
+  };
+
+  // Handle modal close
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+    setSelectedBadge(null);
+  };
 
   return (
     <div className="">
@@ -116,8 +136,8 @@ const MyBadgesPage: React.FC = () => {
               icon={badge.icon}
               bgColor={badge.colorCode}
               iconColor={badge.colorCode}
-       
               requestStatus={userStatus as 'approved' | 'requested' | 'available'}
+              onRequest={() => handleBadgeRequest(badge._id, badge.title)}
             />
           );
         })}
@@ -128,6 +148,16 @@ const MyBadgesPage: React.FC = () => {
         <div className="text-center py-12">
           <p className="text-gray-500">No badges available at the moment.</p>
         </div>
+      )}
+
+      {/* Badge Request Modal */}
+      {selectedBadge && (
+        <BadgeRequestModal
+          isOpen={isModalOpen}
+          onClose={handleModalClose}
+          badgeId={selectedBadge.id}
+          badgeTitle={selectedBadge.title}
+        />
       )}
     </div>
   );

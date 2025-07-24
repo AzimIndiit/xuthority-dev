@@ -224,7 +224,7 @@ export const useLogin = () => {
       'user-login',
       50000 // 50 second timeout for monitoring
     ),
-    retry: getDefaultMutationRetry(),
+    retry:0,
     onError: (error: any) => {
       console.error('Login error:', error);
       // Don't show additional toast here as the store already handles it

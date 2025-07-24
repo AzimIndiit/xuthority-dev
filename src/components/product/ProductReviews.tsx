@@ -168,7 +168,6 @@ const ProductReviews: React.FC<ProductReviewsProps> = ({ product }) => {
 
   // Use all reviews for display (search is now handled by backend)
   const reviews = allReviews;
-
     // Update rating distribution only if not already present
   React.useEffect(() => {
     if (ratingDistributionData.length > 0) {

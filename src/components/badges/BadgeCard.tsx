@@ -8,7 +8,6 @@ import {
   DialogDescription 
 } from '@/components/ui/dialog';
 import { Star } from 'lucide-react';
-import { useRequestBadge } from '@/hooks/useBadges';
 
 interface BadgeCardProps {
   title: string;
@@ -18,7 +17,7 @@ interface BadgeCardProps {
   bgColor?: string;
   iconColor?: string;
   badgeId: string;
-  onRequestBadge?: () => void;
+  onRequest?: () => void;
 }
 
 const BadgeCard: React.FC<BadgeCardProps> = ({ 
@@ -28,16 +27,16 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
   icon,
   bgColor,
   iconColor,
-  badgeId
+  badgeId,
+  onRequest
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const requestBadgeMutation = useRequestBadge();
 
   const isDisabled = requestStatus === 'approved' || requestStatus === 'requested';
   
-  const handleRequestBadge = (badgeId: string) => {
-    if (!requestBadgeMutation.isPending) {
-      requestBadgeMutation.mutate(badgeId);
+  const handleRequestBadge = () => {
+    if (onRequest && !isDisabled) {
+      onRequest();
     }
   };
 
@@ -89,8 +88,7 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
         {/* Status Box - Always at bottom */}
         <Button 
           className={`h-10 w-full ${getButtonClassName()}`}
-          onClick={isDisabled ? undefined : () => handleRequestBadge(badgeId)}
-          loading={requestBadgeMutation.isPending}
+          onClick={isDisabled ? undefined : handleRequestBadge}
         >
           {getButtonText()} 
         </Button>

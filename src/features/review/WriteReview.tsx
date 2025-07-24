@@ -416,6 +416,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   const handleRatingChange = (rating: number) => {
     setValue("rating", rating, { shouldValidate: true });
   };
+  console.log('verificationData', verificationData, 'existingReview', existingReview)
 
   const handleSubRatingChange = (category: string, rating: number) => {
     setValue(`subRatings.${category}` as any, rating.toString(), { shouldValidate: true });
@@ -609,7 +610,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           </div>
 
           {/* File Upload Section - Hidden if verification type is screenshot */}
-          {verificationData?.method !== 'screenshot' || existingReview?.verification?.verificationType !== 'screenshot' && (
+          {verificationData?.method !== 'screenshot' || existingReview && existingReview?.verification?.verificationType !== 'screenshot' && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
                 Attach Image (Optional)

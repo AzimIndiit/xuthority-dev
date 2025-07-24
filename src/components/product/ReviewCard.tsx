@@ -74,7 +74,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
     setIsDisputeModalOpen(true);
   };
 
-
+console.log('product', review.product?.userId?._id === user?.id)
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
@@ -130,7 +130,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
                 {backendReview?.totalReplies ? ` (${backendReview.totalReplies})` : ''}
               </span>
             </button>
-           {review.product?.userId === user?.id && <button
+           {(review.product?.userId === user?.id || review.product?.userId?._id === user?.id) && <button
               onClick={handleDisputeClick}
               className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-[#0071e3] hover:underline cursor-pointer"
               style={{ minWidth: 0 }}

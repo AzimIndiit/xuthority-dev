@@ -24,6 +24,11 @@ export interface UserBadge {
   rejectionReason?: string;
 }
 
+export interface BadgeRequestData {
+  badgeId: string;
+  reason: string;
+}
+
 export interface BadgesResponse {
   data: Badge[];
   meta?: {
@@ -57,7 +62,7 @@ export const getAllBadges = async (): Promise<BadgesResponse> => {
   return response.data;
 };
 
-export const requestBadge = async (badgeId: string): Promise<UserBadge> => {
-  const response = await api.post('/user-badges/request', { badgeId });
+export const requestBadge = async (data: BadgeRequestData): Promise<UserBadge> => {
+  const response = await api.post('/user-badges/request', data);
   return response.data.data;
 }; 

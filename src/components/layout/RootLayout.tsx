@@ -6,11 +6,16 @@ import Breadcrumb from "./Breadcrumb";
 import { Toaster } from "react-hot-toast";
 import ScrollToTop from "@/components/ScrollToTop";
 import CompareButton from "@/components/CompareButton";
+import { Helmet } from "react-helmet-async";
 
 // Root layout with Navbar
 function RootLayout() {
   return (
     <>
+      <Helmet>
+        <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, nocache" />
+        <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet, noimageindex" />
+      </Helmet>
       <ScrollToTop />
       <Navbar />
       <Breadcrumb />

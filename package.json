@@ -38,6 +38,7 @@
     "react": "^19.1.0",
     "react-activity": "^2.1.3",
     "react-dom": "^19.1.0",
+    "react-helmet-async": "^2.0.5",
     "react-hook-form": "^7.59.0",
     "react-hot-toast": "^2.5.2",
     "react-router-dom": "^7.6.2",

@@ -76,7 +76,7 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
             src={icon as string}
             alt={`${title} Badge`}
             style={{ filter: requestStatus === 'approved' ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.5)' }}
-            className="w-16 h-16"
+            className="w-16 h-16 object-contain"
           />
         </div>
 

@@ -39,7 +39,8 @@ export function useUserHasReviewed(productId: string | undefined): {
 } {
 
   const { data: review, isLoading } = useUserReview(productId);
-  const hasReviewed = !!review;
+  // Explicitly check for null/undefined to ensure hasReviewed is false when no review exists
+  const hasReviewed = review !== null && review !== undefined;
   
   console.log('useUserHasReviewed debug:', {
     productId,

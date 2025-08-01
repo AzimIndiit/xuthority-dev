@@ -199,9 +199,9 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      rating: reviewData.rating || 0,
-      title: reviewData.title || "",
-      description: reviewData.description || "",
+      rating: 0,
+      title: "",
+      description: "",
       subRatings: {
         easeOfUse: '',
         customerSupport: '',
@@ -238,7 +238,9 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   };
   // Set edit mode and populate form when existing review is found
   useEffect(() => {
-    if (userReview !== null) {
+    console.log('userReview changed:', userReview);
+    
+    if (userReview !== null && userReview !== undefined) {
       setIsEditMode(true);
       setExistingReview(userReview);
       
@@ -269,6 +271,32 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
         title: userReview.title,
         description: userReview.content,
       });
+    } else {
+      // No review exists - reset form to empty state
+      console.log('No review found - resetting form to empty state');
+      setIsEditMode(false);
+      setExistingReview(null);
+      setExistingFileUrl(null);
+      clearFile();
+      
+      // Reset form to default empty values
+      const emptyFormData = {
+        rating: 0,
+        title: "",
+        description: "",
+        subRatings: {
+          easeOfUse: '',
+          customerSupport: '',
+          features: '',
+          pricing: '',
+          technicalSupport: '',
+        },
+        file: undefined,
+      };
+      
+      reset(emptyFormData);
+      // Clear the review store data to prevent cached values
+      resetReviewData();
     }
   }, [userReview, reset, updateReviewData]);
 

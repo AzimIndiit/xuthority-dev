@@ -154,16 +154,41 @@ const WriteReviewPage = () => {
      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
    }, []); 
 
-  // Handle existing review redirect to edit mode
+  // Handle step navigation based on product selection and review data
   useEffect(() => {
-    if (hasReviewed && review && selectedSoftware && !isLoading && currentStep !== 4) {
-      // User has already reviewed this product, skip to step 3 (WriteReview) for editing
-      setCurrentStep(3);
+    console.log('Step navigation check:', { 
+      selectedSoftware: !!selectedSoftware, 
+      hasReviewed, 
+      review: !!review, 
+      isLoading, 
+      currentStep 
+    });
+
+    if (isLoading) {
+      // Don't change steps while loading
+      return;
     }
-  }, [hasReviewed, review, selectedSoftware, isLoading, setCurrentStep,currentStep]);
+
+    if (hasReviewed && review && selectedSoftware && currentStep !== 4) {
+      // User has already reviewed this product, skip to step 3 (WriteReview) for editing
+      console.log('User has reviewed - going to step 3');
+      setCurrentStep(3);
+    } else if (selectedSoftware && !hasReviewed && currentStep === 1) {
+      // Product is selected but no review exists, go to step 2 (Verify Identity)
+      console.log('Product selected, no review - going to step 2');
+      setCurrentStep(2);
+    } else if (!selectedSoftware && currentStep !== 1) {
+      // No product selected, go to step 1 (Select Software)
+      console.log('No product selected - going to step 1');
+      setCurrentStep(1);
+    }
+  }, [hasReviewed, review, selectedSoftware, isLoading, setCurrentStep, currentStep]);
 
   useEffect(() => {
-    if (currentStep === 1 && !selectedSoftware) {
+    // Show stepper when we have a selected software or when on step 1
+    if (selectedSoftware || currentStep === 1) {
+      setShowStepper(true);
+    } else {
       setShowStepper(false);
     }
   }, [currentStep, selectedSoftware]);

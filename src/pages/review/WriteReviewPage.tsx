@@ -165,7 +165,7 @@ const WriteReviewPage = () => {
      return () => window.removeEventListener('beforeunload', handleBeforeUnload);
    }, []); 
 
-  // Handle step navigation based on product selection and review data
+  // Single, clean step navigation logic
   useEffect(() => {
     console.log('Step navigation check:', { 
       selectedSoftware: !!selectedSoftware, 
@@ -176,12 +176,35 @@ const WriteReviewPage = () => {
       isVerified: verificationData.isVerified
     });
 
-    if (isLoading) {
-      // Don't change steps while loading
+    if (isLoading) return;
+
+    const reviewDeleted = sessionStorage.getItem('reviewDeleted');
+    
+    // Handle review deletion - force verification
+    if (reviewDeleted === 'true' && selectedSoftware && currentStep !== 2 && currentStep !== 4) {
+      console.log('Review was deleted - forcing to step 2 for verification');
+      setCurrentStep(2);
+      sessionStorage.removeItem('reviewDeleted');
       return;
     }
 
-    // Only auto-navigate if user is on step 1 (initial load) or if they just selected a product
+    // Step 3 access control: Only allow if user has review data OR is verified
+    const canAccessStep3 = (hasReviewed && review) || verificationData.isVerified;
+    
+    if (currentStep === 3 && selectedSoftware && !canAccessStep3) {
+      console.log('User on step 3 but not authorized - forcing to step 2');
+      setCurrentStep(2);
+      return;
+    }
+
+    // Allow progression to step 3 after verification
+    if (currentStep === 2 && selectedSoftware && verificationData.isVerified && !isLoading) {
+      console.log('User is verified - allowing progression to step 3');
+      setCurrentStep(3);
+      return;
+    }
+
+    // Initial navigation logic
     const shouldAutoNavigate = currentStep === 1 || sessionStorage.getItem('lastReviewSoftwareId') !== selectedSoftware?.id;
 
     if (hasReviewed && review && selectedSoftware && currentStep !== 4) {
@@ -190,7 +213,6 @@ const WriteReviewPage = () => {
       setCurrentStep(3);
     } else if (selectedSoftware && !hasReviewed && shouldAutoNavigate && currentStep !== 4) {
       // Product is selected but no review exists, go to step 2 (Verify Identity)
-      // Only auto-navigate if this is initial load or product just changed
       console.log('Product selected, no review - going to step 2');
       setCurrentStep(2);
     } else if (!selectedSoftware && currentStep !== 1) {
@@ -199,26 +221,6 @@ const WriteReviewPage = () => {
       setCurrentStep(1);
     }
   }, [hasReviewed, review, selectedSoftware, isLoading, setCurrentStep, currentStep, verificationData.isVerified]);
-
-  // Additional effect to handle review deletion and force verification
-  useEffect(() => {
-    // Check if review was deleted and force verification
-    const reviewDeleted = sessionStorage.getItem('reviewDeleted');
-    
-    // If review was deleted, force verification regardless of current step
-    if (reviewDeleted === 'true' && selectedSoftware && currentStep !== 2 && currentStep !== 4) {
-      console.log('Review was deleted - forcing to step 2 for verification');
-      setCurrentStep(2);
-      // Clear the flag after using it
-      sessionStorage.removeItem('reviewDeleted');
-    }
-    
-    // Allow progression to step 3 if user is verified, even if no review exists
-    if (currentStep === 2 && selectedSoftware && verificationData.isVerified && !isLoading) {
-      console.log('User is verified - allowing progression to step 3');
-      setCurrentStep(3);
-    }
-  }, [currentStep, selectedSoftware, hasReviewed, isLoading, setCurrentStep, verificationData.isVerified]);
 
   useEffect(() => {
     // Show stepper when we have a selected software or when on step 1

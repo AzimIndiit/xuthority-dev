@@ -6,7 +6,7 @@ import Breadcrumb from "./Breadcrumb";
 import { Toaster } from "react-hot-toast";
 import ScrollToTop from "@/components/ScrollToTop";
 import CompareButton from "@/components/CompareButton";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "@dr.pogodin/react-helmet";
 
 // Root layout with Navbar
 function RootLayout() {

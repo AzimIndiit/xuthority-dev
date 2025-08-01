@@ -260,7 +260,10 @@ export async function getUserReviewForProduct(productId: string): Promise<Review
   try {
     // Use the optimized endpoint to get user's specific review
     const response = await ApiService.get(`/product-reviews/product/${productId}/my-review`);
-    return (response as any).data || null;
+    console.log('getUserReviewForProduct response:', response);
+    const result = (response as any).data || null;
+    console.log('getUserReviewForProduct result:', result);
+    return result;
   } catch (error: any) {
     // If 404, user hasn't reviewed this product yet
     if (error?.response?.status === 404) {

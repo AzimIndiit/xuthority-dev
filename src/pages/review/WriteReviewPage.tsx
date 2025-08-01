@@ -119,6 +119,17 @@ const WriteReviewPage = () => {
   const toast = useToast();
   const { hasReviewed, review, isLoading } = useUserHasReviewed(selectedSoftware?.id);
 
+  // Debug logging for review data
+  useEffect(() => {
+    console.log('Review data debug:', {
+      selectedSoftwareId: selectedSoftware?.id,
+      hasReviewed,
+      review: review ? 'exists' : 'null',
+      isLoading,
+      currentStep
+    });
+  }, [selectedSoftware?.id, hasReviewed, review, isLoading, currentStep]);
+
   // Clear review data when user selects a different software (but preserve the software selection)
   useEffect(() => {
     // Keep track of the last software ID we processed
@@ -173,8 +184,9 @@ const WriteReviewPage = () => {
       // User has already reviewed this product, skip to step 3 (WriteReview) for editing
       console.log('User has reviewed - going to step 3');
       setCurrentStep(3);
-    } else if (selectedSoftware && !hasReviewed && currentStep === 1) {
+    } else if (selectedSoftware && !hasReviewed && currentStep !== 2 && currentStep !== 4) {
       // Product is selected but no review exists, go to step 2 (Verify Identity)
+      // Don't redirect if already on step 2 or 4
       console.log('Product selected, no review - going to step 2');
       setCurrentStep(2);
     } else if (!selectedSoftware && currentStep !== 1) {

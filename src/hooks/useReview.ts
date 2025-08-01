@@ -39,8 +39,17 @@ export function useUserHasReviewed(productId: string | undefined): {
 } {
 
   const { data: review, isLoading } = useUserReview(productId);
+  const hasReviewed = !!review;
+  
+  console.log('useUserHasReviewed debug:', {
+    productId,
+    review: review ? 'exists' : 'null',
+    hasReviewed,
+    isLoading
+  });
+  
   return {
-    hasReviewed: !!review,
+    hasReviewed,
     review: review || null,
     isLoading,
   };

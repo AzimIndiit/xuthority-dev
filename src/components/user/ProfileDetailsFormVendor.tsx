@@ -142,7 +142,10 @@ export const profileVendorSchema = z.object({
   email: z.string().email("Invalid email address"),
   region: z.string().min(1, "Please select a region"),
   description: z.string().optional().refine((val) => !val || val.length <= 1000, "Description must be less than 1000 characters"),
-  industry: z.string().min(1, "Please select an industry"),
+  industry: z.string().min(1, "Please select an industry").refine((val) => {
+    // Validate that it's a valid MongoDB ObjectId format
+    return /^[0-9a-fA-F]{24}$/.test(val);
+  }, "Please select a valid industry"),
   companyName: z.string().min(2, "Company name must be at least 2 characters").trim().max(100, "Company name must be less than 100 characters").nonempty("Company name is required"),
   companyEmail: z.string().optional().or(z.literal("")).refine((val) => !val || z.string().email().safeParse(val).success, "Invalid company email address").refine((val) => !val || val.length <= 254, "Company email must be less than 254 characters"),
   companySize: z.string().min(1, "Please select company size"),
@@ -262,7 +265,7 @@ const ProfileDetailsFormVendor: React.FC<ProfileDetailsFormProps> = ({
           lastName: data.lastName,
           region: data.region,
           description: cleanValue(data.description),
-          industry: industryOptions.find(option => option.value === data.industry)?.label || data.industry,
+          industry: data.industry, // Send the ObjectId value directly
           companyName: data.companyName,
           companySize: data.companySize,
           socialLinks: {

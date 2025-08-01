@@ -76,6 +76,20 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, backendReview, showComm
 
 console.log('product', review.product?.userId?._id === user?.id)
 
+  // Create anonymous reviewer if reviewer data is missing
+  const reviewer = review.reviewer || {
+    id: 'anonymous',
+    name: 'Anonymous User',
+    firstName: 'Anonymous',
+    lastName: 'User',
+    avatar: null,
+    isVerified: false,
+    title: null,
+    companyName: null,
+    companySize: null,
+    slug: null
+  };
+
   return (
     <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
       {/* Header: Title, Actions */}
@@ -130,7 +144,7 @@ console.log('product', review.product?.userId?._id === user?.id)
                 {backendReview?.totalReplies ? ` (${backendReview.totalReplies})` : ''}
               </span>
             </button>
-           {(review.product?.userId === user?.id || review.product?.userId?._id === user?.id) && <button
+           {(review.product?.userId === user?.id || (typeof review.product?.userId === 'object' && review.product?.userId?._id === user?.id)) && <button
               onClick={handleDisputeClick}
               className="flex items-center gap-1.5 px-0 py-0 bg-transparent border-none outline-none text-[#0071e3] hover:underline cursor-pointer"
               style={{ minWidth: 0 }}
@@ -163,27 +177,31 @@ console.log('product', review.product?.userId?._id === user?.id)
       <div className="bg-pink-50 px-4 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-pink-100">
         <div className="flex items-center gap-3">
           <div className="relative w-14 h-14">
-            <Avatar className="h-14 w-14 cursor-pointer" onClick={() => {  if(review.reviewer.id !== user?.id){ navigate(`/public-profile/${review.reviewer.slug}`)}else{
-              navigate(`/profile`)
-            }}}>
-              <AvatarImage src={review.reviewer.avatar} alt={getUserDisplayName(review.reviewer as any)} />
-              <AvatarFallback>{getUserInitials(review.reviewer as any)}</AvatarFallback>
+            <Avatar className="h-14 w-14 cursor-pointer" onClick={() => {  
+              if(reviewer.id !== 'anonymous' && reviewer.id !== user?.id){ 
+                navigate(`/public-profile/${reviewer.slug || ''}`)
+              }else if(reviewer.id === user?.id){
+                navigate(`/profile`)
+              }
+            }}>
+              <AvatarImage src={reviewer.avatar} alt={getUserDisplayName(reviewer as any)} />
+              <AvatarFallback>{getUserInitials(reviewer as any)}</AvatarFallback>
             </Avatar>
-            {review.reviewer.isVerified && (
+            {reviewer.isVerified && (
               <VerifiedBadge className="absolute bottom-0 -right-2 w-5 h-5 text-blue-600" />
             )}
           </div>
           <div>
-            <p className="font-semibold text-gray-900 text-[14px] leading-tight">{getUserDisplayName(review.reviewer as any)}</p>
+            <p className="font-semibold text-gray-900 text-[14px] leading-tight">{getUserDisplayName(reviewer as any)}</p>
             <p className="text-[14px] text-gray-600 leading-tight">
-              {review.reviewer.title?.split(' ').slice(0, 2).join(' ')}
-              {review.reviewer.companyName && (
+              {reviewer.title?.split(' ').slice(0, 2).join(' ')}
+              {reviewer.companyName && (
                 <>
-                  , <span className="font-normal">{review.reviewer.companyName}</span>
+                  , <span className="font-normal">{reviewer.companyName}</span>
                 </>
               )}
-              {review.reviewer.companySize && (
-                <> ({review.reviewer.companySize} emp.)</>
+              {reviewer.companySize && (
+                <> ({reviewer.companySize} emp.)</>
               )}
             </p>
           </div>

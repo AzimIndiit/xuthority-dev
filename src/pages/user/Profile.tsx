@@ -256,7 +256,7 @@ const ProfilePage: React.FC = () => {
     email: user?.email || '',
     region: user?.region || '',
     description: user?.description || '',
-    industry: industryOptions.find(option => option.label === user?.industry)?.value || user?.industry || '',
+    industry: user?.industry || '', // user.industry is now the ObjectId string
     companyName: user?.companyName || '',
     companyEmail: user?.companyEmail || '',
     companySize: user?.companySize || '',

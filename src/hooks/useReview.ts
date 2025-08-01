@@ -152,6 +152,10 @@ export const useDeleteReview = () => {
       queryClient.invalidateQueries({ queryKey: ['userReviews'] }); // This invalidates useUserReviews
       queryClient.invalidateQueries({ queryKey: ['userReviewsById'] });
       queryClient.invalidateQueries({ queryKey: ['productReviewStats'] });
+      
+      // Set a flag to indicate review was deleted - this will force verification on next visit
+      sessionStorage.setItem('reviewDeleted', 'true');
+      
       success('Review deleted successfully');
     },
     onError: (err: any) => {

@@ -199,6 +199,26 @@ const WriteReviewPage = () => {
     }
   }, [hasReviewed, review, selectedSoftware, isLoading, setCurrentStep, currentStep]);
 
+  // Additional effect to handle review deletion and force verification
+  useEffect(() => {
+    // Check if review was deleted and force verification
+    const reviewDeleted = sessionStorage.getItem('reviewDeleted');
+    
+    // If user is on step 3 but no review exists, force them to step 2 for verification
+    if (currentStep === 3 && selectedSoftware && !hasReviewed && !isLoading) {
+      console.log('User on step 3 but no review exists - forcing to step 2 for verification');
+      setCurrentStep(2);
+    }
+    
+    // If review was deleted, force verification regardless of current step
+    if (reviewDeleted === 'true' && selectedSoftware && currentStep !== 2 && currentStep !== 4) {
+      console.log('Review was deleted - forcing to step 2 for verification');
+      setCurrentStep(2);
+      // Clear the flag after using it
+      sessionStorage.removeItem('reviewDeleted');
+    }
+  }, [currentStep, selectedSoftware, hasReviewed, isLoading, setCurrentStep]);
+
   useEffect(() => {
     // Show stepper when we have a selected software or when on step 1
     if (selectedSoftware || currentStep === 1) {

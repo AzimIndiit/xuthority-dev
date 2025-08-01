@@ -83,9 +83,9 @@ export function useProductsByCategory(
     // Cache configuration to prevent unnecessary API calls
     staleTime: 5 * 60 * 1000, // 5 minutes - data is considered fresh for 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes - keep in cache for 10 minutes
-    refetchOnWindowFocus: false, // Don't refetch when window regains focus
-    refetchOnMount: false, // Don't refetch when component mounts if data exists
-    refetchOnReconnect: false, // Don't refetch when network reconnects
+    refetchOnWindowFocus: true, // Don't refetch when window regains focus
+    refetchOnMount: true, // Don't refetch when component mounts if data exists
+    refetchOnReconnect: true, // Don't refetch when network reconnects
     placeholderData: (previousData) => previousData, // Show previous data while new data is loading
     // Add retry configuration to handle auth state changes gracefully
     retry: (failureCount, error: any) => {

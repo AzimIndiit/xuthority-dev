@@ -171,6 +171,10 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   // Check if user has already reviewed this product
   const { hasReviewed, review: userReview, isLoading: isCheckingReview } = useUserHasReviewed(selectedSoftware?.id);
 
+  // Debug verification data
+  console.log('WriteReview - verificationData:', verificationData);
+  console.log('WriteReview - isVerified:', verificationData?.isVerified);
+
   // Handle click outside to close tooltip
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -295,8 +299,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
       };
       
       reset(emptyFormData);
-      // Clear the review store data to prevent cached values
-      resetReviewData();
+      // Don't reset review data here as it would clear verification data
+      // Only clear the actual review content, not verification
     }
   }, [userReview, reset, updateReviewData]);
 
@@ -309,8 +313,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
       queryClient.invalidateQueries({ queryKey: ['product'] });
       queryClient.invalidateQueries({ queryKey: ['userReview'] });
       setCurrentStep(4);
-      // Reset the review data after successful submission (preserving step and software)
-      resetReviewData();
+      // Don't reset verification data after successful submission
     },
     onError: (err: any) => {
       toast.review.error(err?.response?.data?.error?.message || 'Failed to submit review');
@@ -327,8 +330,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
       queryClient.invalidateQueries({ queryKey: ['product'] });
       queryClient.invalidateQueries({ queryKey: ['userReview'] });
       setCurrentStep(4);
-      // Reset the review data after successful update (preserving step and software)
-      resetReviewData();
+      // Don't reset verification data after successful update
     },
     onError: (err: any) => {
       toast.review.error(err?.response?.data?.error?.message || 'Failed to update review');

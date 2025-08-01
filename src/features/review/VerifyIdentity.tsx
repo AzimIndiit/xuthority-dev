@@ -56,7 +56,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
     setVerificationData
   } = useReviewStore();
   const toast = useToast();
-  
+  console.log('verificationData', verificationData)
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [otpModalOpen, setOtpModalOpen] = useState(false);
   const [screenshotModalOpen, setScreenshotModalOpen] = useState(false);

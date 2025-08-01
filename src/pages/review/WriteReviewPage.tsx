@@ -126,9 +126,11 @@ const WriteReviewPage = () => {
       hasReviewed,
       review: review ? 'exists' : 'null',
       isLoading,
-      currentStep
+      currentStep,
+      verificationData,
+      isVerified: verificationData?.isVerified
     });
-  }, [selectedSoftware?.id, hasReviewed, review, isLoading, currentStep]);
+  }, [selectedSoftware?.id, hasReviewed, review, isLoading, currentStep, verificationData]);
 
   // Clear review data when user selects a different software (but preserve the software selection)
   useEffect(() => {
@@ -211,9 +213,9 @@ const WriteReviewPage = () => {
       // User has already reviewed this product, skip to step 3 (WriteReview) for editing
       console.log('User has reviewed - going to step 3');
       setCurrentStep(3);
-    } else if (selectedSoftware && !hasReviewed && shouldAutoNavigate && currentStep !== 4) {
-      // Product is selected but no review exists, go to step 2 (Verify Identity)
-      console.log('Product selected, no review - going to step 2');
+    } else if (selectedSoftware && !hasReviewed && !verificationData.isVerified && shouldAutoNavigate && currentStep !== 4) {
+      // Product is selected but no review exists and user is not verified, go to step 2 (Verify Identity)
+      console.log('Product selected, no review, not verified - going to step 2');
       setCurrentStep(2);
     } else if (!selectedSoftware && currentStep !== 1) {
       // No product selected, go to step 1 (Select Software)

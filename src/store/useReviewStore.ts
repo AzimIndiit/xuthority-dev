@@ -164,7 +164,8 @@ export const useReviewStore = create<ReviewStore>()(
         set((state) => ({
           ...state,
           reviewData: initialState.reviewData,
-          verificationData: initialState.verificationData
+          // Keep verification data when resetting review data
+          // verificationData should persist across review resets
         })),
       
       resetVerification: () =>

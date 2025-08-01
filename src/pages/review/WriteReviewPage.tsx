@@ -180,13 +180,16 @@ const WriteReviewPage = () => {
       return;
     }
 
+    // Only auto-navigate if user is on step 1 (initial load) or if they just selected a product
+    const shouldAutoNavigate = currentStep === 1 || sessionStorage.getItem('lastReviewSoftwareId') !== selectedSoftware?.id;
+
     if (hasReviewed && review && selectedSoftware && currentStep !== 4) {
       // User has already reviewed this product, skip to step 3 (WriteReview) for editing
       console.log('User has reviewed - going to step 3');
       setCurrentStep(3);
-    } else if (selectedSoftware && !hasReviewed && currentStep !== 2 && currentStep !== 4) {
+    } else if (selectedSoftware && !hasReviewed && shouldAutoNavigate && currentStep !== 4) {
       // Product is selected but no review exists, go to step 2 (Verify Identity)
-      // Don't redirect if already on step 2 or 4
+      // Only auto-navigate if this is initial load or product just changed
       console.log('Product selected, no review - going to step 2');
       setCurrentStep(2);
     } else if (!selectedSoftware && currentStep !== 1) {

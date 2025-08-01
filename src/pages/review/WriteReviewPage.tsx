@@ -115,7 +115,7 @@ const WriteReviewPage = () => {
   const [showStepper, setShowStepper] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const currentStep = useCurrentStep();
-  const { setCurrentStep, setVerificationData, selectedSoftware, resetReview, setSelectedSoftware } = useReviewStore();
+  const { setCurrentStep, setVerificationData, selectedSoftware, resetReview, setSelectedSoftware, verificationData } = useReviewStore();
   const toast = useToast();
   const { hasReviewed, review, isLoading } = useUserHasReviewed(selectedSoftware?.id);
 
@@ -172,7 +172,8 @@ const WriteReviewPage = () => {
       hasReviewed, 
       review: !!review, 
       isLoading, 
-      currentStep 
+      currentStep,
+      isVerified: verificationData.isVerified
     });
 
     if (isLoading) {
@@ -197,18 +198,12 @@ const WriteReviewPage = () => {
       console.log('No product selected - going to step 1');
       setCurrentStep(1);
     }
-  }, [hasReviewed, review, selectedSoftware, isLoading, setCurrentStep, currentStep]);
+  }, [hasReviewed, review, selectedSoftware, isLoading, setCurrentStep, currentStep, verificationData.isVerified]);
 
   // Additional effect to handle review deletion and force verification
   useEffect(() => {
     // Check if review was deleted and force verification
     const reviewDeleted = sessionStorage.getItem('reviewDeleted');
-    
-    // If user is on step 3 but no review exists, force them to step 2 for verification
-    if (currentStep === 3 && selectedSoftware && !hasReviewed && !isLoading) {
-      console.log('User on step 3 but no review exists - forcing to step 2 for verification');
-      setCurrentStep(2);
-    }
     
     // If review was deleted, force verification regardless of current step
     if (reviewDeleted === 'true' && selectedSoftware && currentStep !== 2 && currentStep !== 4) {
@@ -217,7 +212,13 @@ const WriteReviewPage = () => {
       // Clear the flag after using it
       sessionStorage.removeItem('reviewDeleted');
     }
-  }, [currentStep, selectedSoftware, hasReviewed, isLoading, setCurrentStep]);
+    
+    // Allow progression to step 3 if user is verified, even if no review exists
+    if (currentStep === 2 && selectedSoftware && verificationData.isVerified && !isLoading) {
+      console.log('User is verified - allowing progression to step 3');
+      setCurrentStep(3);
+    }
+  }, [currentStep, selectedSoftware, hasReviewed, isLoading, setCurrentStep, verificationData.isVerified]);
 
   useEffect(() => {
     // Show stepper when we have a selected software or when on step 1

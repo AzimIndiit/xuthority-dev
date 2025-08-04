@@ -316,14 +316,14 @@ export const useRegisterVendor = () => {
           await new Promise(resolve => setTimeout(resolve, 200));
           
           // Fetch fresh profile data after successful registration
-          await getProfileWithAPI();
+          // await getProfileWithAPI();
           
           // Set fresh query data with updated profile
-          const user = useUserStore.getState().user;
-          if (user) {
-            queryClient.setQueryData(queryKeys.user, user);
-            queryClient.setQueryData(queryKeys.profile, user);
-          }
+          // const user = useUserStore.getState().user;
+          // if (user) {
+          //   queryClient.setQueryData(queryKeys.user, user);
+          //   queryClient.setQueryData(queryKeys.profile, user);
+          // }
           
           // Navigate to dashboard or home
           navigate('/');

@@ -19,7 +19,7 @@ const integrations = [
 ];
 
 const IntegrationCard = ({ name, image }: { name: string, image: string }) => (
-  <div className="flex flex-col items-center text-center gap-2">
+  <div className="flex flex-col items-center text-center gap-2" title={name}>
     <div className="w-16 h-16  bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-3 transition-all duration-300 hover:shadow-md hover:border-gray-300">
       <img
         src={image}

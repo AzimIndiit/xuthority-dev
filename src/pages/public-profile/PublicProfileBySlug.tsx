@@ -249,7 +249,7 @@ const PublicProfileBySlugPage: React.FC = () => {
             <div className="flex justify-between items-center gap-2">
               <div className="flex flex-col">
                 <div className="font-semibold text-gray-900 text-base mt-1 truncate">
-                  {getTruncatedDisplayName(publicProfile, 15)}
+                  {getTruncatedDisplayName(publicProfile, 20)}
                 </div>
                 <div className="text-xs text-gray-500 mb-2">{publicProfile?.email}</div>
               </div>

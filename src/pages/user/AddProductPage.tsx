@@ -64,7 +64,7 @@ pricing: z
   .array(
     z.object({
       name: z.string().min(1, 'Pricing name is required') .trim().nonempty('Pricing name is required'),
-      price: z.coerce.number().min(0, 'Price must be a positive number'),
+      price: z.coerce.number().min(0, 'Price must be a positive number').max(1000000, 'Price cannot exceed 1,000,000'),
       seats: z.coerce.number().min(1, 'No of seats must be at least 1').max(10000, 'No of seats cannot exceed 10,000'),
       description: z.string().min(1, 'Pricing description is required') .trim().nonempty('Pricing description is required'),
       features: z
@@ -444,10 +444,10 @@ console.log('mediaUrls', mediaFiles)
           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border">
             <div>
               <h3 className="font-medium text-gray-900">Product Pricing</h3>
-              <p className="text-sm text-gray-600">Is this product available for free?</p>
+              <p className="text-sm text-gray-600">Is this product available for trial?</p>
             </div>
             <label className="flex items-center gap-3">
-              <span className="text-sm font-medium">Available for Free</span>
+              <span className="text-sm font-medium">Available for trial</span>
               <Switch
                 checked={watch('isFree')}
                 onCheckedChange={(checked) => setValue('isFree', checked)}
@@ -659,7 +659,7 @@ console.log('mediaUrls', mediaFiles)
                       label="Price" 
                       type="number" 
                       min={0} 
-                      max={1000} 
+                      max={1000000} 
                       step={1}
                       disabled={addProductMutation.isPending}
                       onKeyDown={(e) => {
@@ -689,7 +689,7 @@ console.log('mediaUrls', mediaFiles)
                           }
                           
                           const newValue = currentValue + e.key;
-                          if (parseFloat(newValue) > 1000) {
+                          if (parseFloat(newValue) > 1000000) {
                             e.preventDefault();
                           }
                         } else if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') {

@@ -48,9 +48,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
         {/* Other Info */}
         <div className="mt-auto text-xs text-gray-600 space-y-1">
-          <div><b>Users:</b> {users}</div>
-          <div><b>Industries:</b> {industries}</div>
-          <div><b>Market Segment:</b> {marketSegment}</div>
+          {users && <div><b>Users:</b> {users}</div>}
+          {industries && <div><b>Industries:</b> {industries}</div>}
+          {marketSegment && <div><b>Market Segment:</b> {marketSegment}</div>}
         </div>
       </div>
     </Card>

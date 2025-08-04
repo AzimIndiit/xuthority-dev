@@ -216,7 +216,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
 
   return (
     <div className="w-full">
-      <Label htmlFor={name} className={error ? 'text-red-500' : ''}>
+      <Label htmlFor={name} className= ''>
         {label}
       </Label>
       <Controller
@@ -247,7 +247,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
                   ref={field.ref}
                   id={name}
                   className={`mt-2 rounded-full w-full min-h-14 px-3 py-2 border cursor-pointer flex items-center ${
-                    error ? 'border-red-500' : 'border-gray-300'
+                    error ? '' : 'border-gray-300'
                   } ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:border-gray-400'}`}
                   onClick={() => !disabled && setIsOpen(!isOpen)}
                 >
@@ -348,7 +348,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
               <SelectTrigger
                 id={name}
                 ref={field.ref}
-                className={`mt-2 rounded-full w-full ${error ? 'border-red-500' : 'border-gray-300'}`}
+                className={`mt-2 rounded-full w-full ${error ? '' : 'border-gray-300'}`}
                 disabled={disabled}
               >
                 <SelectValue placeholder={placeholder} />

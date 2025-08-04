@@ -274,7 +274,7 @@ const deleteMutation = useDeleteProduct();
           <div className="font-semibold text-gray-900 text-sm sm:text-base ">
             Product Description
           </div>
-          <div className="text-gray-700 text-xs sm:text-sm mt-1 line-clamp-4 min-h-[100px]">
+          <div className={`text-gray-700 text-xs sm:text-sm mt-1 line-clamp-4 ${location.pathname==='/profile/products' || location.pathname.includes('/public-profile')? '' :"min-h-[100px]"}`}>
             {description}{" "}
            
           </div>
@@ -285,33 +285,42 @@ const deleteMutation = useDeleteProduct();
             Other Info
           </div>
           <div className="divide-y divide-gray-200">
-            <div className="flex items-start justify-start gap-2 py-2">
+        {users &&    <div className="flex items-start justify-start gap-2 py-2">
               <Users className="w-5 h-5 text-gray-500" />
               <span className="font-medium text-gray-900 text-xs sm:text-sm">
                 Users
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1  max-w-[80%]">
-                ({users})
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 max-w-[80%]">
+                {(() => {
+                  const userItems = users.split(',').map(item => item.trim()).filter(item => item.length > 0);
+                  return userItems.length > 5 ? `(${userItems.slice(0, 5).join(', ')}... +${userItems.length - 5} more)` : `(${users})`;
+                })()}
               </span>
-            </div>
-            <div className="flex items-center gap-2 py-2">
+            </div>}
+           {industries && <div className="flex items-center gap-2 py-2">
               <Building2 className="w-5 h-5 text-gray-500" />
               <span className="font-medium text-gray-900 text-xs sm:text-sm ">
                 Industries
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1  max-w-[80%]">
-                ({industries})
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 max-w-[80%]">
+                {(() => {
+                  const industryItems = industries.split(',').map(item => item.trim()).filter(item => item.length > 0);
+                  return industryItems.length > 5 ? `(${industryItems.slice(0, 5).join(', ')}... +${industryItems.length - 5} more)` : `(${industries})`;
+                })()}
               </span>
-            </div>
-            <div className="flex items-center gap-2 py-2">
+            </div>}
+            {marketSegment &&   <div className="flex items-center gap-2 py-2">
               <Network className="w-5 h-5 text-gray-500" />
               <span className="font-medium text-gray-900 text-xs sm:text-sm">
                 Market Segment
               </span>
-              <span className="text-gray-500 text-xs sm:text-sm ml-1 line-clamp-1  max-w-[80%]">
-                ({marketSegment})
+              <span className="text-gray-500 text-xs sm:text-sm ml-1 max-w-[80%]">
+                {(() => {
+                  const marketItems = marketSegment.split(',').map(item => item.trim()).filter(item => item.length > 0);
+                  return marketItems.length > 5 ? `(${marketItems.slice(0, 5).join(', ')}... +${marketItems.length - 5} more)` : `(${marketSegment})`;
+                })()}
               </span>
-            </div>
+            </div>}
           </div>
         </div>
         {/* Bottom Actions */}
@@ -336,7 +345,7 @@ const deleteMutation = useDeleteProduct();
               Entry Level Price: {formatCurrency(minPrice || 0)}
             </Button>
             <Button
-              onClick={() => window.open(`https://${websiteUrl}`, '_blank')}
+              onClick={() => window.open(websiteUrl, '_blank')}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px]  h-10  xl:h-12 sm:ml-2"
               // onClick={onTry}
             >

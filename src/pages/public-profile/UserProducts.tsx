@@ -113,9 +113,10 @@ const UserProducts = ({publicProfile}) => {
         console.log('Save to list clicked');
     };
 
-    const handleTry = () => {
+    const handleTry = (websiteUrl:string) => {
         // Handle try for free logic
-        console.log('Try for free clicked');
+        console.log('Try for free clicked',websiteUrl);
+        // window.open(`https://${websiteUrl}`, '_blank')
     };
     
     return (
@@ -164,7 +165,8 @@ const UserProducts = ({publicProfile}) => {
                                         setCurrentStep(2);
                                     }}
                                     onSave={handleSave}
-                                    onTry={handleTry}
+                                    // onTry={()=>handleTry(product.websiteUrl)}
+                                    websiteUrl={product.websiteUrl}
                                     hasUserReviewed={product.hasUserReviewed}
                                     isFree={product.isFree}
                                 />

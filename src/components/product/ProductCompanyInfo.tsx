@@ -7,8 +7,9 @@ import {
   Linkedin,
   UserCheck,
 } from "lucide-react";
-import { getUserDisplayName } from "@/utils/userHelpers";
+import { getUserDisplayName, getUserInitials } from "@/utils/userHelpers";
 import useUserStore from "@/store/useUserStore";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 // A custom X/Twitter Icon
 const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -79,11 +80,16 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
       />
       <div className="relative z-10 lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         <div className="flex items-center gap-6">
-         {companyData.logoUrl && <img
+
+        <Avatar className="h-14 w-14 cursor-pointer" >
+              <AvatarImage src={companyData.logoUrl} alt={getUserDisplayName(companyData as any)} className="object-cover" />
+              <AvatarFallback>{getUserInitials(companyData as any)}</AvatarFallback>
+            </Avatar>
+         {/* {companyData.logoUrl && <img
             src={companyData.logoUrl}
             alt="Company Logo"
-            className="h-16 w-16 rounded-full border-4 border-white shadow-md"
-          />}
+            className="h-16 w-16 rounded-full  object-cover"
+          />} */}
           <h2 className="text-2xl font-bold tracking-tight text-gray-900 ">
             {companyData.name} Company Info
           </h2>

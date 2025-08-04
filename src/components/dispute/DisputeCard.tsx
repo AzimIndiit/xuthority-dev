@@ -141,7 +141,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
             }}}>
           <div className="relative w-10 h-10">
             <Avatar className="h-10 w-10" >
-              <AvatarImage src={review.avatar} alt={getUserDisplayName(review as any)} />
+              <AvatarImage src={review.avatar} alt={getUserDisplayName(review as any)}  className='object-cover'/>
               <AvatarFallback>{getUserInitials(review as any)}</AvatarFallback>
             </Avatar>
     
@@ -241,7 +241,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
             }}>
           <div className="relative w-12 h-12" >
             <Avatar className="h-12 w-12 ">
-              <AvatarImage src={product.logoUrl} alt={product.name} />
+              <AvatarImage src={product.logoUrl} alt={product.name} className='object-cover'/>
               <AvatarFallback>{getUserInitials(product as any) || 'UN'}</AvatarFallback>
             </Avatar>
     
@@ -291,14 +291,14 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       </div>
 
       {/* Explanation Section */}
-      {dispute.explanations && dispute.status === 'active' && (
+      {(
         <div className='mt-4'>
           <h3 className="text-lg sm:text-xl font-bold text-gray-900">Explanation</h3>
           <div className="mt-2 flex justify-between items-start text-gray-700 text-sm bg-gray-50 p-3 rounded-lg border border-gray-20 gap-4">
             <p className="0">
               {dispute.explanations}
             </p>
-           { review.isOwnReview &&  <button className='text-blue-600 text-sm cursor-pointer flex gap-2 items-center justify-center' onClick={() => {
+           {dispute.explanations && dispute.status === 'active' &&  review.isOwnReview &&  <button className='text-blue-600 text-sm cursor-pointer flex gap-2 items-center justify-center' onClick={() => {
               setEditExplanation(prev => !prev)
               setExplanation(dispute.explanations)
             }}><Edit className="w-3 h-3" /> Edit</button>}

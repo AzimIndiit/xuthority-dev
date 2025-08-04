@@ -433,7 +433,7 @@ const ProfileDetailsFormVendor: React.FC<ProfileDetailsFormProps> = ({
                     alt="Company Logo"
                   />
                   <AvatarFallback className="text-sm sm:text-base bg-gray-100">
-                    {formMethods.watch("companyName")?.charAt(0)?.toUpperCase() || "C"}
+                    {formMethods.watch("companyName")?.split(' ').slice(0, 2).map(word => word[0]).join('') || "C"}
                   </AvatarFallback>
                 </Avatar>
                 <div className="absolute -bottom-1 -right-1">

@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import ProductFeatures from "./ProductFeatures";
 import ProductIntegrations from "./ProductIntegrations";
+import { ReadMoreText } from "../ui";
 
 interface DetailItemProps {
   icon: React.ElementType;
@@ -50,16 +51,16 @@ const ProductOverview = ({product}: {product: any}) => {
     const items = data.split(',').map(item => item.trim()).filter(item => item.length > 0);
     
     if (items.length <= maxItems) {
-      return data;
+      return  <span className="ml-1">( <span>{items.join(', ')}</span>)</span> ;
     }
+    
 
     const isExpanded = expandedSections[sectionKey];
     const displayItems = isExpanded ? items : items.slice(0, maxItems);
     const hasMore = items.length > maxItems;
-
     return (
       <div className="space-y-2">
-        <span>{displayItems.join(', ')}</span>
+       ( <span>{displayItems.join(', ')}</span>)
         {hasMore && (
           <div>
             <Button
@@ -82,11 +83,11 @@ const ProductOverview = ({product}: {product: any}) => {
   const productDetails = {
     name: product.name,
     description: product.description,
-    website: product.websiteUrl || 'N/A',
-    languages: product.languages?.map((language: any) => language.name).join(', ')  || 'N/A',
-    users: product.whoCanUse?.map((user: any) => user.name).join(', ') || 'N/A',
-    industries: product.industries?.map((industry: any) => industry.name).join(', ') || 'N/A',
-    marketSegment: product.marketSegment?.map((marketSegment: any) => marketSegment.name).join(', ') || 'N/A',
+    website: product.websiteUrl ,
+    languages: product.languages?.map((language: any) => language.name).join(', ') ,
+    users: product.whoCanUse?.map((user: any) => user.name).join(', ') ,
+    industries: product.industries?.map((industry: any) => industry.name).join(', ') ,
+    marketSegment: product.marketSegment?.map((marketSegment: any) => marketSegment.name).join(', ') ,
   };
 
   return (
@@ -94,7 +95,15 @@ const ProductOverview = ({product}: {product: any}) => {
       <h2 className="text-2xl md:text-2xl font-bold text-gray-900">
         {productDetails.name} Overview
       </h2>
-      <p className="mt-4 text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-line">
+      <ReadMoreText
+          content={fullText}
+          maxLines={4}
+          className="mt-4 text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-line"
+          buttonClassName="text-blue-600 hover:text-blue-800"
+        >
+           {/* {fullText} */}
+          </ReadMoreText>
+      {/* <p className="mt-4 text-gray-600 leading-relaxed text-sm md:text-base whitespace-pre-line">
         {fullText}
         {/* {!isExpanded && (
           <button
@@ -104,7 +113,7 @@ const ProductOverview = ({product}: {product: any}) => {
             See More
           </button>
         )} */}
-      </p>
+      {/* </p> */} 
 
       {/* <div className="mt-10">
         <h3 className="text-xl font-bold text-gray-900">Product Description</h3>
@@ -130,37 +139,37 @@ const ProductOverview = ({product}: {product: any}) => {
                 )
               </p>
             </DetailItem>
-            <DetailItem icon={Globe}>
+            {  productDetails.languages &&<DetailItem icon={Globe}>
+                <div>
+                  <span className="font-semibold">Languages</span> 
+                  {renderDetailWithViewAll(productDetails.languages, 'languages')}
+                  
+                </div>
+              </DetailItem>}
+            {productDetails.industries && <DetailItem icon={Building2}>
               <div>
-                <span className="font-semibold">Languages</span> (
-                {renderDetailWithViewAll(productDetails.languages, 'languages')}
-                )
-              </div>
-            </DetailItem>
-            <DetailItem icon={Building2}>
-              <div>
-                <span className="font-semibold">Industries</span> (
+                <span className="font-semibold">Industries</span> 
                 {renderDetailWithViewAll(productDetails.industries, 'industries')}
-                )
+                
               </div>
-            </DetailItem>
+            </DetailItem>}
           </div>
           {/* Right Column */}
           <div>
-            <DetailItem icon={Users}>
+            {productDetails.users && <DetailItem icon={Users}>
               <div>
-                <span className="font-semibold">Users</span> (
+                <span className="font-semibold">Users</span> 
                 {renderDetailWithViewAll(productDetails.users, 'users')}
-                )
+                
               </div>
-            </DetailItem>
-            <DetailItem icon={TrendingUp}>
+            </DetailItem>}
+            {productDetails.marketSegment && <DetailItem icon={TrendingUp}>
               <div>
-                <span className="font-semibold">Market Segment</span> (
+                <span className="font-semibold">Market Segment</span> 
                 {renderDetailWithViewAll(productDetails.marketSegment, 'marketSegment')}
-                )
+                
               </div>
-            </DetailItem>
+            </DetailItem>}
           </div>
         </div>
       </div>

@@ -144,7 +144,7 @@ const ProfileSidebar: React.FC<ProfileSidebarProps> = ({
       </div>
 
       {user?._id && <div className="mb-4">
-        <h3 className="text-xl font-bold text-gray-900">{getTruncatedDisplayName(user, 15)}</h3>
+        <h3 className="text-xl font-bold text-gray-900">{getTruncatedDisplayName(user, 20)}</h3>
         <p className="text-sm text-gray-500">{user?.email}</p>
       </div>}
 

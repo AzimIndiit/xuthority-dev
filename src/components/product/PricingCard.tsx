@@ -43,9 +43,9 @@ const PricingCard: React.FC<PricingCardProps> = ({
         </div>
       )}
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-start gap-4">
         <div className={cn(
-            "flex h-14 w-14 items-center justify-center rounded-lg",
+            "flex min-h-14 min-w-14 items-center justify-center rounded-lg",
             isPopular ? "bg-white" : "bg-blue-100"
         )}>
           {icon}
@@ -87,7 +87,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
 
       <div className="mt-auto pt-8">
         <Button
-          onClick={() => window.open(`https://${product.website}`, '_blank')}
+          onClick={() => window.open(`${product.website}`, '_blank')}
           className={cn(
             'w-full rounded-full py-3 text-base font-semibold transition-transform duration-200 hover:scale-105',
             isPopular

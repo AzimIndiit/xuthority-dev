@@ -118,7 +118,7 @@ const MediaPreviewModal = ({
             src={currentMedia}
             className="max-w-full max-h-full object-contain"
             controlsList="nodownload noplaybackrate nopictureinpicture"
-            autoPlay={true}
+            autoPlay={false}
             controls
             onPlay={() => setIsVideoPlaying(true)}
             onPause={() => setIsVideoPlaying(false)}
@@ -217,7 +217,7 @@ const MediaCard = ({
             src={mediaSrc}
             className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             controlsList="nodownload noplaybackrate nopictureinpicture"
-            autoPlay={true}
+            autoPlay={false}
             controls
      
             disablePictureInPicture

@@ -20,6 +20,7 @@ import { formatNumber } from "@/utils/formatNumber";
 import { queryClient } from "@/lib/queryClient";
 import ConfirmationModal from "../ui/ConfirmationModal";
 import { useFollowStatus } from "@/hooks/useFollow";
+import ProfileVerificationModal from '@/components/ui/ProfileVerificationModal';
 
 const navLinks = [
   { label: "Software", href: "/software" },
@@ -55,6 +56,8 @@ export default function Navbar() {
   const navigate = useNavigate();
   
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const showProfileVerificationModal = useUserStore(state => state.showProfileVerificationModal);
+  const setShowProfileVerificationModal = useUserStore(state => state.setShowProfileVerificationModal);
   
   // Auto-close drawer on desktop (lg and up)
   useEffect(() => {
@@ -434,6 +437,11 @@ export default function Navbar() {
         description="Are you sure you want to logout?"
         confirmText="Yes I'm Sure"
         isLoading={logoutMutation.isPending}
+      />
+      <ProfileVerificationModal
+        isOpen={showProfileVerificationModal}
+        onOpenChange={setShowProfileVerificationModal}
+        onConfirm={() => setShowProfileVerificationModal(false)}
       />
     </>
   );

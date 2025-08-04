@@ -191,7 +191,7 @@ export const useLogin = () => {
           45000,
           'Login request timed out'
         );
-        
+        console.log('success-======', success)
         if (success) {
           // Clear auth-related queries more gracefully
           setTimeout(() => {
@@ -217,6 +217,7 @@ export const useLogin = () => {
            
           return success;
         } else {
+          console.log('Login failed', success)
           // The error is already handled in the store with toast, just throw to mark as failed
           throw new Error('Login failed');
         }

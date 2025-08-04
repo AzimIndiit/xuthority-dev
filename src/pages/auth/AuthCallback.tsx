@@ -11,7 +11,7 @@ import { useReviewStore } from '@/store/useReviewStore';
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { loginWithToken } = useUserStore();
+  const { loginWithToken, setShowProfileVerificationModal } = useUserStore();
   const { postLoginAction, clearPostLoginAction } = useUIStore();
   const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +24,9 @@ const AuthCallback: React.FC = () => {
         const token = searchParams.get('token');
         const error = searchParams.get('error');
         const provider = searchParams.get('provider');
-
+        const status = searchParams.get('status');
+        const isPending = searchParams.get('isPending') === 'true';
+console.log('status', status)
         if (error) {
           setError(`Authentication failed: ${error}`);
           toast.auth.error(`Authentication failed: ${error}`);
@@ -33,13 +35,28 @@ const AuthCallback: React.FC = () => {
           }, 3000);
           return;
         }
-
+if(status==='pending'){
+  setShowProfileVerificationModal(true);
+  navigate('/')
+  return;
+}
         if (!token) {
           setError('No authentication token received');
           toast.auth.error('No authentication token received');
           setTimeout(() => {
             navigate('/');
           }, 3000);
+          return;
+        }
+
+        // Check if user is pending (for OAuth users)
+        if (isPending ) {
+          // Store the token temporarily
+          AuthService.tokenStorage.setToken(token);
+          
+          // Show verification modal and redirect to home
+          setShowProfileVerificationModal(true);
+          navigate('/');
           return;
         }
 
@@ -57,6 +74,14 @@ const AuthCallback: React.FC = () => {
         
         if (!profileResponse.success || !profileResponse.data) {
           throw new Error(profileResponse.error?.message || 'Failed to fetch user profile');
+        }
+
+        // Check if user status is pending (for regular login)
+        if (profileResponse.data.user.status === 'pending') {
+          // Show verification modal and redirect to home
+          setShowProfileVerificationModal(true);
+          navigate('/');
+          return;
         }
 
         // Login the user with the fetched data
@@ -102,7 +127,7 @@ const AuthCallback: React.FC = () => {
     };
 
     handleAuthCallback();
-  }, [searchParams, navigate, queryClient, loginWithToken]);
+  }, [searchParams, navigate, queryClient, loginWithToken, setShowProfileVerificationModal]);
 
   if (error) {
     return (

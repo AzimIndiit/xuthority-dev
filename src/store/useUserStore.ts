@@ -27,6 +27,8 @@ interface UserState {
   clearError: () => void;
   setLoading: (loading: boolean) => void;
   initializeAuth: () => void;
+  showProfileVerificationModal: boolean;
+  setShowProfileVerificationModal: (open: boolean) => void;
 }
 
 const useUserStore = create<UserState>()(
@@ -88,29 +90,39 @@ const useUserStore = create<UserState>()(
           const response = await AuthService.login(credentials);
           console.log('response', response)
           if (response.success && response.data) {
-            // Map API response to UserInfo format
+            // Check if user status is pending or blocked
+            if (response.data.user.status === 'pending') {
+            
+              set({ isLoading: false,token:null,user:null });
+              
+              // Show verification modal
+              const { setShowProfileVerificationModal } = get();
+              setShowProfileVerificationModal(true);
+              
+              // toast.dismiss()
+              // toast.error('Your account is pending verification. Please wait for approval.');
+              return false; // Don't proceed with normal login
+            }
+            
+            if (response.data.user.status === 'blocked') {
+              set({ isLoading: false,token:null,user:null });
+              toast.dismiss()
+              toast.error('Your account has been blocked. Please contact support.');
+              return false; // Don't proceed with normal login
+            }
+
+            // Only set token and user state if approved
             const userInfo: User = {
               id: response.data.user._id,
               displayName: `${response.data.user.firstName} ${response.data.user.lastName}`,
               ...response.data.user
             };
-            
-            // Extract accessToken from user object
             const token = response.data.user.accessToken || response.data.token;
-            
-            // Set the token in storage immediately
             if (token) {
               AuthService.tokenStorage.setToken(token);
             }
-            
-            set({
-              user: userInfo,
-              token: token,
-              isLoggedIn: true,
-              isLoading: false,
-              error: null,
-            });
-            toast.dismiss()
+            set({ user: userInfo, token, isLoggedIn: true, isLoading: false, error: null });
+            toast.dismiss();
             toast.success('Login successful!');
             return true;
           } else {
@@ -137,13 +149,30 @@ const useUserStore = create<UserState>()(
       loginWithToken: async (user: User, token: string): Promise<boolean> => {
         set({ isLoading: true, error: null });
         try {
+          // Check if user status is pending or blocked
+          if (user.status === 'pending') {
+            // Store token temporarily but don't set as logged in
+            
+            set({ isLoading: false,token:null,user:null });
+            
+            // Show verification modal
+            const { setShowProfileVerificationModal } = get();
+            setShowProfileVerificationModal(true);
+            
+            return false; // Don't proceed with normal login
+          }
+          
+          if (user.status === 'blocked') {
+            set({ isLoading: false,token:null,user:null });
+            return false; // Don't proceed with normal login
+          }
+          
           // Map API response to UserInfo format
           const userInfo: User = {
             id: user._id || user.id,
             displayName: `${user.firstName} ${user.lastName}`,
             ...user
           };
-          
           set({
             user: userInfo,
             token: token,
@@ -238,28 +267,28 @@ const useUserStore = create<UserState>()(
           const response = await AuthService.registerVendor(data);
           if (response.success && response.data) {
             // Map API response to UserInfo format
-            const userInfo: User = {
-              id: response.data.user._id,
-              displayName: `${response.data.user.firstName} ${response.data.user.lastName}`,
+            // const userInfo: User = {
+            //   id: response.data.user._id,
+            //   displayName: `${response.data.user.firstName} ${response.data.user.lastName}`,
          
-              ...response.data.user
-            };
+            //   ...response.data.user
+            // };
             
             // Extract accessToken from user object
-            const token = response.data.user.accessToken || response.data.token;
+            // const token = response.data.user.accessToken || response.data.token;
             
             // Set the token in storage immediately
-            if (token) {
-              AuthService.tokenStorage.setToken(token);
-            }
+            // if (token) {
+            //   AuthService.tokenStorage.setToken(token);
+            // }
             
-            set({
-              user: userInfo,
-              token: token,
-              isLoggedIn: true,
-              isLoading: false,
-              error: null,
-            });
+            // set({
+            //   user: userInfo,
+            //   token: token,
+            //   isLoggedIn: true,
+            //   isLoading: false,
+            //   error: null,
+            // });
             toast.dismiss()
             toast.success('Registration successful!');
             return true;
@@ -365,6 +394,8 @@ const useUserStore = create<UserState>()(
           }
         }
       },
+      showProfileVerificationModal: false,
+      setShowProfileVerificationModal: (open: boolean) => set({ showProfileVerificationModal: open }),
     }),
     {
       name: "user-store",

@@ -45,24 +45,31 @@ export function LoginForm() {
 
   const onSubmit = async (data: LoginFormInputs) => {
     try {
-      await loginMutation.mutateAsync({
+      const success = await loginMutation.mutateAsync({
         email: data.email,
         password: data.password,
       });
       
-      // Execute post-login action if exists
-      if (postLoginAction?.type === 'navigate-to-write-review') {
-        setSelectedSoftware(postLoginAction.payload.software);
-        setCurrentStep(postLoginAction.payload.currentStep);
-        clearPostLoginAction();
-        closeAuthModal();
-        navigate('/write-review');
+      // If login was successful (not pending/blocked)
+      if (success) {
+        // Execute post-login action if exists
+        if (postLoginAction?.type === 'navigate-to-write-review') {
+          setSelectedSoftware(postLoginAction.payload.software);
+          setCurrentStep(postLoginAction.payload.currentStep);
+          clearPostLoginAction();
+          closeAuthModal();
+          navigate('/write-review');
+        } else {
+          closeAuthModal();
+        }
       } else {
+        // Login failed due to pending/blocked status, close auth modal
         closeAuthModal();
       }
     } catch (error) {
       // Error is handled by the mutation hook
       console.error('Login error:', error);
+      closeAuthModal();
     }
   };
 

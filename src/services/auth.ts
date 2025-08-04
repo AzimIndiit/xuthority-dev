@@ -35,6 +35,7 @@ export interface User {
   authProvider?: 'email' | 'google' | 'linkedin';
   acceptedTerms?: boolean;
   acceptedMarketing?: boolean;
+  status?: 'approved' | 'pending' | 'blocked';
   followers?: number;
   following?: number;
   createdAt?: string;
@@ -162,7 +163,7 @@ export class AuthService {
     if (response.success && response.data) {
       // Extract token from user object or response
       const token = response.data.user?.accessToken || response.data.token;
-      if (token) {
+      if (token &&response.data.user.status==='approved') {
         tokenStorage.setToken(token);
       }
     }

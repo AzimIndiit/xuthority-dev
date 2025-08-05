@@ -8,6 +8,7 @@ import {
   DialogDescription 
 } from '@/components/ui/dialog';
 import { Star } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 interface BadgeCardProps {
   title: string;
@@ -68,16 +69,22 @@ const BadgeCard: React.FC<BadgeCardProps> = ({
       <div className="max-w-sm h-64 rounded-2xl p-4 flex flex-col items-center justify-between text-center relative max-h-[200px]" style={{ backgroundColor: requestStatus === 'approved' ? bgColor : '#F4F4F4' }}>
         {/* Icon Container */}
         <div 
-          className="w-24 h-24 rounded-full flex items-center justify-center absolute -top-12 left-1/2 transform -translate-x-1/2 shadow-lg border-2 border-white cursor-pointer hover:scale-105 transition-transform" 
+          className="w-24 h-24 rounded-full flex items-center justify-center absolute -top-12 left-1/2 transform -translate-x-1/2 shadow-lg border-2 border-white cursor-pointer hover:scale-105 transition-transform p-3" 
           style={{ backgroundColor: requestStatus === 'approved' ? iconColor : '#F4F4F4' }}
           onClick={handleImageClick}
         >
-          <img
+            <Avatar className="h-full w-full">
+            <AvatarImage src={icon} alt={`${title} Badge`}         className=" object-contain" style={{ filter: requestStatus === 'approved' ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.5)' }}  />
+            <AvatarFallback className="bg-gray-100 text-gray-600 text-base">
+              {title? `${title.charAt(0).toUpperCase() }${title.charAt(1).toUpperCase()}` : 'N/A'}
+            </AvatarFallback>
+          </Avatar>
+          {/* <img
             src={icon as string}
             alt={`${title} Badge`}
             style={{ filter: requestStatus === 'approved' ? 'grayscale(0) opacity(1)' : 'grayscale(1) opacity(0.5)' }}
             className="w-16 h-16 object-contain"
-          />
+          /> */}
         </div>
 
         {/* Title - with flex-grow to push button to bottom */}

@@ -407,7 +407,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           let verificationDataField: any = {};
           if (verificationData.method === 'company-email') {
             verificationType = 'company_email';
-            verificationDataField = { companyEmail: verificationData.companyEmail };
+            verificationDataField = { companyEmail: verificationData.companyEmail,companyName: verificationData.companyName };
           } else if (verificationData.method === 'vendor-invitation') {
             verificationType = 'vendor_invite';
             verificationDataField = { vendorInvitationLink: verificationData.vendorInvitationLink };
@@ -416,7 +416,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
             verificationDataField = { screenshot: verificationData.screenshot };
           } else if (verificationData.method === 'linkedin') {
             verificationType = 'linkedin';
-            verificationDataField = {};
+            verificationDataField = { ...verificationData?.linkedInData  };
           }
           verification = {
             isVerified: verificationData.isVerified || false,

@@ -116,6 +116,7 @@ export const useUserReviewsById = (userId: string, options?: {
   limit?: number;
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
+  publicProfile?: boolean;
 }) => {
   return useQuery({
     queryKey: ['userReviewsById', userId, options],

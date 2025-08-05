@@ -278,7 +278,7 @@ const WriteReviewPage = () => {
     if (linkedinVerified === 'true' && linkedinData) {
       try {
         const parsedLinkedInData = JSON.parse(decodeURIComponent(linkedinData));
-        
+        console.log('parsedLinkedInData', parsedLinkedInData)
         // Set verification data
         setVerificationData({
           method: 'linkedin',

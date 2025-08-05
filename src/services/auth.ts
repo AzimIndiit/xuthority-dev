@@ -224,6 +224,7 @@ export class AuthService {
     limit?: number;
     sortBy?: string;
     sortOrder?: 'asc' | 'desc';
+    publicProfile?: boolean;
   }): Promise<ApiResponse<{
     reviews: any[];
     pagination: {
@@ -241,7 +242,7 @@ export class AuthService {
     if (options?.limit) params.append('limit', options.limit.toString());
     if (options?.sortBy) params.append('sortBy', options.sortBy);
     if (options?.sortOrder) params.append('sortOrder', options.sortOrder);
-    
+    if (options?.publicProfile) params.append('publicProfile', options.publicProfile.toString());
     const queryString = params.toString();
     return await ApiService.get(`/users/${userId}/reviews${queryString ? `?${queryString}` : ''}`);
   }

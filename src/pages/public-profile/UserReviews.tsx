@@ -64,7 +64,8 @@ const UserReviews = ({publicProfile}) => {
         page: 1,
         limit: 10,
         sortBy: 'createdAt',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
+        publicProfile: true
     });
 
     const pagination = usePagination({
@@ -78,7 +79,8 @@ const UserReviews = ({publicProfile}) => {
         page: pagination.currentPage,
         limit: pagination.itemsPerPage,
         sortBy: 'createdAt',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
+        publicProfile: true
     });
 
     const handlePageChange = (page: number) => {

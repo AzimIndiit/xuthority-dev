@@ -14,26 +14,33 @@ const BlogCard: React.FC<BlogCardProps> = ({
   onClick,
   className 
 }) => {
-  const getStatusBadge = () => {
-    const variants = {
-      'active': 'text-red-600',
-      'inactive': 'text-gray-600'
+  const getContentTypeBadge = () => {
+    const contentTypeVariants: Record<string, string> = {
+      'On Demand': 'text-red-600 bg-red-50',
+      'Upcoming': 'text-blue-600 bg-blue-50',
+      'EBook': 'text-green-600 bg-green-50',
+      'Marketing': 'text-purple-600 bg-purple-50',
+      'Sales': 'text-orange-600 bg-orange-50',
+      'Live': 'text-green-600 bg-green-50',
+      'Archived': 'text-gray-600 bg-gray-50',
+      'Featured': 'text-purple-600 bg-purple-50',
+      'New': 'text-yellow-600 bg-yellow-50'
     };
 
-    const labels = {
-      'active': 'On Demand',
-      'inactive': 'Draft'
-    };
+    // Only show badge if it's one of the valid content types
+    if (!blog?.tag || !contentTypeVariants[blog.tag]) {
+      return null;
+    }
 
     return (
-      <div 
+      <Badge 
         className={cn(
-          'py-1 text-md font-medium rounded-md',
-          variants[blog.status]
+          'px-2 py-1 text-xs font-medium rounded-md border-0',
+          contentTypeVariants[blog.tag]
         )}
       >
-        {labels[blog.status]}
-      </div>
+        {blog.tag}
+      </Badge>
     );
   };
 
@@ -60,9 +67,9 @@ const BlogCard: React.FC<BlogCardProps> = ({
 
       {/* Content */}
       <div className="px-4 pb-4 pt-2">
-        {getStatusBadge()}
+        {getContentTypeBadge()}
 
-        <h3 className="mb-4  text-base sm:text-lg font-bold text-black leading-tight line-clamp-2" >
+        <h3 className="mb-4 mt-2 text-base sm:text-lg font-bold text-black leading-tight line-clamp-2" >
           {blog.title}
         </h3>
         

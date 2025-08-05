@@ -266,29 +266,15 @@ const useUserStore = create<UserState>()(
         try {
           const response = await AuthService.registerVendor(data);
           if (response.success && response.data) {
-            // Map API response to UserInfo format
-            // const userInfo: User = {
-            //   id: response.data.user._id,
-            //   displayName: `${response.data.user.firstName} ${response.data.user.lastName}`,
-         
-            //   ...response.data.user
-            // };
+            // Don't set user data or token for vendor registration
+            // Vendors need approval before they can log in
             
-            // Extract accessToken from user object
-            // const token = response.data.user.accessToken || response.data.token;
+            // Reset loading state without logging in
+            set({
+              isLoading: false,
+              error: null,
+            });
             
-            // Set the token in storage immediately
-            // if (token) {
-            //   AuthService.tokenStorage.setToken(token);
-            // }
-            
-            // set({
-            //   user: userInfo,
-            //   token: token,
-            //   isLoggedIn: true,
-            //   isLoading: false,
-            //   error: null,
-            // });
             toast.dismiss()
             toast.success('Registration successful!');
             return true;

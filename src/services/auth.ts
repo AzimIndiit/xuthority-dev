@@ -147,13 +147,14 @@ export class AuthService {
   // Vendor registration
   static async registerVendor(data: VendorRegisterRequest): Promise<ApiResponse<AuthResponse>> {
     const response = await ApiService.post<AuthResponse>('/auth/register-vendor', data);
-    if (response.success && response.data) {
-      // Extract token from user object or response
-      const token = response.data.user?.accessToken || response.data.token;
-      if (token) {
-        tokenStorage.setToken(token);
-      }
-    }
+    // Don't set token for vendor registration as vendors need approval
+    // if (response.success && response.data) {
+    //   // Extract token from user object or response
+    //   const token = response.data.user?.accessToken || response.data.token;
+    //   if (token) {
+    //     tokenStorage.setToken(token);
+    //   }
+    // }
     return response;
   }
 

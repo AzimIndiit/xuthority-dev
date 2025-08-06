@@ -115,6 +115,7 @@ const PasswordRequirementsChecker = ({ password }: { password: string }) => {
   );
 };
 
+  
 export function VendorSignupForm() {
   const {
     setAuthModalView,

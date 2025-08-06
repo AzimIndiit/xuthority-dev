@@ -31,7 +31,7 @@ const BlogDetailPage = lazy(() => import("@/pages/resource/BlogDetailPage").then
 // Lazy load legal pages
 const TermsConditionsPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.TermsConditionsPage })));
 const PrivacyPolicyPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.PrivacyPolicyPage })));
-const RefundPolicyPage = lazy(() => import("@/pages/legal").then(module => ({ default: module.RefundPolicyPage })));
+const AboutUsPage = lazy(() => import("@/pages/aboutus").then(module => ({ default: module.AboutUsPage })));
 
 // Lazy load vendor pages
 const ForVendorsPage = lazy(() => import("@/pages/vendor").then(module => ({ default: module.ForVendorsPage })));
@@ -217,13 +217,14 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "/refund",
+        path: "/about",
         Component: (props: any) => (
           <Suspense fallback={<Loader />}>
-            <RefundPolicyPage {...props} />
+            <AboutUsPage {...props} />
           </Suspense>
         ),
       },
+    
       {
         path: "/:category",
         children: [
@@ -270,7 +271,8 @@ const router = createBrowserRouter([
             <ComparePage {...props} />
           </Suspense>
         ),
-      },        
+      }, 
+            
       {
         path: "/product-detail/:productSlug/reviews",
         Component: (props: any) => (

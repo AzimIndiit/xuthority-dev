@@ -7,8 +7,44 @@ import {
   type CarouselApi,
 } from "@/components/ui/carousel";
 import { useEffect, useRef, useState } from "react";
+import { useLandingPageSection } from "@/hooks/useLandingPageSection";
 
-const testimonials = [
+// Comment out old implementation - keeping for reference
+// const testimonials = [
+//   {
+//     text: "While XUTHORITY has some useful features, I found it lacking in key integrations with other platforms we use. The interface is decent, but the reporting tools could be more detailed. It's a decent option for small businesses, but larger companies may need a more advanced solution.",
+//     name: "Katherine",
+//     avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+//   },
+//   {
+//     text: "XUTHORITY has transformed the way we manage customer feedback. With real-time tracking, seamless response management, and automation features, we can easily build trust and strengthen our reputation. The intuitive dashboard makes navigating reviews effortless, saving us valuable time.",
+//     name: "Sarah",
+//     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+//   },
+//   {
+//     text: "While XUTHORITY has some useful features, I found it lacking in key integrations with other platforms we use. The interface is decent, but the reporting tools could be more detailed. It's a decent option for small businesses, but larger companies may need a more advanced solution.",
+//     name: "Katherine",
+//     avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+//   },
+//   {
+//     text: "XUTHORITY offers great tools for review monitoring and responding, but some features feel a bit limited. The analytics are helpful, but more customization options would make it even better. Customer support is responsive, which is a plus. Overall, a solid tool, but a few enhancements would make it perfect.",
+//     name: "Emily",
+//     avatar: "https://randomuser.me/api/portraits/women/65.jpg",
+//   },
+//   {
+//     text: "While XUTHORITY has some useful features, I found it lacking in key integrations with other platforms we use. The interface is decent, but the reporting tools could be more detailed. It's a decent option for small businesses, but larger companies may need a more advanced solution.",
+//     name: "Katherine",
+//     avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+//   },
+//   {
+//     text: "XUTHORITY has transformed the way we manage customer feedback. With real-time tracking, seamless response management, and automation features, we can easily build trust and strengthen our reputation. The intuitive dashboard makes navigating reviews effortless, saving us valuable time.",
+//     name: "Sarah",
+//     avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+//   },
+// ];
+
+// Fallback testimonials in case API fails
+const fallbackTestimonials = [
   {
     text: "While XUTHORITY has some useful features, I found it lacking in key integrations with other platforms we use. The interface is decent, but the reporting tools could be more detailed. It's a decent option for small businesses, but larger companies may need a more advanced solution.",
     name: "Katherine",
@@ -41,68 +77,24 @@ const testimonials = [
   },
 ];
 
-const categories = [
-  {
-    title: "CAD Software",
-    items: [
-      "GIS Software",
-      "Computer-Aided Manufacturing (CAM) Software",
-      "Product Data Management (PDM) Software",
-      "PCB Design Software",
-    ],
-  },
-  {
-    title: "Deep Learning Software",
-    items: [
-      "GIS Software",
-      "Computer-Aided Manufacturing (CAM) Software",
-      "Product Data Management (PDM) Software",
-      "PCB Design Software",
-    ],
-  },
-  {
-    title: "IT Infrastructure Software",
-    items: [
-      "Operating System",
-      "Server Virtualization Software",
-      "Application Server Software",
-      "Infrastructure as a Service (IaaS) Providers",
-    ],
-  },
-  {
-    title: "3D Design Software",
-    items: [],
-  },
-  {
-    title: "Endpoint Security Solutions",
-    items: [],
-  },
-  {
-    title: "Blockchain Software",
-    items: [],
-  },
-  {
-    title: "Deep Learning Software",
-    items: [],
-  },
-  {
-    title: "UTM Solutions",
-    items: [],
-  },
-  {
-    title: "CASB Solutions",
-    items: [],
-  },
-  {
-    title: "Network Security Solutions",
-    items: [],
-  },
-];
+// Note: Categories were not related to testimonials - removed from this component
 
 export default function TestimonialsCarousel() {
   const [api, setApi] = useState<CarouselApi>();
   const [current, setCurrent] = useState(0);
   const [cardsPerSlide, setCardsPerSlide] = useState(1);
+  
+  // Fetch testimonials from admin-configured data
+  const { data: testimonialsData, isLoading: testimonialsLoading } = useLandingPageSection('user', 'testimonials');
+  
+  // Transform the API data to match our component structure
+  const testimonials = testimonialsData?.testimonials?.map((testimonial: any) => ({
+    text: testimonial.text,
+    name: testimonial.userName,
+    avatar: testimonial.userImage || `https://ui-avatars.com/api/?name=${encodeURIComponent(testimonial.userName)}&background=random`,
+  })) || fallbackTestimonials;
+  
+  const sectionHeading = testimonialsData?.heading || "What they Say About Us!";
 
   // Responsive: update cardsPerSlide
   useEffect(() => {
@@ -118,7 +110,7 @@ export default function TestimonialsCarousel() {
 
   // Auto-scroll
   useEffect(() => {
-    if (!api) return;
+    if (!api || testimonials.length === 0) return;
     const interval = setInterval(() => {
       const next = (api.selectedScrollSnap() + cardsPerSlide) % Math.ceil(testimonials.length / cardsPerSlide);
       api.scrollTo(next);
@@ -160,7 +152,7 @@ export default function TestimonialsCarousel() {
         <div className="absolute right-0 bottom-0 w-64 h-32 bg-red-100 rounded-tl-full opacity-60 -z-10" />
 
         <h2 className="text-3xl sm:text-5xl font-bold text-center mb-12 text-gray-900">
-          What they Say About Us!
+          {sectionHeading}
         </h2>
     
        
@@ -170,56 +162,73 @@ export default function TestimonialsCarousel() {
 
         </div>
 
-          <Carousel
-            setApi={setApi}
-            opts={{
-              align: "center",
-              loop: true,
-              slidesToScroll: 1,
-            }}
-            className="w-full"
-          >
-            <CarouselContent>
-
-              {testimonials.map((t, idx) => (
-                <CarouselItem
-                  key={t.name + idx}
-                  className="md:basis-1/2 lg:basis-1/3 flex flex-col"
-                > 
-                  <div className="bg-white rounded-md  border border-gray-200 p-4 flex flex-col justify-between min-h-[320px] mx-2 flex-1">
-                    <p className="text-gray-800 text-base mb-8 leading-relaxed font-semibold ">{t.text}</p>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-red-600 text-4xl font-family-buffalo">
-                        {t.name}
-                      </span>
-                      <img
-                        src={t.avatar}
-                        alt={t.name}
-                        className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
-                      />
+          {testimonialsLoading ? (
+            // Loading skeleton
+            <div className="w-full">
+              <div className="flex gap-4 animate-pulse">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="bg-gray-200 rounded-md h-80 flex-1"></div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <Carousel
+              setApi={setApi}
+              opts={{
+                align: "center",
+                loop: true,
+                slidesToScroll: 1,
+              }}
+              className="w-full"
+            >
+              <CarouselContent>
+                {testimonials.map((t: any, idx: number) => (
+                  <CarouselItem
+                    key={t.name + idx}
+                    className="md:basis-1/2 lg:basis-1/3 flex flex-col"
+                  > 
+                    <div className="bg-white rounded-md  border border-gray-200 p-4 flex flex-col justify-between min-h-[320px] mx-2 flex-1">
+                      <p className="text-gray-800 text-base mb-8 leading-relaxed font-semibold ">{t.text}</p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className="text-red-600 text-4xl font-family-buffalo">
+                          {t.name}
+                        </span>
+                        <img
+                          src={t.avatar}
+                          alt={t.name}
+                          className="w-12 h-12 rounded-full object-cover border-2 border-white shadow"
+                          onError={(e) => {
+                            // Fallback to avatar generator if image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(t.name)}&background=random`;
+                          }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            {/* Optional: Show arrows on desktop */}
-            {/* <CarouselPrevious className="hidden md:flex" />
-          <CarouselNext className="hidden md:flex" /> */}
-          </Carousel>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              {/* Optional: Show arrows on desktop */}
+              {/* <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" /> */}
+            </Carousel>
+          )}
         </div>
         {/* Dots */}
-        <div className="flex items-center justify-center gap-2 mt-8 ">
-          {Array.from({ length: totalSlides }).map((_, idx) => (
-            <button
-              key={idx}
-              className={`w-3 h-3 rounded-full border-2 border-red-200 transition-all ${
-                idx === dotActive ? "bg-red-600 border-red-600" : "bg-white"
-              }`}
-              onClick={() => api?.scrollTo(idx)}
-              aria-label={`Go to testimonial slide ${idx + 1}`}
-            />
-          ))}
-        </div>
+        {!testimonialsLoading && testimonials.length > 0 && (
+          <div className="flex items-center justify-center gap-2 mt-8 ">
+            {Array.from({ length: totalSlides }).map((_, idx) => (
+              <button
+                key={idx}
+                className={`w-3 h-3 rounded-full border-2 border-red-200 transition-all ${
+                  idx === dotActive ? "bg-red-600 border-red-600" : "bg-white"
+                }`}
+                onClick={() => api?.scrollTo(idx)}
+                aria-label={`Go to testimonial slide ${idx + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

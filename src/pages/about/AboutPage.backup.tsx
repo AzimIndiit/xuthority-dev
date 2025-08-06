@@ -1,11 +1,10 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { HeroSection, ValuesSection, FeatureSection, LandingPageSkeleton } from '@/components/common';
+import { HeroSection, ValuesSection, FeatureSection } from '@/components/common';
 import { useAuthenticatedAction } from '@/hooks/useAuthenticatedAction';
 import TestimonialsCarousel from '@/components/home/TestimonialsCarousel';
 import useUserStore from '@/store/useUserStore';
 import useUIStore from '@/store/useUIStore';
-import { useLandingPageSection } from '@/hooks/useLandingPageSection';
 
 export const AboutPage: React.FC = () => {
   const { isLoggedIn, user } = useUserStore();
@@ -15,11 +14,6 @@ export const AboutPage: React.FC = () => {
     resetReviewStore: true
   });
 
-  // Fetch about page sections data
-  const { data: heroData, isLoading: heroLoading } = useLandingPageSection('about', 'hero');
-  const { data: valuesData, isLoading: valuesLoading } = useLandingPageSection('about', 'values');
-  const { data: missionData, isLoading: missionLoading } = useLandingPageSection('about', 'missionSupport');
-
   const handleWriteReview = () => {
     executeAction();
   };
@@ -28,25 +22,7 @@ export const AboutPage: React.FC = () => {
     executeAction();
   };
 
-  // Check if any section is loading
-  const isPageLoading = heroLoading || valuesLoading || missionLoading;
-
-  // Return skeleton if page is loading
-  if (isPageLoading) {
-    return <LandingPageSkeleton />;
-  }
-
-  // Transform values data from admin panel
-  const customValues = valuesData?.cards?.map((card: any, index: number) => ({
-    id: card.id || index + 1,
-    title: card.heading || "",
-    description: card.subtext || "",
-    // Keep hardcoded images as they don't come from admin
-    image: index === 0 ? "/svg/about-us/section_2_2.svg" : 
-           index === 1 ? "/svg/about-us/section_2_3.svg" : 
-           "/svg/about-us/section_2_1.svg",
-    imageAlt: card.heading || "Value icon"
-  })) || [
+  const customValues = [
     {
       id: 1,
       title: "Real People, Real Reviews, 100% Verified",
@@ -74,8 +50,8 @@ export const AboutPage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
       <HeroSection
-        title={heroData?.heading || "Manage & Master Your Reviews!"}
-        subtitle={heroData?.subtext || "XUTHORITY is the trusted platform for managing and optimizing reviews. Businesses and professionals rely on it to track, respond to, and leverage customer feedback—powered by real, verified insights to build credibility and trust."}
+        title="Manage & Master Your Reviews!"
+        subtitle="XUTHORITY is the trusted platform for managing and optimizing reviews. Businesses and professionals rely on it to track, respond to, and leverage customer feedback—powered by real, verified insights to build credibility and trust."
         backgroundImage="/svg/home_bg.svg"
         illustration="/svg/about-us/section_1.svg"
         illustrationAlt="Manage and master your reviews illustration"
@@ -83,16 +59,16 @@ export const AboutPage: React.FC = () => {
 
       {/* Our Values Section */}
       <ValuesSection 
-        title={valuesData?.heading || "Why Choose Us"}
+        title="Why Choose Us"
         values={customValues}
-        buttonText={valuesData?.buttonText || "Write a Review"}
+        buttonText="Write a Review"
         onButtonClick={handleWriteReview}
       />
 
       {/* Feature Section */}
       <FeatureSection
-        title={missionData?.heading || "Achieve More. We're Here to Help."}
-        description={missionData?.subtext || "XUTHORITY is transforming the way businesses manage feedback by prioritizing real, user-driven insights. Instead of relying on biased ratings, we empower you with authentic customer experiences to build trust and make informed decisions. Your reputation, backed by real voices, helps you reach new heights."}
+        title="Achieve More. We're Here to Help."
+        description="XUTHORITY is transforming the way businesses manage feedback by prioritizing real, user-driven insights. Instead of relying on biased ratings, we empower you with authentic customer experiences to build trust and make informed decisions. Your reputation, backed by real voices, helps you reach new heights."
         illustration="/svg/home/home_section_1.svg"
         illustrationAlt="Leave a review illustration"
         reverse={true}
@@ -101,7 +77,7 @@ export const AboutPage: React.FC = () => {
           onClick={handleWriteReview}
           className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-3 shadow transition-all"
         >
-         {missionData?.buttonText || "Write a Review"} <span aria-hidden className="ml-2">→</span>
+          Write a Review <span aria-hidden className="ml-2">→</span>
         </Button>}
       </FeatureSection>
 

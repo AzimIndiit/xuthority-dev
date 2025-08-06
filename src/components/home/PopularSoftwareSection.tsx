@@ -1,6 +1,7 @@
 import { StyledAccordion } from "@/components/ui/StyledAccordion";
 import { usePopularSoftwares } from "@/hooks/useFeaturedSoftwares";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
+import { useLandingPageSection } from "@/hooks/useLandingPageSection";
 
 interface ProductItem {
   value: string;
@@ -15,36 +16,135 @@ interface CategoryItem {
 }
 
 const PopularSoftwareSection = () => {
-  const { popularSoftwares, isLoading, error, hasData } = usePopularSoftwares({
-    limit: 12, // Get more softwares to ensure good coverage
-    productsPerSoftware: 4, // Get top 4 products per software
-    minRating: 3, // Only show well-rated products
-    sortBy: 'totalReviews',
-    sortOrder: 'desc'
-  });
+  // Comment out old implementation - keeping for reference
+  // const { popularSoftwares, isLoading, error, hasData } = usePopularSoftwares({
+  //   limit: 12, // Get more softwares to ensure good coverage
+  //   productsPerSoftware: 4, // Get top 4 products per software
+  //   minRating: 3, // Only show well-rated products
+  //   sortBy: 'totalReviews',
+  //   sortOrder: 'desc'
+  // });
+  
+  // New implementation using admin-configured data
+  const { data: popularData, isLoading: popularLoading } = useLandingPageSection('user', 'popular');
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Transform API data to accordion format
-  const categories: CategoryItem[] = useMemo(() => {
-    if (!hasData) return [];
-
-    return popularSoftwares.map((item) => ({
-      title: item.software.name,
-      items: item.topProducts.map((product) => ({
-        value: `${product.name}`,
-        rating: product.avgRating,
-        reviews: product.totalReviews,
-        slug: product.slug
-      }))
-    }));
-  }, [popularSoftwares, hasData]);
-
+  // Fetch all data when popularData changes
+  useEffect(() => {
+    const fetchPopularData = async () => {
+      if (!popularData?.solutions || popularData.solutions.length === 0) {
+        setCategories([]);
+        setIsLoading(false);
+        return;
+      }
+      
+      setIsLoading(true);
+      setError(null);
+      
+      try {
+        const api = (await import('@/services/api')).default;
+        const transformedCategories: CategoryItem[] = [];
+        
+        // Process each solution/software item
+        for (const item of popularData.solutions) {
+          let categoryTitle = '';
+          let categoryId = '';
+          
+          // Determine if it's software or solution
+          if (item.software) {
+            categoryId = typeof item.software === 'object' && item.software._id 
+              ? item.software._id 
+              : item.software;
+            
+            // Fetch software details if not populated
+            if (typeof item.software === 'string') {
+              try {
+                const softwareRes = await api.get(`/softwares/${categoryId}`);
+                categoryTitle = softwareRes.data.data?.name || categoryId;
+              } catch (err) {
+                categoryTitle = categoryId;
+              }
+            } else {
+              categoryTitle = item.software.name || categoryId;
+            }
+          } else if (item.solution) {
+            categoryId = typeof item.solution === 'object' && item.solution._id 
+              ? item.solution._id 
+              : item.solution;
+              
+            // Fetch solution details if not populated
+            if (typeof item.solution === 'string') {
+              try {
+                const solutionRes = await api.get(`/solutions/${categoryId}`);
+                categoryTitle = solutionRes.data.data?.name || categoryId;
+              } catch (err) {
+                categoryTitle = categoryId;
+              }
+            } else {
+              categoryTitle = item.solution.name || categoryId;
+            }
+          }
+          
+          // Extract product IDs
+          const productIds = item.products?.map((product: any) => {
+            if (typeof product === 'string') return product;
+            if (typeof product === 'object' && product._id) return product._id;
+            return null;
+          }).filter(Boolean) || [];
+          
+          // Fetch product details
+          const productItems: ProductItem[] = [];
+          
+          for (const productId of productIds) {
+            try {
+              const productRes = await api.get(`/products/${productId}`);
+              const product = productRes.data.data;
+              
+              if (product) {
+                productItems.push({
+                  value: product.name,
+                  rating: product.avgRating || 0,
+                  reviews: product.totalReviews || 0,
+                  slug: product.slug || productId
+                });
+              }
+            } catch (err) {
+              console.error(`Failed to fetch product ${productId}:`, err);
+            }
+          }
+          
+          if (categoryTitle && productItems.length > 0) {
+            transformedCategories.push({
+              title: categoryTitle,
+              items: productItems
+            });
+          }
+        }
+        
+        setCategories(transformedCategories);
+      } catch (err) {
+        console.error('Error fetching popular data:', err);
+        setError('Failed to load popular software categories');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchPopularData();
+  }, [popularData]);
+  
+  const hasData = categories.length > 0;
+  const sectionHeading = popularData?.heading || "Popular Software Categories";
+const sectionSubtext=popularData?.subtext
   // Loading state
-  if (isLoading) {
+  if (isLoading || popularLoading) {
     return (
       <section className="py-24 md:py-20 bg-gray-50">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-center">
-            Popular Software Categories
+            {sectionHeading}
           </h2>
           <p className="mt-4 text-lg text-gray-600 text-center max-w-3xl mx-auto">
             Loading our most popular software categories...
@@ -97,7 +197,7 @@ const PopularSoftwareSection = () => {
       <section className="py-12 md:py-20 bg-gray-50">
         <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
           <h2 className="text-3xl md:text-4xl font-bold text-center">
-            Popular Software Categories
+            {sectionHeading}
           </h2>
           <div className="mt-8 text-center">
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
@@ -119,11 +219,10 @@ const PopularSoftwareSection = () => {
     <section className="py-24 bg-gray-50">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6">
         <h2 className="text-3xl md:text-5xl font-bold text-center">
-          Popular Software Categories
+          {sectionHeading}
         </h2>
         <p className="mt-4 text-lg text-gray-600 text-center max-w-4xl mx-auto leading-relaxed">
-          Explore our most popular software categories with top-rated products 
-          to find the right solution for your business needs.
+        {sectionSubtext}
         </p>
       </div>
 

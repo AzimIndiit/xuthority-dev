@@ -6,7 +6,6 @@ import { useProductsByCategory } from "@/hooks/useProducts";
 import LottieLoader from "@/components/LottieLoader";
 import { useNavigate } from "react-router-dom";
 import SecondaryLoader from "./ui/SecondaryLoader";
-import { useLandingPageSection } from "@/hooks/useLandingPageSection";
 
 const DUMMY_LOGO = "https://placehold.co/48x48/png";
 
@@ -107,156 +106,29 @@ const SoftwareGridSkeleton = () => (
 );
 
 export default function SoftwareGrid() {
-  // Comment out old implementation - keeping for reference
-  // const {options:softwareOptions,isLoading:softwareLoading}=useSoftwareOptions(1,10)
-  
-  // New implementation using admin-configured data
-  const { data: categoriesData, isLoading: categoriesLoading } = useLandingPageSection('user', 'categories');
+  const {options:softwareOptions,isLoading:softwareLoading}=useSoftwareOptions(1,10)
   const navigate = useNavigate();
-  
-  // Transform categories data into the format we need
-  const softwareOptions = categoriesData?.categories?.map((category: any) => {
-    // Handle populated name field (software)
-    const softwareId = typeof category.name === 'object' && category.name?._id 
-      ? category.name._id 
-      : category.name || '';
-    
-    const softwareName = typeof category.name === 'object' && category.name?.name
-      ? category.name.name
-      : '';
-    
-    return {
-      slug: softwareId, // This is the software ID
-      label: softwareName || softwareId, // Use name if available, otherwise ID
-      value: softwareId,
-      products: category.products || []
-    };
-  }) || [];
-  
   const [activeCategory, setActiveCategory] = useState(softwareOptions[0]?.slug);
-  const [activeCategoryIndex, setActiveCategoryIndex] = useState(0);
 
   useEffect(() => {
-    if (softwareOptions.length > 0) {
-      setActiveCategory(softwareOptions[0]?.slug);
-      setActiveCategoryIndex(0);
-    }
-  }, [softwareOptions.length]);
-  
-  // Comment out old product fetching
-  // const {
-  //   data: productsResult,
-  //   isLoading,
-  //   isFetching,
-  //   isError,
-  //   error
-  // } = useProductsByCategory(
-  //   'software',
-  //   activeCategory || '',
-  //   "",
-  //   1,
-  //   8,
-  //   {}
-  // );
-  // const products=Array.isArray(productsResult?.data) ? productsResult?.data : []
-  
-  // Get products from the selected category
-  const activeCategoryProducts = activeCategoryIndex >= 0 && softwareOptions[activeCategoryIndex]?.products || [];
-  
-  // Extract product IDs (handle both populated objects and plain IDs)
-  const activeProductIds = activeCategoryProducts.map((product: any) => {
-    if (typeof product === 'string') return product;
-    if (typeof product === 'object' && product?._id) return product._id;
-    return null;
-  }).filter(Boolean);
-  
-  // We'll need to fetch the actual product details
-  const [products, setProducts] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isFetching, setIsFetching] = useState(false);
+    setActiveCategory(softwareOptions[0]?.slug)
+  }, [softwareOptions])
+  const {
+    data: productsResult,
+    isLoading,
+    isFetching,
+    isError,
+    error
+  } = useProductsByCategory(
+    'software',
+    activeCategory || '',
+    "",
+    1,
+    8,
+    {}
+  );
+  const products=Array.isArray(productsResult?.data) ? productsResult?.data : []
 
-  // Fetch product details when active category changes
-  useEffect(() => {
-    const fetchProducts = async () => {
-      if (activeProductIds.length === 0) {
-        setProducts([]);
-        return;
-      }
-      
-      setIsLoading(true);
-      setIsFetching(true);
-      
-      try {
-        // Import the API service
-        const api = (await import('@/services/api')).default;
-        
-        // Fetch all product details in parallel
-        const productPromises = activeProductIds.map((productId: string) => 
-          api.get(`/products/${productId}`)
-        );
-        
-        const responses = await Promise.all(productPromises);
-        const fetchedProducts = responses.map(res => res.data.data).filter(Boolean);
-        
-        setProducts(fetchedProducts);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-        setProducts([]);
-      } finally {
-        setIsLoading(false);
-        setIsFetching(false);
-      }
-    };
-    
-    fetchProducts();
-  }, [activeProductIds.join(',')]);
-  
-  // Fetch software details to get labels (only for items without labels)
-  const [softwareLabels, setSoftwareLabels] = useState<Record<string, string>>({});
-  
-  useEffect(() => {
-    const fetchSoftwareLabels = async () => {
-      if (softwareOptions.length === 0) return;
-      
-      // Filter options that don't have labels
-      const optionsWithoutLabels = softwareOptions.filter((option: any) => !option.label || option.label === option.slug);
-      
-      if (optionsWithoutLabels.length === 0) return;
-      
-      try {
-        const api = (await import('@/services/api')).default;
-        
-        // Fetch only software details that don't have labels
-        const softwarePromises = optionsWithoutLabels.map((option: any) => 
-          api.get(`/softwares/${option.slug}`).catch(() => null)
-        );
-        
-        const responses = await Promise.all(softwarePromises);
-        const labels: Record<string, string> = {};
-        
-        responses.forEach((res, index) => {
-          if (res?.data?.data) {
-            labels[optionsWithoutLabels[index].slug] = res.data.data.name || optionsWithoutLabels[index].slug;
-          }
-        });
-        
-        setSoftwareLabels(labels);
-      } catch (error) {
-        console.error('Error fetching software labels:', error);
-      }
-    };
-    
-    fetchSoftwareLabels();
-  }, [softwareOptions.map(o => o.slug).join(',')]);
-  
-  // Update software options with labels
-  const softwareOptionsWithLabels = softwareOptions.map((option: any) => ({
-    ...option,
-    label: softwareLabels[option.slug] || option.label || option.slug
-  }));
-  
-  const softwareLoading = categoriesLoading;
-  
   // Show full skeleton loader when software options are loading
   if (softwareLoading) {
     return (
@@ -309,7 +181,7 @@ export default function SoftwareGrid() {
     <section className="py-24 px-2 sm:px-4 md:px-6 lg:px-8 bg-gradient-to-b from-red-100/50 via-white to-red-100/50" >
       <div className="w-full lg:max-w-screen-xl mx-auto">
         <h2 className="text-2xl sm:text-5xl font-bold text-center max-w-3xl mx-auto mb-8 text-gray-900">
-          {categoriesData?.heading || "The Most Widely Used Software Categories."}
+          The Most Widely Used Software Categories.
         </h2>
         <div className="flex flex-col sm:flex-row  gap-4 lg:gap-8 items-start">
           {/* Mobile: horizontal scrollable pills */}
@@ -326,7 +198,7 @@ export default function SoftwareGrid() {
               </button>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-2">
-              {softwareOptionsWithLabels.map((cat, index) => (
+              {softwareOptions.map((cat) => (
                 <button
                   key={cat.slug}
                   className={`px-5 py-2 rounded-xl text-sm  whitespace-nowrap font-medium transition-colors ${
@@ -334,10 +206,7 @@ export default function SoftwareGrid() {
                       ? "bg-red-600 text-white"
                       : "bg-white border border-gray-200 text-black"
                   }`}
-                  onClick={() => {
-                    setActiveCategory(cat.slug);
-                    setActiveCategoryIndex(index);
-                  }}
+                  onClick={() => setActiveCategory(cat.slug)}
                 >
                   {cat.label}
                 </button>
@@ -349,7 +218,7 @@ export default function SoftwareGrid() {
           <aside className="hidden sm:block w-48 lg:w-64 flex-shrink-0 mb-4 md:mb-0 space-y-4 rounded-t-xl overflow-hidden md:static lg:sticky lg:top-10">
             <nav className="bg-white border border-gray-200 rounded-xl  ">
               <ul className="divide-y divide-gray-200">
-                  {softwareOptionsWithLabels.map((cat, index) => (
+                  {softwareOptions.map((cat) => (
                   <li key={cat.slug} className="">
                     <Button
                       variant={cat.slug === activeCategory ? "default" : "ghost"}
@@ -358,10 +227,7 @@ export default function SoftwareGrid() {
                           ? "bg-red-600 text-white hover:bg-red-700"
                           : "text-gray-900 hover:bg-gray-50"
                       }`}
-                      onClick={() => {
-                        setActiveCategory(cat.slug);
-                        setActiveCategoryIndex(index);
-                      }}
+                      onClick={() => setActiveCategory(cat.slug)}
                     >
                       <span
                         className={`break-words ${

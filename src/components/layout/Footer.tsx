@@ -1,14 +1,87 @@
 import { Link } from "react-router-dom";
+import { useLandingPageSection } from '@/hooks/useLandingPageSection';
+import { useEffect, useState } from 'react';
 
 export default function Footer() {
-  // Static top categories to avoid unnecessary API calls
-  const topCategories = [
+  // Fetch categories from landing page API
+  const { data: categoriesData } = useLandingPageSection('user', 'categories');
+  const [softwareLabels, setSoftwareLabels] = useState<Record<string, string>>({});
+  
+  // Transform categories data into the format we need
+  const categoriesFromAPI = categoriesData?.categories?.map((category: any) => {
+    // Handle populated name field (software)
+    const softwareId = typeof category.name === 'object' && category.name?._id 
+      ? category.name._id 
+      : category.name || '';
+    
+    const softwareName = typeof category.name === 'object' && category.name?.name
+      ? category.name.name
+      : '';
+    
+    const softwareSlug = typeof category.name === 'object' && category.name?.slug
+      ? category.name.slug
+      : '';
+    
+    return {
+      value: softwareId,
+      slug: softwareSlug || softwareId, // Use slug if available, otherwise use ID
+      label: softwareName || softwareId,
+    };
+  }) || [];
+  
+  // Fetch software labels for categories without names
+  useEffect(() => {
+    const fetchSoftwareLabels = async () => {
+      if (categoriesFromAPI.length === 0) return;
+      
+      // Filter options that don't have labels
+      const optionsWithoutLabels = categoriesFromAPI.filter((option: any) => !option.label || option.label === option.slug);
+      
+      if (optionsWithoutLabels.length === 0) return;
+      
+      try {
+        const api = (await import('@/services/api')).default;
+        
+        // Fetch only software details that don't have labels
+        const softwarePromises = optionsWithoutLabels.map((option: any) => 
+          api.get(`/softwares/${option.slug || option.value}`).catch(() => null)
+        );
+        
+        const responses = await Promise.all(softwarePromises);
+        const labels: Record<string, string> = {};
+        
+        responses.forEach((res: any, index: number) => {
+          if (res?.data?.data?.name) {
+            const key = optionsWithoutLabels[index].slug || optionsWithoutLabels[index].value;
+            labels[key] = res.data.data.name;
+          }
+        });
+        
+        setSoftwareLabels(labels);
+      } catch (error) {
+        console.error('Error fetching software labels:', error);
+      }
+    };
+    
+    fetchSoftwareLabels();
+  }, [categoriesFromAPI.map((o: any) => o.slug).join(',')]);
+  
+  // Update categories with labels, take only first 5
+  const topCategories = categoriesFromAPI.slice(0, 5).map((option: any) => ({
+    ...option,
+    label: softwareLabels[option.slug] || softwareLabels[option.value] || option.label || option.slug
+  }));
+  console.log('categoriesFromAPI', categoriesFromAPI)
+  // Fallback to default categories if API data is not available
+  const defaultCategories = [
     { label: "CRM Software", slug: "crm-software" },
     { label: "Project Management", slug: "project-management" },
     { label: "Marketing Automation", slug: "marketing-automation" },
     { label: "HR Management", slug: "hr-management" },
     { label: "E-commerce", slug: "e-commerce" }
   ];
+  
+  const finalCategories = topCategories.length > 0 ? topCategories : defaultCategories;
   return (
     <footer className="bg-[#111] text-white border-t border-neutral-800">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 py-10 flex flex-col md:flex-row gap-10 md:gap-0">
@@ -112,7 +185,7 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-3">Top Categories</h4>
             <ul className="space-y-2 text-gray-200">
-              {topCategories.map((category, index) => (
+              {finalCategories.map((category: any, index: number) => (
                 <li key={index}>
                   <Link to={`/software/${category.slug}`} className="hover:text-white transition-colors">
                     {category.label}
@@ -134,11 +207,7 @@ export default function Footer() {
                   Privacy Policy
                 </a>
               </li>
-              <li>
-                <a href="/refund" className="hover:text-white transition-colors">
-                  Refund Policy
-                </a>
-              </li>
+             
             
             </ul>
           </div>

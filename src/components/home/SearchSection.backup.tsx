@@ -5,7 +5,6 @@ import useDebounce from "@/hooks/useDebounce";
 import LottieLoader from "@/components/LottieLoader";
 import { useGlobalSearch } from "@/hooks/useGlobalSearch";
 import { useNavigate } from "react-router-dom";
-import { useLandingPageSection } from "@/hooks/useLandingPageSection";
 
 const icons = {
   software: (
@@ -57,13 +56,6 @@ export default function SearchSection() {
 
   const { data, isLoading ,isFetching} = useGlobalSearch(debounced);
   const results = data as { softwares?: any[]; solutions?: any[]; products?: any[] } | undefined;
-  
-  // Fetch hero section data from admin configuration
-  const { data: heroData, isLoading: heroLoading } = useLandingPageSection('user', 'hero');
-  
-  // Use admin-configured text or fallback to defaults
-  const heroHeading = heroData?.heading || "Find the right software with Us!";
-  const heroSubtext = heroData?.subtext || "We helps you discover the ideal solutions for your business. Compare options by price, features, business size, industry, and reviews from verified users.";
 
   // Show/hide dropdown based on debounced input
   // (optional: you can also close on blur/click outside)
@@ -72,27 +64,6 @@ export default function SearchSection() {
   // You can further enhance with click outside logic if needed
   if (debounced && !showDropdown) setShowDropdown(true);
   if (!debounced && showDropdown) setShowDropdown(false);
-
-  // Show skeleton loader while hero data is loading
-  if (heroLoading) {
-    return (
-      <section className="flex flex-col items-center justify-center min-h-[70dvh] w-full bg-gradient-to-br from-yellow-100 via-yellow-50 to-yellow-200 px-4 sm:px-6 lg:px-8 py-12 animate-pulse" style={{backgroundImage: 'url(/svg/home_bg.svg)',backgroundSize: 'cover',backgroundPosition: 'center' ,backgroundRepeat: 'no-repeat'}}>
-        <div className="w-full lg:max-w-screen-xl mx-auto">
-          {/* Title skeleton */}
-          <div className="h-12 lg:h-16 bg-gray-300 rounded-lg w-3/4 mx-auto mb-4"></div>
-          {/* Subtitle skeleton */}
-          <div className="space-y-3 max-w-3xl mx-auto mb-8">
-            <div className="h-6 md:h-8 bg-gray-300 rounded w-full"></div>
-            <div className="h-6 md:h-8 bg-gray-300 rounded w-5/6 mx-auto"></div>
-          </div>
-          {/* Search bar skeleton */}
-          <div className="flex w-full max-w-xl mx-auto px-2 mt-8">
-            <div className="flex w-full h-14 rounded-full bg-gray-300"></div>
-          </div>
-        </div>
-      </section>
-    );
-  }
   function renderSection(title: string, items: any[] | undefined, type: string) {
     if (!items?.length) return null;
     return (
@@ -122,10 +93,10 @@ export default function SearchSection() {
     <section className=" flex flex-col items-center justify-center min-h-[70dvh] w-full bg-gradient-to-br from-yellow-100 via-yellow-50 to-yellow-200  px-4 sm:px-6 lg:px-8 py-12" style={{backgroundImage: 'url(/svg/home_bg.svg)',backgroundSize: 'cover',backgroundPosition: 'center' ,backgroundRepeat: 'no-repeat'}}>
       <div className="w-full lg:max-w-screen-xl mx-auto">
         <h1 className="text-4xl lg:text-6xl font-bold text-center mb-3 sm:mb-4 mt-8 md:mt-0 px-4 leading-[1.2]">
-          {heroHeading}
+          Find the right software with Us!
         </h1>
         <p className="text-gray-700 text-center  mx-auto mb-6 sm:mb-8 text-base md:text-2xl px-4">
-          {heroSubtext}
+          We helps you discover the ideal solutions for your business. Compare options by price, features, business size, industry, and reviews from verified users.
         </p>
         <form className="flex w-full max-w-xl mx-auto px-2 mt-8 relative" onSubmit={e => e.preventDefault()}>
           <div className="flex w-full rounded-full border border-red-400 bg-white overflow-hidden shadow-sm ">

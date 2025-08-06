@@ -33,7 +33,7 @@ const navLinks = [
   { label: "Notifications", href: "/profile/notifications" },
   { label: "Terms of Service", href: "/terms" },
   { label: "Privacy Policy", href: "/policy" },
-  { label: "Refund Policy", href: "/refund" },
+  // { label: "Refund Policy", href: "/refund" },
   // Log Out handled separately
 ];
 

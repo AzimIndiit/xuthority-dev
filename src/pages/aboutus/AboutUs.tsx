@@ -1,49 +1,11 @@
 import React from 'react';
-import { usePageBySlug } from '@/hooks/usePages';
-import { LegalPageSkeleton } from '@/components/legal/LegalPageSkeleton';
 
-export const TermsConditionsPage: React.FC = () => {
-  const { data: pageData, isLoading, error } = usePageBySlug('terms-conditions');
-
-  if (isLoading) {
-    return <LegalPageSkeleton />;
-  }
-
-  if (error && (error as any)?.response?.status !== 404) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Error Loading Page</h2>
-          <p className="text-gray-600">Failed to load Terms & Conditions. Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Use API content if available, otherwise use default content
-  const pageContent = pageData?.data?.content;
-
-  if (pageContent) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-            Terms & Conditions
-          </h1>
-          <div className="prose prose-lg max-w-none text-gray-700 whitespace-pre-wrap">
-            {pageContent}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Fallback to default content if no API content
+export const AboutUsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="w-full lg:max-w-screen-xl mx-auto px-4 sm:px-6 py-16">
             <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-              Terms & Conditions
+       About Us
             </h1>
             
             <div className="prose prose-lg max-w-none text-gray-700 space-y-8">

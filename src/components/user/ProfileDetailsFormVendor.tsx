@@ -140,7 +140,7 @@ export const profileVendorSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters").trim().max(50, "First name must be less than 50 characters").nonempty("First name is required"),
   lastName: z.string().min(2, "Last name must be at least 2 characters").trim().max(50, "Last name must be less than 50 characters").nonempty("Last name is required"),
   email: z.string().email("Invalid email address"),
-  region: z.string().min(1, "Please select a region"),
+  region: z.string().optional(),
   description: z.string().optional().refine((val) => !val || val.length <= 1000, "Description must be less than 1000 characters"),
   industry: z.string().min(1, "Please select an industry").refine((val) => {
     // Validate that it's a valid MongoDB ObjectId format

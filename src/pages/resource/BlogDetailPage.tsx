@@ -190,7 +190,7 @@ export const BlogDetailPage: React.FC = () => {
         style={{ 
           backgroundImage: blog.mediaUrl ? `url(${blog.mediaUrl})` : 'none', 
           backgroundSize: 'cover', 
-          backgroundPosition: 'top',
+          backgroundPosition: 'center',
         }}
       />
       

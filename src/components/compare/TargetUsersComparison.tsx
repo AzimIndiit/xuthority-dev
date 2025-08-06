@@ -146,7 +146,7 @@ export default function TargetUsersComparison({ products, className }: TargetUse
                 </td>
               ))}
               {products.length < 3 && [...Array(3 - products.length)].map((_, index) => (
-                <td key={`empty-segment-${index}`} className="p-3 sm:p-4 text-center align-top w-1/4">
+                <td key={`empty-segment-${index}`} className="p-3 sm:p-4 text-center align-top w-1/4 border-r">
                   <span className="text-gray-300 italic text-sm">
                     No product selected
                   </span>

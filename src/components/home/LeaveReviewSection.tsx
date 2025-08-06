@@ -7,7 +7,7 @@ import { useLandingPageSection } from "@/hooks/useLandingPageSection";
 
 export default function LeaveReviewSection() {
   const { setSelectedSoftware, setCurrentStep } = useReviewStore();
-  const { isLoggedIn } = useUserStore();
+  const { isLoggedIn,user } = useUserStore();
   const { openAuthModal } = useUIStore();
   const navigate = useNavigate();
   
@@ -51,7 +51,7 @@ export default function LeaveReviewSection() {
           <p className="text-gray-600 mb-6 max-w-lg leading-relaxed">
             {subtext}
           </p>
-          <Button
+         {(!isLoggedIn  || user?.role === 'user' ) && <Button
             onClick={()=>{
               if (!isLoggedIn) {
                 openAuthModal();
@@ -64,7 +64,7 @@ export default function LeaveReviewSection() {
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-3 shadow transition-all"
           >
             {buttonText} <span aria-hidden className="ml-2">→</span>
-          </Button>
+          </Button>}
         </div>
         {/* Illustration */}
         <div className="w-full sm:w-1/2 flex justify-center mb-8 md:mb-0">

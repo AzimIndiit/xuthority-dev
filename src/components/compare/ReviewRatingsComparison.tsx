@@ -48,7 +48,7 @@ export default function ReviewRatingsComparison({ products, className }: ReviewR
                 )
               })}
               {products.length < 3 && [...Array(3 - products.length)].map((_, index) => (
-                <td key={`empty-${index}`} className="p-3 sm:p-4 text-center w-1/4 ">
+                <td key={`empty-${index}`} className="p-3 sm:p-4 text-center w-1/4 border-r">
                   <div className="flex flex-col items-center gap-2">
                     {/* <StarRating rating={0} size="md" showEmpty /> */}
                     <div className="text-gray-300 italic text-sm ">No Product Selected</div>
@@ -64,7 +64,7 @@ export default function ReviewRatingsComparison({ products, className }: ReviewR
                 </td>
               ))}
               {products.length < 3 && [...Array(3 - products.length)].map((_, index) => (
-                <td key={`empty-${index}`} className="p-3 sm:p-4 text-center w-1/4">
+                <td key={`empty-${index}`} className="p-3 sm:p-4 text-center w-1/4 border-r">
                   <div className="text-gray-300 italic text-sm ">No Product Selected</div>
                 </td>
               ))}

@@ -113,6 +113,17 @@ console.log(products,"sanitizedProducts");
                   </div>
                 </div>
               ))}
+                 {sanitizedProducts.length < 2 && (
+                <div className="p-3 sm:p-4 border-l">
+                  <button
+                    onClick={handleAddProduct}
+                    className="w-full h-full min-h-[150px] sm:min-h-[200px] border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center hover:border-gray-400 transition-colors cursor-pointer"
+                  >
+                    <Plus className="w-6 h-6 sm:w-8 sm:h-8 text-gray-400 mb-2" />
+                    <span className="text-sm sm:text-base text-gray-500">Add Product</span>
+                  </button>
+                </div>
+              )}
               {sanitizedProducts.length < 3 && (
                 <div className="p-3 sm:p-4 border-l">
                   <button

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "../ui/button";
 import useUserStore from "@/store/useUserStore";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useUIStore from "@/store/useUIStore";
 import { useAuth, useLogout, useUserProfileStats } from "@/hooks/useAuth";
 import { getUserDisplayName, getUserInitials, getTruncatedDisplayName } from "@/utils/userHelpers";
@@ -54,6 +54,11 @@ export default function Navbar() {
   
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  const isActiveLink = (href: string) => {
+    return location.pathname === href;
+  };
   
   const [showLogoutModal, setShowLogoutModal] = useState(false);
   const showProfileVerificationModal = useUserStore(state => state.showProfileVerificationModal);
@@ -137,7 +142,11 @@ export default function Navbar() {
                 <li key={link.label}>
                   <a
                     href={link.href}
-                    className="text-base font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                    className={`text-base font-medium transition-colors ${
+                      isActiveLink(link.href) 
+                        ? 'text-red-600' 
+                        : 'text-gray-900 hover:text-blue-600'
+                    }`}
                   >
                     {link.label}
                   </a>
@@ -363,11 +372,17 @@ export default function Navbar() {
               <li key={link.label}>
                 <a
                   href={link.href}
-                className="flex items-center justify-between px-6 py-3 text-base text-gray-900 hover:bg-gray-50 transition-colors"
+                  className={`flex items-center justify-between px-6 py-3 text-base transition-colors ${
+                    isActiveLink(link.href)
+                      ? 'text-red-600 bg-red-50'
+                      : 'text-gray-900 hover:bg-gray-50'
+                  }`}
                 >
                   {link.label}
                 <svg
-                  className="w-5 h-5 text-gray-400"
+                  className={`w-5 h-5 ${
+                    isActiveLink(link.href) ? 'text-red-400' : 'text-gray-400'
+                  }`}
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"

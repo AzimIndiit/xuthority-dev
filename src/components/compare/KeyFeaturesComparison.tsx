@@ -197,8 +197,8 @@ export default function KeyFeaturesComparison({ products, className }: KeyFeatur
                 </td>
               ))}
               {/* Empty columns for up to 2 products */}
-              {visibleProducts.length < 3 &&
-                [...Array(2 - visibleProducts.length)].map((_, idx) => (
+              {/* {visibleProducts.length < 3 &&
+                [...Array(3 - visibleProducts.length)].map((_, idx) => (
                   <td
                     key={`empty-features-${idx}`}
                     className="p-3 sm:p-4 text-center align-top w-1/4 "
@@ -207,7 +207,7 @@ export default function KeyFeaturesComparison({ products, className }: KeyFeatur
                       No product selected
                     </div>
                   </td>
-                ))}
+                ))} */}
             </tr>
           </tbody>
         </table>

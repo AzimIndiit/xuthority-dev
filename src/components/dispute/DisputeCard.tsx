@@ -234,12 +234,13 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       {/* Dispute Section */}
       <div className='mt-4'>
         <h3 className="text-lg sm:text-xl font-bold text-gray-900">Dispute</h3>
-        <div className="flex items-center gap-3 my-4  cursor-pointer"  onClick={() => {
+     <div className="flex items-center gap-3 my-4  " >
+          <div className=' flex gap-3 cursor-pointer items-center' onClick={() => {
           if(product.isActive==='active'){
             navigate(`/product-detail/${product.slug}`)
           }
             }}>
-          <div className="relative w-12 h-12" >
+          <div className="relative w-12 h-12  " >
             <Avatar className="h-12 w-12 ">
               <AvatarImage src={product.logoUrl} alt={product.name} className='object-cover'/>
               <AvatarFallback>{getUserInitials(product as any) || 'UN'}</AvatarFallback>
@@ -252,6 +253,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
               {formatDate(product.createdAt)}
               
             </p>
+          </div>
           </div>
         </div>
         <div className="mt-2">

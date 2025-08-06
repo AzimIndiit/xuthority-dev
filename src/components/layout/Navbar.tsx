@@ -57,7 +57,16 @@ export default function Navbar() {
   const location = useLocation();
   
   const isActiveLink = (href: string) => {
-    return location.pathname === href;
+    // Exact match
+    if (location.pathname === href) return true;
+    
+    // Check if current path includes the href as a parent path
+    // This handles nested routes like /software/abc when href is /software
+    if (href !== '/' && location.pathname.startsWith(href + '/')) {
+      return true;
+    }
+    
+    return false;
   };
   
   const [showLogoutModal, setShowLogoutModal] = useState(false);

@@ -1,5 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 const integrations = [
   { name: 'Slack', logoUrl: 'https://www.vectorlogo.zone/logos/slack/slack-icon.svg' },
@@ -19,16 +25,25 @@ const integrations = [
 ];
 
 const IntegrationCard = ({ name, image }: { name: string, image: string }) => (
-  <div className="flex flex-col items-center text-center gap-2" title={name}>
-    <div className="w-16 h-16  bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-3 transition-all duration-300 hover:shadow-md hover:border-gray-300">
-      <img
-        src={image}
-        alt={`${name} logo`}
-        className="w-full h-full object-contain"
-      />
-    </div>
-    <p className="text-base font-semibold text-gray-800 line-clamp-1">{name}</p>
-  </div>
+  <TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div className="flex flex-col items-center text-center gap-2 cursor-pointer">
+          <div className="w-16 h-16  bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-3 transition-all duration-300 hover:shadow-md hover:border-gray-300">
+            <img
+              src={image}
+              alt={`${name} logo`}
+              className="w-full h-full object-contain"
+            />
+          </div>
+          <p className="text-base font-semibold text-gray-800 line-clamp-1">{name}</p>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>
+        <p>{name}</p>
+      </TooltipContent>
+    </Tooltip>
+  </TooltipProvider>
 );
 
 const ProductIntegrations = ({integrations}: {integrations: any}) => {

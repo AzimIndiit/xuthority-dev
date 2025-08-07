@@ -127,37 +127,11 @@ api.interceptors.response.use(
     const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
     
     // Handle 401 Unauthorized errors
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      
-      // Check if we have a refresh token
-      const refreshToken = tokenStorage.getRefreshToken();
-      if (refreshToken) {
-        try {
-          // Attempt to refresh the token
-          const refreshResponse = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
-            refreshToken
-          });
-          
-          const { accessToken } = refreshResponse.data.data;
-          tokenStorage.setToken(accessToken);
-          
-          // Retry the original request with new token
-          if (originalRequest.headers) {
-            originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-          }
-          return api(originalRequest);
-        } catch (refreshError) {
-          // Refresh failed, clear tokens and redirect to login
-          // tokenStorage.removeToken();
-          // window.location.href = '/';
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // No refresh token, redirect to login
-        tokenStorage.removeToken();
-        // window.location.href = '/login';
-      }
+    if (error.response?.status === 401) {
+      // Clear all local storage and reload the page
+      localStorage.clear();
+      window.location.reload();
+      return Promise.reject(error);
     }
     
     // Handle other errors
@@ -186,7 +160,7 @@ export class ApiService {
     const response = await api.get<ApiResponse<T>>(url, config);
     return response.data;
   }
-  
+   
   // Generic POST request
   static async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<ApiResponse<T>> {
     const response = await api.post<ApiResponse<T>>(url, data, config);

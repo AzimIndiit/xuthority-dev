@@ -51,7 +51,7 @@ const ProductOverview = ({product}: {product: any}) => {
     const items = data.split(',').map(item => item.trim()).filter(item => item.length > 0);
     
     if (items.length <= maxItems) {
-      return  <span className="ml-1">( <span>{items.join(', ')}</span>)</span> ;
+      return  <span className="ml-1">(<span>{items.join(', ')}</span>)</span> ;
     }
     
 
@@ -60,7 +60,7 @@ const ProductOverview = ({product}: {product: any}) => {
     const hasMore = items.length > maxItems;
     return (
       <div className="space-y-2">
-       ( <span>{displayItems.join(', ')}</span>)
+       (<span>{displayItems.join(', ')}</span>)
         {hasMore && (
           <div>
             <Button

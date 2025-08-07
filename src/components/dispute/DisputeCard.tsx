@@ -235,7 +235,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       <div className='mt-4'>
         <h3 className="text-lg sm:text-xl font-bold text-gray-900">Dispute</h3>
      <div className="flex items-center gap-3 my-4  " >
-          <div className=' flex gap-3 cursor-pointer items-center' onClick={() => {
+          <div className={`flex gap-3  items-center ${product.isActive==='active' ? 'cursor-pointer':'' }`} onClick={() => {
           if(product.isActive==='active'){
             navigate(`/product-detail/${product.slug}`)
           }

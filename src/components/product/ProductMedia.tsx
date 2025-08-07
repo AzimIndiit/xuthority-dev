@@ -124,9 +124,11 @@ const MediaPreviewModal = ({
             onPause={() => setIsVideoPlaying(false)}
             onEnded={() => setIsVideoPlaying(false)}
             disablePictureInPicture
-            height={'500px'}
+   
 
             style={{
+              height: "900px",
+
               // Attempt to hide the native "3 dot" overflow menu in Chromium browsers
               // and further restrict PiP via attribute above
               // @ts-ignore

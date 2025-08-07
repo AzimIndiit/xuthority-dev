@@ -78,6 +78,7 @@ export default function ProductDetailHeader({
     }
     setShowAddToListModal(true);
   };
+  console.log('product', product)
   return (
     <>
       {/* Banner */}
@@ -138,7 +139,7 @@ export default function ProductDetailHeader({
                     <Button
                       size="lg"
                       variant="outline"
-                      onClick={() => window.open(`https://${product.website}`, '_blank')}
+                      onClick={() => window.open(`${product.website}`, '_blank')}
                       className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
                     >
                       <User className="w-4 h-4 mr-1" />
@@ -176,15 +177,16 @@ export default function ProductDetailHeader({
                       Entry Level Price: {product.entryPrice}
                     </Button>
                     <Button
-                    onClick={() => {
-                      // scroll to pricing section
-                      const pricingSection = document.getElementById('pricing');
-                      if (pricingSection) {
-                        pricingSection.scrollIntoView({
-                          behavior: "smooth",
-                        });
-                      }
-                    }}
+                    // onClick={() => {
+                    //   // scroll to pricing section
+                    //   const pricingSection = document.getElementById('pricing');
+                    //   if (pricingSection) {
+                    //     pricingSection.scrollIntoView({
+                    //       behavior: "smooth",
+                    //     });
+                    //   }
+                    // }}
+                    onClick={() => window.open(`${product.website}`, '_blank')}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 ml-2"
                     >
                       Try For Free
@@ -219,7 +221,7 @@ export default function ProductDetailHeader({
             <Button
               size="sm"
               variant="outline"
-              onClick={() => window.open(`https://${product.website}`, '_blank')}
+              onClick={() => window.open(`${product.website}`, '_blank')}
               className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
             >
               <User className="w-4 h-4 mr-1" />
@@ -232,6 +234,7 @@ export default function ProductDetailHeader({
             Entry Level Price: {product.entryPrice}
           </Button>
           <Button
+           onClick={() => window.open(`${product.website}`, '_blank')}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 "
           >
             Try For Free

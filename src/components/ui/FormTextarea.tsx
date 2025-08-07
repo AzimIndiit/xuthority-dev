@@ -18,14 +18,14 @@ export const FormTextarea: React.FC<FormTextareaProps> = ({ name, label, ...prop
 
   return (
     <div className="w-full">
-      <Label htmlFor={name} className={error ? 'text-red-500' : ''}>
+      <Label htmlFor={name} className={error ? '' : ''}>
         {label}
       </Label>
       <Textarea
         id={name}
         {...register(name)}
         {...props}
-        className={`mt-2 resize-none rounded-xl min-h-40 ${error ? 'border-red-500' : 'border-gray-300'}`}
+        className={`mt-2 resize-none rounded-xl min-h-40 ${error ? '' : 'border-gray-300'}`}
       />
       {error && (
         <p className="text-red-500 text-sm mt-2">{error.message?.toString()}</p>

@@ -19,6 +19,7 @@ interface ProductDetailHeaderProps {
 export default function ProductDetailHeader({
   product,
 }: ProductDetailHeaderProps) {
+  console.log('product', product)
   return (
       <>
       {/* divBanner */}
@@ -72,6 +73,10 @@ export default function ProductDetailHeader({
                       Follow
                     </Button>
                     <Button
+                      onClick={() => 
+                        window.open(product.websiteUrl, '_blank',
+                        'noopener,noreferrer')}
+                               
                       size="lg"
                       variant="outline"
                       className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
@@ -93,6 +98,9 @@ export default function ProductDetailHeader({
                       Entry Level Price: {product.entryPrice}
                     </Button>
                     <Button
+                      onClick={() => 
+                        window.open(product.websiteUrl, '_blank',
+                        'noopener,noreferrer')}
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 ml-2"
                     >
                       Try For Free
@@ -116,6 +124,9 @@ export default function ProductDetailHeader({
               Follow
             </Button>
             <Button
+              onClick={() => 
+                window.open(product.websiteUrl, '_blank',
+                'noopener,noreferrer')}
               size="sm"
               variant="outline"
               className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
@@ -130,6 +141,9 @@ export default function ProductDetailHeader({
             Entry Level Price: {product.entryPrice}
           </Button>
           <Button
+            onClick={() => 
+              window.open(product.websiteUrl, '_blank',
+              'noopener,noreferrer')}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 "
           >
             Try For Free

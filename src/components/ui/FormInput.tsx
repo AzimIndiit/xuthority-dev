@@ -17,14 +17,14 @@ export const FormInput: React.FC<FormInputProps> = ({ name, label, ...props }) =
   const error = errors[name];
   return (
     <div className="w-full">
-      <Label htmlFor={name} className={error ? 'text-red-500' : ''}>
+      <Label htmlFor={name} className={error ? '' : ''}>
         {label}
       </Label>
       <Input
         id={name}
         {...register(name)}
         {...props}
-        className={`mt-2 rounded-full ${error ? 'border-red-500' : 'border-gray-300'}`}
+        className={`mt-2 rounded-full ${error ? '' : 'border-gray-300'}`}
       />
       {error && (
         <p className="text-red-500 text-sm mt-2">{error.message?.toString()}</p>

@@ -129,7 +129,8 @@ api.interceptors.response.use(
     // Handle 401 Unauthorized errors
     if (error.response?.status === 401) {
       // Clear all local storage and reload the page
-      localStorage.clear();
+      localStorage.removeItem(TOKEN_KEY)
+      localStorage.removeItem(REFRESH_TOKEN_KEY)
       window.location.reload();
       return Promise.reject(error);
     }

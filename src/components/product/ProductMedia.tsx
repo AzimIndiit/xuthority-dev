@@ -139,6 +139,7 @@ const MediaPreviewModal = ({
           <img
             src={currentMedia}
             alt={`Media ${currentIndex + 1}`}
+            style={   {height: "900px"}}
             className="max-w-full max-h-full object-contain"
           />
         )}

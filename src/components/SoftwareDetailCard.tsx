@@ -259,13 +259,13 @@ const deleteMutation = useDeleteProduct();
      >
       
      </Button>
-     <Button
+     {/* <Button
       title="Delete"
       leftIcon={Trash}
        className="bg-red-500 hover:bg-red-600 rounded-full text-white font-semibold w-10 h-10 px-4 py-2 text-xs sm:text-sm shadow"
        onClick={onDelete}
      >
-     </Button>
+     </Button> */}
 </div>
           }
         </div>

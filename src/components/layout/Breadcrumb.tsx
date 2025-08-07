@@ -79,11 +79,11 @@ const Breadcrumb = () => {
                   <BreadcrumbItem>
                     {shouldBeNonClickable ? (
                       <BreadcrumbPage className="font-semibold text-gray-700 capitalize text-base">
-                        {name}
+                        {name.length > 40 ? `${name.substring(0, 40)}...` : name}
                       </BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink asChild className="text-gray-700 hover:text-blue-600 capitalize font-semibold text-base">
-                        <Link to={linkTo}>{name}</Link>
+                        <Link to={linkTo}>{name.length > 40 ? `${name.substring(0, 40)}...` : name}</Link> 
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>

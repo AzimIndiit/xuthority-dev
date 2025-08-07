@@ -129,7 +129,7 @@ const ProductOverview = ({product}: {product: any}) => {
               <p>
                 <span className="font-semibold">Product Website</span> (
                 <a
-                  href={`https://${productDetails.website}`}
+                  href={`${productDetails.website}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-blue-600 hover:underline break-all "

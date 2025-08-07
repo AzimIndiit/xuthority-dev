@@ -265,14 +265,14 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
             </span>
         </div>
             { dispute.isOwner && location.pathname === '/profile/dispute-management' &&   <div className="flex gap-2 self-end sm:self-start flex-shrink-0">
-          <Button onClick={() => {
+        {dispute.status!=='resolved' &&  <Button onClick={() => {
             console.log('Opening dispute modal with data:', dispute);
             setIsDisputeModalOpen(true);
           }}
            className="bg-blue-600 text-white rounded-full hover:bg-blue-700 px-4 py-2 !text-xs font-semibold flex items-center h-10">
             <Edit className="w-2 h-2" />
           <span className="hidden sm:block text-xs"> Edit Dispute</span>
-          </Button>
+          </Button>}
           <Button 
             variant="destructive" 
             className="rounded-full px-4 py-2 !text-xs font-semibold flex items-center h-10"
@@ -293,7 +293,7 @@ const DisputeCard: React.FC<DisputeCardProps> = ({ review, dispute, product, ref
       </div>
 
       {/* Explanation Section */}
-      {(
+      {dispute.explanations && (
         <div className='mt-4'>
           <h3 className="text-lg sm:text-xl font-bold text-gray-900">Explanation</h3>
           <div className="mt-2 flex justify-between items-start text-gray-700 text-sm bg-gray-50 p-3 rounded-lg border border-gray-20 gap-4">

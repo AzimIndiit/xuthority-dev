@@ -107,7 +107,7 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
                 (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`} className="text-blue-600 hover:underline">{companyData.seller}</a>)
               </DetailItem>}
               {companyData.website && <DetailItem icon={Globe} label="Company Website">
-                (<a href={companyData.website} className="text-blue-600 hover:underline">{companyData?.website?.length > 30 ? companyData.website.substring(0, 30) + "..." : companyData.website}</a>)
+                (<a target="_blank" href={companyData.website} className="text-blue-600 hover:underline">{companyData?.website?.length > 30 ? companyData.website.substring(0, 30) + "..." : companyData.website}</a>)
               </DetailItem>}
               {companyData.founded && <DetailItem icon={Calendar} label="Year Founded">({companyData.founded})</DetailItem>}
             {companyData.hq && <DetailItem icon={MapPin} label="HQ Location">({companyData.hq})</DetailItem>}
@@ -119,7 +119,7 @@ const ProductCompanyInfo = ({companyDescription}: {companyDescription: any}) => 
               {companyData.linkedin && <DetailItem icon={Linkedin} label="LinkedIn Page">
                 (<a href={`${companyData.linkedin}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">{companyData?.linkedin?.length > 30 ? companyData.linkedin.substring(0, 30) + "..." : companyData.linkedin }</a>{companyData.linkedinEmployees ? `, ${companyData.linkedinEmployees?.length > 30 ? companyData.linkedinEmployees.substring(0, 30) + "..." : companyData.linkedinEmployees} employees on LinkedIn®` : ''})
               </DetailItem>}
-              {companyData.ownership && <DetailItem icon={UserCheck} label="Ownership"> (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`}  className="text-blue-600 hover:underline">{companyData.ownership}</a>)</DetailItem>}
+              {/* {companyData.ownership && <DetailItem icon={UserCheck} label="Ownership"> (<a href={user?._id === companyData.sellerId  ?  `/profile` : `/public-profile/${companyData.slug}`}  className="text-blue-600 hover:underline">{companyData.ownership}</a>)</DetailItem>} */}
             </div>
           </div>
         </div>

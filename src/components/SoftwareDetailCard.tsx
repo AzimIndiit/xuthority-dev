@@ -344,13 +344,13 @@ const deleteMutation = useDeleteProduct();
             <Button className="bg-white border hover:bg-white borderr-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px]  h-10 xl:h-12 sm:ml-2">
               Entry Level Price: {formatCurrency(minPrice || 0)}
             </Button>
-            <Button
+           {isFree && <Button
               onClick={() => window.open(websiteUrl, '_blank')}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px]  h-10  xl:h-12 sm:ml-2"
               // onClick={onTry}
             >
               Try For Free
-            </Button>
+            </Button>}
           </div>
         </div>}
       </Card>

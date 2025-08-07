@@ -124,6 +124,8 @@ const MediaPreviewModal = ({
             onPause={() => setIsVideoPlaying(false)}
             onEnded={() => setIsVideoPlaying(false)}
             disablePictureInPicture
+            height={'500px'}
+
             style={{
               // Attempt to hide the native "3 dot" overflow menu in Chromium browsers
               // and further restrict PiP via attribute above
@@ -198,11 +200,11 @@ const MediaCard = ({
       onClick={handleCardClick}
     >
       {/* Preview overlay */}
-      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 z-10">
+      {mediaSrc && type === "image"  &&<div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100 z-10">
         <div className="bg-white/90 rounded-full p-2">
           <ZoomIn className="h-6 w-6 text-gray-700" />
         </div>
-      </div>
+      </div>}
 
       {mediaSrc && type === "image" && (
         <img

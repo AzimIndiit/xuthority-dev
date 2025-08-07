@@ -9,6 +9,7 @@ import useUIStore from "@/store/useUIStore";
 import AddToListModal from "./ui/AddToListModal";
 import { useFavoriteStatus } from "@/hooks/useFavorites";
 import { useToast } from "@/hooks/useToast";
+import { Link } from "react-router-dom";
 
 interface Product {
   _id?: string;
@@ -29,6 +30,7 @@ interface ProductDetailHeaderProps {
     _id: string;
     firstName: string;
     lastName: string;
+    email:string
   };
   id: string;
 }
@@ -136,15 +138,15 @@ export default function ProductDetailHeader({
                     >
                       {isFollowing ? "Unfollow" : "Follow"}
                     </Button>}
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={() => window.open(`${product.website}`, '_blank')}
-                      className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
-                    >
-                      <User className="w-4 h-4 mr-1" />
-                      Contact
-                    </Button>
+                    <a
+  href={`mailto:${productOwner?.email}`}
+  className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600 flex items-center px-2 py-2 rounded border"
+>
+  <User className="w-4 h-4 mr-1" />
+  Contact
+</a>
+                   
+
                   </div>
                 </div>
 
@@ -176,7 +178,7 @@ export default function ProductDetailHeader({
                     >
                       Entry Level Price: {product.entryPrice}
                     </Button>
-                    <Button
+                    {product.isFree && <Button
                     // onClick={() => {
                     //   // scroll to pricing section
                     //   const pricingSection = document.getElementById('pricing');
@@ -190,7 +192,7 @@ export default function ProductDetailHeader({
                       className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 ml-2"
                     >
                       Try For Free
-                    </Button>
+                    </Button>}
                   </div>
                 </div>
               </div>
@@ -218,27 +220,28 @@ export default function ProductDetailHeader({
             >
               {isFollowing ? "Unfollow" : "Follow"} 
             </Button>}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => window.open(`${product.website}`, '_blank')}
-              className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600"
-            >
-              <User className="w-4 h-4 mr-1" />
-              Contact
-            </Button>
+           
+
+            <a
+  href={`mailto:${productOwner?.email}`}
+  className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600 flex items-center px-3 py-1 rounded border"
+>
+  <User className="w-4 h-4 mr-1" />
+  Contact
+</a>
+                   
           </div>
         </div>
         <div className="flex  justify-between gap-2 mt-2  sm:hidden w-full">
           <Button className="bg-white border hover:bg-white border-red-400 text-red-500 font-semibold rounded-full px-3 py-1 !text-[12px] xl:!text-[14px] h-10 xl:h-12 ">
             Entry Level Price: {product.entryPrice}
           </Button>
-          <Button
+         {product.isFree && <Button
            onClick={() => window.open(`${product.website}`, '_blank')}
             className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-5 py-2 !text-[12px] xl:!text-[14px] h-10  xl:h-12 "
           >
             Try For Free
-          </Button>
+          </Button>}
         </div>
       </div>
       

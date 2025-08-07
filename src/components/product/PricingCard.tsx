@@ -86,7 +86,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
       </ul>
 
       <div className="mt-auto pt-8">
-        <Button
+       {product.isFree && <Button
           onClick={() => window.open(`${product.website}`, '_blank')}
           className={cn(
             'w-full rounded-full py-3 text-base font-semibold transition-transform duration-200 hover:scale-105',
@@ -96,7 +96,7 @@ const PricingCard: React.FC<PricingCardProps> = ({
           )}
         >
           Try For Free
-        </Button>
+        </Button>}
       </div>
     </div>
   );

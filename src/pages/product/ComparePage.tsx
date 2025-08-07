@@ -104,13 +104,13 @@ console.log(products,"sanitizedProducts");
                     <h3 className="font-semibold text-sm sm:text-lg mb-1 line-clamp-2">{product.name}</h3>
                     <a href={product.websiteUrl} target="_blank" rel="noopener noreferrer" className="text-xs sm:text-sm text-gray-500 mb-2 line-clamp-1 hover:underline hover:text-blue-600 ">{product.websiteUrl.length > 30 ? product.websiteUrl.substring(0, 30) + "..." : product.websiteUrl}</a>
                   
-                    <Button
+                  {product.isFree &&  <Button
                       onClick={() => window.open(product.websiteUrl, '_blank', 'noopener,noreferrer')}
                       variant="default"
                       className="bg-blue-600 hover:bg-blue-700 text-white rounded-full text-xs sm:text-sm px-3 py-1 sm:px-4 sm:py-2 h-10"
                     >
                       Try For Free
-                    </Button>
+                    </Button>}
                   </div>
                 </div>
               ))}

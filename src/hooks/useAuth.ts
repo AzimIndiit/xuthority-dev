@@ -226,7 +226,7 @@ export const useLogin = () => {
       'user-login',
       50000 // 50 second timeout for monitoring
     ),
-    retry:0,
+    retry:false,
     onError: (error: any) => {
       console.error('Login error:', error);
       // Don't show additional toast here as the store already handles it
@@ -282,7 +282,7 @@ export const useRegisterUser = () => {
       'user-registration',
       50000 // 50 second timeout for monitoring
     ),
-    retry: getDefaultMutationRetry(),
+    retry: false,
     onError: (err: any) => {
       console.error('Registration error:', err);
       // Don't show additional toast here as the store already handles it
@@ -329,7 +329,7 @@ export const useRegisterVendor = () => {
       'vendor-registration',
       50000 // 50 second timeout for monitoring
     ),
-    retry: getDefaultMutationRetry(),
+    retry: false,
     onError: (err: any) => {
       console.error('Vendor registration error:', err);
       // Don't show additional toast here as the store already handles it

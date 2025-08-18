@@ -8,6 +8,7 @@ import VendorInvitationModal from "@/features/review/VendorInvitationModal";
 import { ChevronLeft } from "lucide-react";
 import { useReviewStore } from "@/store/useReviewStore";
 import { useNavigate } from "react-router-dom";
+import UploadImagesModal from "./UploadImagesModal";
 
 interface VerifyIdentityProps {
   setShowStepper?: (show: boolean) => void;
@@ -107,9 +108,9 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
   };
 
   // Handler for screenshot upload
-  const handleScreenshotUploaded = (fileUrl: string) => {
+  const handleScreenshotUploaded = (attachments: any[]) => {
     setVerificationData({
-      screenshot: fileUrl,
+      attachments: attachments,
       method: "screenshot",
       isVerified: true,
     });
@@ -215,7 +216,7 @@ const VerifyIdentity: React.FC<VerifyIdentityProps> = ({ setShowStepper }) => {
         onSuccess={handleOtpVerified}
         email={currentCompanyEmail}
       />
-      <UploadScreenshotModal
+      <UploadImagesModal
         open={screenshotModalOpen}
         onClose={() => setScreenshotModalOpen(false)}
         onSuccess={handleScreenshotUploaded}

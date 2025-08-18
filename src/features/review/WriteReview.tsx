@@ -122,27 +122,20 @@ const schema = z.object({
       message: "Please select a valid rating"
     }),
   }),
-  file: z
-    .instanceof(File)
-    .optional()
+  files: z
+    .array(z.instanceof(File))
+    .max(3, "You can attach up to 3 images")
     .refine(
-      (file) => {
-        if (!file) return true; // Optional file
-        return file.size <= 5 * 1024 * 1024; // 5MB limit
-      },
-      {
-        message: "File size must be less than 5MB",
-      }
+      (files) => files.length === 0 || files.every((file) => file.size <= 5 * 1024 * 1024),
+      { message: "Each image must be less than 5MB" }
     )
     .refine(
-      (file) => {
-        if (!file) return true; // Optional file
+      (files) => {
+        if (files.length === 0) return true;
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-        return allowedTypes.includes(file.type);
+        return files.every((file) => allowedTypes.includes(file.type));
       },
-      {
-        message: "Only JPG, JPEG, PNG, and GIF images are allowed",
-      }
+      { message: "Only JPG, JPEG, PNG, and GIF images are allowed" }
     ),
 });
 
@@ -162,8 +155,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [existingReview, setExistingReview] = useState<Review | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [existingFileUrl, setExistingFileUrl] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [existingFileUrls, setExistingFileUrls] = useState<string[]>([]);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
@@ -172,8 +165,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
   const { hasReviewed, review: userReview, isLoading: isCheckingReview } = useUserHasReviewed(selectedSoftware?.id);
 
   // Debug verification data
-  console.log('WriteReview - verificationData:', verificationData);
-  console.log('WriteReview - isVerified:', verificationData?.isVerified);
+  console.log('WriteReview - verificationData:', verificationData.method);
 
   // Handle click outside to close tooltip
   useEffect(() => {
@@ -213,32 +205,55 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
         pricing: '',
         technicalSupport: '',
       },
-      file: undefined,
+      files: [],
     },
   });
 
   const watchedRating = watch("rating");
   const watchedSubRatings = watch("subRatings");
-  const watchedFile = watch("file");
+  const watchedFiles = watch("files");
 
   console.log('userReview', userReview)
 
   // File handling functions
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setSelectedFile(file);
-      setValue("file", file, { shouldValidate: true });
+    const files = Array.from(event.target.files || []);
+    if(files.length>3){
+      return toast.review.error("Max 3 images allowed")
+    }
+
+    if (files.length > 0) {
+      const maxBytes = 5 * 1024 * 1024;
+      const oversized = files.filter((f) => f.size > maxBytes);
+      const validFiles = files.filter((f) => f.size <= maxBytes);
+      if (oversized.length > 0) {
+        toast.review.error('Each image must be less than 5MB');
+      }
+      const remainingSlots = Math.max(0, 3 - (existingFileUrls.length + selectedFiles.length));
+      const toAdd = validFiles.slice(0, remainingSlots);
+      const combined = [...selectedFiles, ...toAdd];
+      setSelectedFiles(combined);
+      setValue("files", combined, { shouldValidate: true });
     }
   };
 
-  const clearFile = () => {
-    setSelectedFile(null);
-    setExistingFileUrl(null);
-    setValue("file", undefined);
+  const clearFiles = () => {
+    setSelectedFiles([]);
+    setExistingFileUrls([]);
+    setValue("files", []);
     if (inputRef.current) {
       inputRef.current.value = '';
     }
+  };
+
+  const removeSelectedFileAt = (index: number) => {
+    const updated = selectedFiles.filter((_, i) => i !== index);
+    setSelectedFiles(updated);
+    setValue("files", updated, { shouldValidate: true });
+  };
+
+  const removeExistingFileAt = (index: number) => {
+    setExistingFileUrls((prev) => prev.filter((_, i) => i !== index));
   };
   // Set edit mode and populate form when existing review is found
   useEffect(() => {
@@ -250,8 +265,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
       
       // Handle existing file attachments
       if (userReview.metaData?.attachments && userReview.metaData.attachments.length > 0) {
-        const firstAttachment = userReview.metaData.attachments[0];
-        setExistingFileUrl(firstAttachment.fileUrl);
+        const urls = userReview.metaData.attachments.map((a) => a.fileUrl).slice(0, 3);
+        setExistingFileUrls(urls);
       }
       
       // Populate form with existing review data
@@ -266,7 +281,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           pricing: userReview.subRatings?.pricing ? userReview.subRatings.pricing.toString() : 'N/A',
           technicalSupport: userReview.subRatings?.technicalSupport ? userReview.subRatings.technicalSupport.toString() : 'N/A',
         },
-        file: undefined, // Don't populate file in form, we'll handle display separately
+        files: [], // Don't populate files in form, we'll handle display separately
       };
       
       reset(formData);
@@ -280,8 +295,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
       console.log('No review found - resetting form to empty state');
       setIsEditMode(false);
       setExistingReview(null);
-      setExistingFileUrl(null);
-      clearFile();
+      setExistingFileUrls([]);
+      clearFiles();
       
       // Reset form to default empty values
       const emptyFormData = {
@@ -295,7 +310,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           pricing: '',
           technicalSupport: '',
         },
-        file: undefined,
+        files: [],
       };
       
       reset(emptyFormData);
@@ -349,50 +364,81 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
         Object.entries(data.subRatings).map(([k, v]) => [k, v === 'N/A' ? 0 : parseInt(v)])
       );
 
+      // Require at least 1 image (up to 3) when screenshot verification is not selected
+      const shouldRequireAttachment = (verificationData?.method !== 'screenshot') || (isEditMode && existingReview?.verification?.verificationType !== 'screenshot');
+      if (shouldRequireAttachment) {
+        const totalCount = (data.files?.length || 0) + (existingFileUrls?.length || 0);
+        if (totalCount < 1) {
+          toast.review.error('Please attach at least 1 image (up to 3).');
+          return;
+        }
+      }
+
       // Handle file upload if present
+      const originalExisting = (existingReview?.metaData?.attachments || []).slice(0, 3);
+      const hasNewFiles = Array.isArray(data.files) && data.files.length > 0;
+      const hasExistingChanged = originalExisting.length !== (existingFileUrls?.length || 0)
+        || originalExisting.some((att: any) => !existingFileUrls.includes(att.fileUrl));
+
       let metaData: any = {
         reviewVersion: '1.0',
         attachments: []
       };
 
-      // If we have a new file, upload it
-      if (data.file) {
+      // If we have new files, upload them
+      if (hasNewFiles) {
         setIsUploadingFile(true);
-        toast.loading('Uploading image...');
+        toast.loading('Uploading images...');
         try {
-          const fileUploadResponse = await FileUploadService.uploadFile(data.file);
-          
-          if (fileUploadResponse.success && fileUploadResponse.data) {
-            metaData.attachments.push({
-              fileName: fileUploadResponse.data.originalName || data.file.name,
-              fileUrl: FileUploadService.getFileUrl(fileUploadResponse.data),
-              fileType: data.file.type,
-              fileSize: data.file.size,
-              uploadedAt: new Date().toISOString()
-            });
+          // Start with kept existing attachments so we never lose them if upload returns empty
+          const keptExisting = (isEditMode && originalExisting.length)
+            ? originalExisting.filter((att: any) => existingFileUrls.includes(att.fileUrl))
+            : [];
+          metaData.attachments = keptExisting.slice(0, 3);
+
+          // Upload files individually for consistent response handling
+          const newAttachments = [];
+          for (const file of data.files) {
+            const uploadResponse = await FileUploadService.uploadFile(file);
+            if (uploadResponse.success && uploadResponse.data) {
+              newAttachments.push({
+                fileName: uploadResponse.data.originalName || uploadResponse.data.filename || file.name,
+                fileUrl: uploadResponse.data.url || uploadResponse.data.bestImageUrl || FileUploadService.getFileUrl(uploadResponse.data),
+                fileType: uploadResponse.data.mimeType || file.type,
+                fileSize: uploadResponse.data.size || file.size,
+                uploadedAt: new Date().toISOString()
+              });
+            }
           }
+          metaData.attachments = [...metaData.attachments, ...newAttachments].slice(0, 3);
           toast.dismiss();
         } catch (uploadError) {
           toast.dismiss();
-          toast.review.error('Failed to upload image. Please try again.');
+          toast.review.error('Failed to upload images. Please try again.');
           return;
         } finally {
           setIsUploadingFile(false);
         }
-      } 
-      // If we're in edit mode and have an existing file but no new file, preserve existing metaData
-      else if (isEditMode && existingReview?.metaData && existingFileUrl) {
-        metaData = existingReview.metaData;
+      }
+      // If we're in edit mode and have no new files, reflect deletions or keep originals
+      else if (isEditMode) {
+        if (hasExistingChanged) {
+          const keptExisting = originalExisting.filter((att: any) => existingFileUrls.includes(att.fileUrl));
+          metaData.attachments = keptExisting.slice(0, 3);
+        } else {
+          metaData.attachments = originalExisting;
+        }
       }
 
       if (isEditMode && existingReview) {
         // Update existing review
-        const updatePayload = {
+        const updatePayload: any = {
           overallRating: data.rating,
           title: data.title,
           content: data.description,
           subRatings: subRatingsPayload,
-          ...(metaData.attachments.length > 0 && { metaData })
+          // Always send metaData on update so backend persists additions/removals/no-change correctly
+          metaData,
         };
         
         updateMutation.mutate({ 
@@ -407,13 +453,14 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           let verificationDataField: any = {};
           if (verificationData.method === 'company-email') {
             verificationType = 'company_email';
-            verificationDataField = { companyEmail: verificationData.companyEmail,companyName: verificationData.companyName };
+            verificationDataField = { companyEmail: verificationData.companyEmail };
           } else if (verificationData.method === 'vendor-invitation') {
             verificationType = 'vendor_invite';
             verificationDataField = { vendorInvitationLink: verificationData.vendorInvitationLink };
           } else if (verificationData.method === 'screenshot') {
             verificationType = 'screenshot';
             verificationDataField = { screenshot: verificationData.screenshot };
+            metaData.attachments= verificationData.attachments
           } else if (verificationData.method === 'linkedin') {
             verificationType = 'linkedin';
             verificationDataField = { ...verificationData?.linkedInData  };
@@ -438,6 +485,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
         createMutation.mutate(createPayload);
       }
     } catch (error) {
+      console.log('error', error)
       toast.dismiss();
       toast.review.error('Error preparing review data');
     }
@@ -640,10 +688,10 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           </div>
 
           {/* File Upload Section - Hidden if verification type is screenshot */}
-          {verificationData?.method !== 'screenshot' || existingReview && existingReview?.verification?.verificationType !== 'screenshot' && (
+          {(verificationData?.method !== 'screenshot' || existingReview && existingReview?.verification?.verificationType !== 'screenshot') && (
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Attach Image (Optional)
+                Attach Images (1-3)
               </h3>
               <p className="text-gray-500 text-sm mb-4">Confirm that you are a current user of {selectedSoftware?.name} by uploading a screenshot showing you logged into {selectedSoftware?.name}.</p>
             <div
@@ -652,50 +700,80 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                  const file = files[0];
-                  setSelectedFile(file);
-                  setValue("file", file, { shouldValidate: true });
+                const dropped = Array.from(e.dataTransfer.files).filter((f) => f.type.startsWith('image/'));
+                if (dropped.length > 0) {
+                  const maxBytes = 5 * 1024 * 1024;
+                  const oversized = dropped.filter((f) => f.size > maxBytes);
+                  const validFiles = dropped.filter((f) => f.size <= maxBytes);
+                  if (oversized.length > 0) {
+                    toast.review.error('Each image must be less than 5MB');
+                  }
+                  const remainingSlots = Math.max(0, 3 - (existingFileUrls.length + selectedFiles.length));
+                  if (validFiles.length > remainingSlots) {
+                    toast.review.error('Max 3 images allowed');
+                  }
+                  const toAdd = validFiles.slice(0, remainingSlots);
+                  const combined = [...selectedFiles, ...toAdd];
+                  setSelectedFiles(combined);
+                  setValue("files", combined, { shouldValidate: true });
                 }
               }}
             >
               <input
-                {...register("file")}
+                {...register("files")}
                 ref={inputRef}
                 type="file"
                 accept="image/*"
+                multiple
                 className="hidden"
                 onChange={handleFileChange}
               />
-              {selectedFile || watchedFile || existingFileUrl ? (
-                <div className="w-full max-w-sm relative">
-                  <img
-                    src={
-                      selectedFile || watchedFile 
-                        ? URL.createObjectURL(selectedFile || watchedFile!)
-                        : existingFileUrl!
-                    }
-                    alt="Uploaded file preview"
-                    className="w-full h-48 object-cover rounded-lg"
-                  />
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      clearFile();
-                    }}
-                    className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                  {existingFileUrl && !selectedFile && !watchedFile && (
-                    <div className="absolute bottom-2 left-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
-                      Existing attachment
+              {selectedFiles.length > 0 || (watchedFiles && watchedFiles.length > 0) || existingFileUrls.length > 0 ? (
+                <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {existingFileUrls.map((url, idx) => (
+                    <div key={`existing-${idx}`} className="relative">
+                      <img src={url} alt={`Existing attachment ${idx + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                 
+                        <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeExistingFileAt(idx);
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
                     </div>
-                  )}
+                  ))}
+                  {selectedFiles.map((file, idx) => (
+                    <div key={`selected-${idx}`} className="relative">
+                      <img src={URL.createObjectURL(file)} alt={`Selected image ${idx + 1}`} className="w-full h-48 object-cover rounded-lg" />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeSelectedFileAt(idx);
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                  <div className="col-span-full flex justify-end">
+                    <button
+                      type="button"
+                      onClick={(e) => { e.stopPropagation(); clearFiles(); }}
+                      className="text-sm text-red-600 hover:text-red-700 underline"
+                    >
+                      Clear all
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center">
@@ -721,7 +799,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
                     <span className="text-blue-600 underline cursor-pointer">
                       Click here
                     </span>{" "}
-                    to upload or drop image here
+                    to upload or drop images here (max 3)
                   </div>
                   <div className="text-gray-500 text-sm mt-1">
                     Support JPG, PNG, GIF (Max 5MB)
@@ -729,8 +807,8 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
                 </div>
               )}
             </div>
-            {errors.file && (
-              <p className="text-red-500 text-sm mt-2">{errors.file.message}</p>
+            {errors.files && (
+              <p className="text-red-500 text-sm mt-2">{(errors.files as any)?.message}</p>
             )}
           </div>
           )}

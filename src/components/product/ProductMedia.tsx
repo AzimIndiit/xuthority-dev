@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { PlayCircle, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
+import { PlayCircle, PauseCircle, X, ChevronLeft, ChevronRight, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // Media Preview Modal Component
@@ -70,10 +70,44 @@ const MediaPreviewModal = ({
     };
   }, [isOpen]);
 
-  if (!isOpen || !mediaUrls[currentIndex]) return null;
-
-  const currentMedia = mediaUrls[currentIndex];
+  const currentMedia = mediaUrls[currentIndex] || '';
   const isVideo = isVideoUrl(currentMedia);
+
+  // Ensure autoplay works on first open by muting and attempting programmatic play
+  useEffect(() => {
+    if (!isOpen || !isVideo) return;
+    const video = videoRef.current;
+    if (!video) return;
+    video.muted = true;
+
+    const tryPlay = () => {
+      const playPromise = video.play();
+      if (playPromise && typeof (playPromise as any).catch === 'function') {
+        (playPromise as Promise<void>).catch(() => {
+          // Autoplay might be blocked; ignore silently
+        });
+      }
+    };
+
+    if (video.readyState >= 2) {
+      tryPlay();
+    } else {
+      video.addEventListener('loadeddata', tryPlay, { once: true });
+    }
+
+    return () => {
+      video.removeEventListener('loadeddata', tryPlay);
+    };
+  }, [isOpen, currentIndex, isVideo]);
+
+  // Pause when modal closes
+  useEffect(() => {
+    if (!isOpen && videoRef.current) {
+      videoRef.current.pause();
+    }
+  }, [isOpen]);
+
+  if (!isOpen || !mediaUrls[currentIndex]) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90">
@@ -117,13 +151,17 @@ const MediaPreviewModal = ({
             ref={videoRef}
             src={currentMedia}
             className="max-w-full max-h-full object-contain"
-            controlsList="nodownload noplaybackrate nopictureinpicture"
-            autoPlay={false}
-            controls
-            onPlay={() => setIsVideoPlaying(true)}
-            onPause={() => setIsVideoPlaying(false)}
-            onEnded={() => setIsVideoPlaying(false)}
+            // controlsList="nodownload noplaybackrate nopictureinpicture"
+            autoPlay={true}
+            muted
+            playsInline
+            preload="auto"
+            controls={false}
+            // onPlay={() => setIsVideoPlaying(true)}
+            // onPause={() => setIsVideoPlaying(false)}
+            // onEnded={() => setIsVideoPlaying(false)}
             disablePictureInPicture
+            key={currentMedia}
    
 
             style={{
@@ -213,30 +251,29 @@ const MediaCard = ({
         <img
           src={mediaSrc}
           alt="Media background"
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 "
         />
       )}
       {mediaSrc && type === "video" && (
         <>
           <video
             src={mediaSrc}
-            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-            controlsList="nodownload noplaybackrate nopictureinpicture"
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 "
+            // controlsList="nodownload noplaybackrate nopictureinpicture"
             autoPlay={false}
-            controls
+            controls={false}
      
             disablePictureInPicture
             preload="metadata"
-            onPlay={handlePlay}
-            onPause={handlePause}
-            onEnded={handleEnded}
+            // onPlay={handlePlay}
+            // onPause={handlePause}
+            // onEnded={handleEnded}
             ref={videoRef}
           />
-          {!isPlaying && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 group-hover:bg-black/40 cursor-pointer" onClick={handlePlay}>
-              <PlayCircle className="h-16 w-16 text-white/80 transition-transform duration-300 group-hover:scale-110" />
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 transition-opacity duration-300 group-hover:bg-black/40 cursor-pointer opacity-0 group-hover:opacity-100 " >
+              <PlayCircle className="h-16 w-16 text-white/80 transition-transform duration-300 " />
             </div>
-          )}
+          
         </>
       )}
       {children && <div className="relative z-10 h-full">{children}</div>}

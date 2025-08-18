@@ -295,7 +295,7 @@ const MyFavorites: React.FC<MyFavoritesProps> = ({ className }) => {
             {sortedLists.map((list) => (
               <Card
                 key={list.listName}
-                className="bg-white border border-gray-200 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition-shadow duration-200 p-0 gap-0"
+                className="bg-white border border-gray-200 rounded-lg shadow-sm  hover:shadow-md transition-shadow duration-200 p-0 gap-0"
           
               >
                 {/* Header with background */}

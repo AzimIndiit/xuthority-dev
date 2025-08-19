@@ -55,7 +55,7 @@ const BlogCard: React.FC<BlogCardProps> = ({
       {/* Image Container */}
       <div className="relative aspect-video overflow-hidden bg-gray-100">
         <img
-          src={blog.mediaUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80'}
+          src={blog.thumbnailUrl || 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=500&q=80'}
           alt={blog.title}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={(e) => {

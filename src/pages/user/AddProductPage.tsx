@@ -28,6 +28,7 @@ const MAX_MEDIA_FILES = 5;
 const schema = z.object({
   name: z.string().min(3, 'Product name is required').trim().nonempty('Product name is required'),
   websiteUrl: z.string().url('Enter a valid URL').trim().nonempty('Website URL is required'),
+  contactEmail: z.string().email('Enter a valid email address').trim().nonempty('Contact email is required'),
   softwareIds: z.array(z.string()).min(1, 'Software is required'),
   solutionIds: z.array(z.string()).min(1, 'Solution is required'),
   whoCanUse: z.array(z.string()).min(1, 'Who can use is required'),
@@ -98,6 +99,7 @@ type FormData = z.infer<typeof schema>;
 const defaultValues: FormData = {
   name: '',
   websiteUrl: '',
+  contactEmail: '',
   softwareIds: [],
   solutionIds: [],
   whoCanUse: [],
@@ -431,6 +433,15 @@ console.log('mediaUrls', mediaFiles)
               onChange={handleProductNameChange}
             />
             <FormInput name="websiteUrl" label="Product Website" maxLength={200} placeholder='Enter product website' disabled={addProductMutation.isPending} />
+            <FormInput 
+              name="contactEmail" 
+              label="Contact Email" 
+              type="email"
+              maxLength={100} 
+              placeholder='Enter contact email' 
+              disabled={addProductMutation.isPending} 
+            />
+            <FormInput name="brandColors" type='color' label="Brand Colors" maxLength={100} disabled={addProductMutation.isPending}  />
             <FormSelect name="softwareIds" label="Software" placeholder="Select software" options={softwareOptions} searchable disabled={softwareLoading || addProductMutation.isPending} multiple  />
             <FormSelect name="solutionIds" label="Solutions" placeholder="Select solutions" options={solutionOptions} searchable disabled={solutionLoading || addProductMutation.isPending} multiple  />
             <FormSelect name="whoCanUse" label="Who can use" placeholder="Select user roles" options={userRoleOptions} searchable disabled={userRoleLoading || addProductMutation.isPending} multiple  />
@@ -438,7 +449,6 @@ console.log('mediaUrls', mediaFiles)
             <FormSelect name="integrations" label="Integrations" placeholder="Select integrations" options={integrationOptions} searchable disabled={integrationLoading || addProductMutation.isPending} multiple  />
             <FormSelect name="languages" label="Languages" placeholder="Select languages" options={languageOptions} searchable disabled={languageLoading || addProductMutation.isPending} multiple  />
             <FormSelect name="marketSegment" label="Market Segment" placeholder="Select market segment" options={marketSegmentOptions} searchable disabled={marketSegmentLoading || addProductMutation.isPending} multiple  />
-            <FormInput name="brandColors" type='color' label="Brand Colors" maxLength={100} disabled={addProductMutation.isPending} />
           </div>
           <FormTextarea name="description" label="Description" rows={8} maxLength={2000} className="w-full" disabled={addProductMutation.isPending} placeholder='Enter product description' />
           

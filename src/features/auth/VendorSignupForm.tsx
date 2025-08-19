@@ -166,30 +166,28 @@ export function VendorSignupForm() {
         password: data.password,
         companyName: data.companyName,
         companyEmail: data.companyEmail,
-        industry: data.industry, // Send the ObjectId value directly
+        industry:data.industry,
         companySize: data.companySize,
         acceptedTerms: data.terms,
         acceptedMarketing: data.updates || false,
       });
-      // Instead of setShowVerificationModal(true):
-      import('@/store/useUserStore').then(({ default: useUserStore }) => {
-        useUserStore.getState().setShowProfileVerificationModal(true);
-      });
+      
       // Execute post-login action if exists
-      if (postLoginAction?.type === "navigate-to-write-review") {
+      if (postLoginAction?.type === 'navigate-to-write-review') {
         setSelectedSoftware(postLoginAction.payload.software);
         setCurrentStep(postLoginAction.payload.currentStep);
         clearPostLoginAction();
         closeAuthModal();
-        navigate("/write-review");
-      }else{
+        navigate('/write-review');
+      } else {
         closeAuthModal();
       }
     } catch (error) {
       // Error is handled by the mutation hook
-      console.error("Vendor registration error:", error);
+      console.error('Vendor registration error:', error);
     }
   };
+
 
   const handleGoogleLogin = () => {
     googleLogin("vendor");

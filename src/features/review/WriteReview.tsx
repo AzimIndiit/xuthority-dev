@@ -460,7 +460,9 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
           } else if (verificationData.method === 'screenshot') {
             verificationType = 'screenshot';
             verificationDataField = { screenshot: verificationData.screenshot };
-            metaData.attachments= verificationData.attachments
+            if ((verificationData as any)?.attachments) {
+              metaData.attachments = (verificationData as any).attachments;
+            }
           } else if (verificationData.method === 'linkedin') {
             verificationType = 'linkedin';
             verificationDataField = { ...verificationData?.linkedInData  };
@@ -658,17 +660,65 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
                     data-tooltip-container
                   >
                     <div className="text-sm text-gray-700">
-                      <div className="font-medium mb-2">Rating Scale Guide:</div>
-                      <div className="space-y-1">
-                        <div><strong>1:</strong> Very Poor</div>
-                        <div><strong>2:</strong> Poor</div>
-                        <div><strong>3:</strong> Fair</div>
-                        <div><strong>4:</strong> Good</div>
-                        <div><strong>5:</strong> Very Good</div>
-                        <div><strong>6:</strong> Excellent</div>
-                        <div><strong>7:</strong> Outstanding</div>
-                        <div><strong>N/A:</strong> Not Applicable/No Experience</div>
-                      </div>
+                      <div className="font-medium mb-3">Rating Scale Guide</div>
+                      <ul className="space-y-1.5">
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>😡</span>
+                            <span><strong>1:</strong> Very Poor</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-red-50 text-red-700 border-red-200">Very Poor</span> */}
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>😟</span>
+                            <span><strong>2:</strong> Poor</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-orange-50 text-orange-700 border-orange-200">Poor</span> */}
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>😐</span>
+                            <span><strong>3:</strong> Fair</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-amber-50 text-amber-700 border-amber-200">Fair</span> */}
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>🙂</span>
+                            <span><strong>4:</strong> Good</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-yellow-50 text-yellow-700 border-yellow-200">Good</span> */}
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>😊</span>
+                            <span><strong>5:</strong> Very Good</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-lime-50 text-lime-700 border-lime-200">Very Good</span> */}
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>😃</span>
+                            <span><strong>6:</strong> Excellent</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-green-50 text-green-700 border-green-200">Excellent</span> */}
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>🤩</span>
+                            <span><strong>7:</strong> Outstanding</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-emerald-50 text-emerald-700 border-emerald-200">Outstanding</span> */}
+                        </li>
+                        <li className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-lg" aria-hidden>🚫</span>
+                            <span><strong>N/A:</strong> Not Applicable / No Experience</span>
+                          </div>
+                          {/* <span className="px-2 py-0.5 rounded-full border bg-gray-50 text-gray-700 border-gray-200">N/A</span> */}
+                        </li>
+                      </ul>
                     </div>
                     {/* Arrow pointing up */}
                     <div className="absolute -top-2 left-4 w-4 h-4 bg-white border-l border-t border-gray-200 transform rotate-45"></div>

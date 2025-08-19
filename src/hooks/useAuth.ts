@@ -293,7 +293,7 @@ export const useRegisterUser = () => {
 // Hook for vendor registration mutation
 export const useRegisterVendor = () => {
   const navigate = useNavigate();
-  const { registerVendorWithAPI } = useUserStore();
+  const { registerVendorWithAPI, getProfileWithAPI } = useUserStore();
 
   return useMutation({
     mutationFn: withMutationMonitoring(
@@ -314,11 +314,20 @@ export const useRegisterVendor = () => {
             localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
           }, 100);
           
-          // Don't fetch profile or set user data for vendor registration
-          // Vendors need approval before they can access their profile
+          // Wait a bit to ensure token is properly set in headers
+          await new Promise(resolve => setTimeout(resolve, 200));
           
-          // Navigate to home page after successful registration
-          // The modal will show the verification message
+          // Fetch fresh profile data after successful registration
+          await getProfileWithAPI();
+          
+          // Set fresh query data with updated profile
+          const user = useUserStore.getState().user;
+          if (user) {
+            queryClient.setQueryData(queryKeys.user, user);
+            queryClient.setQueryData(queryKeys.profile, user);
+          }
+          
+          // Navigate to dashboard or home
           navigate('/');
           return success;
         } else {
@@ -329,7 +338,7 @@ export const useRegisterVendor = () => {
       'vendor-registration',
       50000 // 50 second timeout for monitoring
     ),
-    retry: false,
+    retry: getDefaultMutationRetry(),
     onError: (err: any) => {
       console.error('Vendor registration error:', err);
       // Don't show additional toast here as the store already handles it

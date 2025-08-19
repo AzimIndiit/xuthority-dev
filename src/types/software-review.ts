@@ -20,6 +20,7 @@ export interface SoftwareReview {
   overallRating: number;
   updatedAt: string;
   content: string;
+  status?: 'pending' | 'approved' | 'dispute' | 'rejected';
   isHelpful?: boolean;
   helpfulVotes?: {
     count: number;

@@ -106,6 +106,7 @@ export interface ChangePasswordRequest {
 export interface UpdateProfileRequest {
   firstName?: string;
   lastName?: string;
+  status?:string;
   companyName?: string;
   companyEmail?: string;
   industry?: string;

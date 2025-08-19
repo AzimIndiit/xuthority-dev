@@ -29,6 +29,8 @@ interface UserState {
   initializeAuth: () => void;
   showProfileVerificationModal: boolean;
   setShowProfileVerificationModal: (open: boolean) => void;
+  showVendorOnboarding: boolean;
+  setShowVendorOnboarding: (open: boolean) => void;
 }
 
 const useUserStore = create<UserState>()(
@@ -91,17 +93,37 @@ const useUserStore = create<UserState>()(
           console.log('response', response)
           if (response.success && response.data) {
             // Check if user status is pending or blocked
-            if (response.data.user.status === 'pending') {
-            
-              set({ isLoading: false,token:null,user:null });
+            if (response.data.user.status === 'pending' && response.data.user.role === 'vendor') {
+              // For pending vendors, store the user data and log them in
+              // They need to be logged in to complete onboarding
+              const userInfo: User = {
+                id: response.data.user._id,
+                displayName: `${response.data.user.firstName} ${response.data.user.lastName}`,
+                ...response.data.user
+              };
               
-              // Show verification modal
-              const { setShowProfileVerificationModal } = get();
-              setShowProfileVerificationModal(true);
+              // Extract and store token
+              const token = response.data.user.accessToken || response.data.token;
+              if (token) {
+                AuthService.tokenStorage.setToken(token);
+              }
               
-              // toast.dismiss()
-              // toast.error('Your account is pending verification. Please wait for approval.');
-              return false; // Don't proceed with normal login
+              set({ 
+                isLoading: false,
+                token: token,
+                user: userInfo,
+                isLoggedIn: true 
+              });
+              
+              // Update query cache
+              queryClient.setQueryData(queryKeys.user, userInfo);
+              queryClient.setQueryData(queryKeys.profile, userInfo);
+              
+              // Show vendor onboarding modal
+              const { setShowVendorOnboarding } = get();
+              setShowVendorOnboarding(true);
+              
+              return true; // Return true since login was successful
             }
             
             if (response.data.user.status === 'blocked') {
@@ -150,16 +172,34 @@ const useUserStore = create<UserState>()(
         set({ isLoading: true, error: null });
         try {
           // Check if user status is pending or blocked
-          if (user.status === 'pending') {
-            // Store token temporarily but don't set as logged in
+          if (user.status === 'pending' && user.role === 'vendor') {
+            // For pending vendors, store the user data and log them in
+            // They need to be logged in to complete onboarding
+            const userInfo: User = {
+              id: user._id || user.id,
+              displayName: `${user.firstName} ${user.lastName}`,
+              ...user
+            };
             
-            set({ isLoading: false,token:null,user:null });
+            // Store token properly
+            AuthService.tokenStorage.setToken(token);
             
-            // Show verification modal
-            const { setShowProfileVerificationModal } = get();
-            setShowProfileVerificationModal(true);
+            set({ 
+              isLoading: false,
+              token: token,
+              user: userInfo,
+              isLoggedIn: true  // Set to true so vendor can see their profile and complete onboarding
+            });
             
-            return false; // Don't proceed with normal login
+            // Update query cache
+            queryClient.setQueryData(queryKeys.user, userInfo);
+            queryClient.setQueryData(queryKeys.profile, userInfo);
+            
+            // Show vendor onboarding modal
+            const { setShowVendorOnboarding } = get();
+            setShowVendorOnboarding(true);
+            
+            return true; // Return true since login was successful
           }
           
           if (user.status === 'blocked') {
@@ -266,17 +306,40 @@ const useUserStore = create<UserState>()(
         try {
           const response = await AuthService.registerVendor(data);
           if (response.success && response.data) {
-            // Don't set user data or token for vendor registration
-            // Vendors need approval before they can log in
+            // Map API response to UserInfo format
+            const userInfo: User = {
+              id: response.data.user._id,
+              displayName: `${response.data.user.firstName} ${response.data.user.lastName}`,
+              ...response.data.user
+            };
             
-            // Reset loading state without logging in
+            // Extract accessToken from user object
+            const token = response.data.user.accessToken || response.data.token;
+            
+            // Set the token in storage immediately
+            if (token) {
+              AuthService.tokenStorage.setToken(token);
+            }
+            
             set({
+              user: userInfo,
+              token: token,
+              isLoggedIn: true,
               isLoading: false,
               error: null,
             });
             
+            // Clear auth-related queries more gracefully
+            setTimeout(() => {
+              queryClient.removeQueries({ queryKey: ['user'] });
+              queryClient.removeQueries({ queryKey: ['profile'] });
+              queryClient.removeQueries({ queryKey: ['publicProfile'] });
+              queryClient.removeQueries({ queryKey: ['publicProfileBySlug'] });
+              localStorage.removeItem('REACT_QUERY_OFFLINE_CACHE');
+            }, 100);
+            
             toast.dismiss()
-            toast.success('Registration successful!');
+            toast.success('Registration successful!.');
             return true;
           } else {
             set({
@@ -382,6 +445,8 @@ const useUserStore = create<UserState>()(
       },
       showProfileVerificationModal: false,
       setShowProfileVerificationModal: (open: boolean) => set({ showProfileVerificationModal: open }),
+      showVendorOnboarding: false,
+      setShowVendorOnboarding: (open: boolean) => set({ showVendorOnboarding: open }),
     }),
     {
       name: "user-store",

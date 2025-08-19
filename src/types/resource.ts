@@ -27,6 +27,7 @@ export interface Blog {
   authorName: string;
   designation?: string;
   mediaUrl?: string;
+  thumbnailUrl?:string;
   watchUrl?: string;
   tag: string;
   status: 'active' | 'inactive';

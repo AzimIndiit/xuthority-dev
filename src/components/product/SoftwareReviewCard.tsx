@@ -9,6 +9,7 @@ import useUIStore from '@/store/useUIStore';
 import { useDeleteReview, useHelpfulVote } from '@/hooks/useReview';
 import DisputeModal from './DisputeModal';
 import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 import ConfirmationModal from '../ui/ConfirmationModal';
 import { useReviewStore } from '@/store/useReviewStore';
 
@@ -122,6 +123,30 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
     setIsDeleteModalOpen(false);
   };
 
+  const reviewStatus = (review as any)?.status as
+    | 'pending'
+    | 'approved'
+    | 'dispute'
+    | 'rejected'
+    | undefined;
+
+  const getStatusBadgeProps = (
+    status?: string
+  ): { variant?: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string } => {
+    switch ((status || '').toLowerCase()) {
+      case 'approved':
+        return { variant: 'secondary', className: 'bg-green-100 text-green-800 border-green-200' };
+      case 'pending':
+        return { variant: 'secondary', className: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+      case 'dispute':
+        return { variant: 'secondary', className: 'bg-amber-100 text-amber-800 border-amber-200' };
+      case 'rejected':
+        return { variant: 'destructive' };
+      default:
+        return { variant: 'outline', className: 'bg-gray-100 text-gray-800 border-gray-200' };
+    }
+  };
+
   return (
     <div className={cn('bg-white rounded-lg border border-gray-200 shadow-sm', className)}>
       {/* Header Section */}
@@ -141,8 +166,8 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
                   className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
                 />
               ) : (
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-red-400 via-yellow-400 to-green-400 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-base sm:text-lg">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br bg-gray-200 rounded-lg flex items-center justify-center">
+                  <span className="text-gray-600 font-bold text-base sm:text-lg">
                     {software.name.charAt(0)}
                   </span>
                 </div>
@@ -259,7 +284,13 @@ const   SoftwareReviewCard: React.FC<SoftwareReviewCardProps> = ({
         <div className="space-y-3">
           {/* Review Title */}
           <h4 className="text-lg sm:text-xl font-semibold text-gray-900 leading-tight">
-            "{review.title}"
+            "{review.title}"{' '}
+          {!location.pathname.includes('public-profile') &&  <Badge
+              variant={getStatusBadgeProps(reviewStatus).variant}
+              className={cn('ml-2 capitalize', getStatusBadgeProps(reviewStatus).className)}
+            >
+              {reviewStatus}
+            </Badge>}
           </h4>
 
           {/* Review Rating and Date */}

@@ -11,7 +11,8 @@ import { useReviewStore } from '@/store/useReviewStore';
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { loginWithToken, setShowProfileVerificationModal } = useUserStore();
+  // const [loading,setLoading] = useState(true);
+  const { loginWithToken, setShowVendorOnboarding } = useUserStore();
   const { postLoginAction, clearPostLoginAction } = useUIStore();
   const { setSelectedSoftware, setCurrentStep } = useReviewStore();
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +27,9 @@ const AuthCallback: React.FC = () => {
         const provider = searchParams.get('provider');
         const status = searchParams.get('status');
         const isPending = searchParams.get('isPending') === 'true';
-console.log('status', status)
+        
+        console.log('OAuth callback params:', { provider, status, isPending });
+
         if (error) {
           setError(`Authentication failed: ${error}`);
           toast.auth.error(`Authentication failed: ${error}`);
@@ -35,11 +38,7 @@ console.log('status', status)
           }, 3000);
           return;
         }
-if(status==='pending'){
-  setShowProfileVerificationModal(true);
-  navigate('/')
-  return;
-}
+
         if (!token) {
           setError('No authentication token received');
           toast.auth.error('No authentication token received');
@@ -49,16 +48,7 @@ if(status==='pending'){
           return;
         }
 
-        // Check if user is pending (for OAuth users)
-        if (isPending ) {
-          // Store the token temporarily
-          AuthService.tokenStorage.setToken(token);
-          
-          // Show verification modal and redirect to home
-          setShowProfileVerificationModal(true);
-          navigate('/');
-          return;
-        }
+      
 
         // First, clear all existing data
         localStorage.clear();
@@ -76,16 +66,29 @@ if(status==='pending'){
           throw new Error(profileResponse.error?.message || 'Failed to fetch user profile');
         }
 
-        // Check if user status is pending (for regular login)
-        if (profileResponse.data.user.status === 'pending') {
+        const user = profileResponse.data.user;
+        
+        // Check if vendor needs to complete onboarding
+        if (user.role === 'vendor' && user.status === 'pending') {
+          console.log('Vendor pending status detected, showing onboarding modal');
+          
+          // Login with token will handle setting the user data and showing the modal
+          await loginWithToken(user, token);
+          
+          // Navigate to home (modal will be shown on top)
+          navigate('/');
+          return;
+        }
+        
+        // Check if regular user status is pending (email verification)
+        if (user.role === 'user' && user.status === 'pending') {
           // Show verification modal and redirect to home
-          setShowProfileVerificationModal(true);
           navigate('/');
           return;
         }
 
         // Login the user with the fetched data
-        const success = await loginWithToken(profileResponse.data.user, token);
+        const success = await loginWithToken(user, token);
         
         if (success) {
           // Set fresh query data
@@ -127,7 +130,7 @@ if(status==='pending'){
     };
 
     handleAuthCallback();
-  }, [searchParams, navigate, queryClient, loginWithToken, setShowProfileVerificationModal]);
+  }, [searchParams, navigate, queryClient, loginWithToken, setShowVendorOnboarding]);
 
   if (error) {
     return (
@@ -155,9 +158,9 @@ if(status==='pending'){
   }
 
   return (
-    <div className="w-full flex justify-center items-center min-h-[100dvh] text-lg font-semibold">
-    <LottieLoader />
-  </div>
+    <div className="fixed inset-0 z-50 flex justify-center items-center bg-white text-lg font-semibold">
+      <LottieLoader />
+    </div>
   );
 };
 

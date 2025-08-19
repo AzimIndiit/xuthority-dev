@@ -244,7 +244,7 @@ const UploadImagesModal: React.FC<UploadImagesModalProps> = ({
                   );
                 })}
                 
-                {attachments.length < MAX_FILES && (
+                {/* {attachments.length < MAX_FILES && (
                   <div className="border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center h-32">
                     <div className="text-center">
                       <svg className="w-8 h-8 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -253,7 +253,7 @@ const UploadImagesModal: React.FC<UploadImagesModalProps> = ({
                       <p className="text-xs text-gray-500 mt-1">Add more</p>
                     </div>
                   </div>
-                )}
+                )} */}
               </div>
             ) : (
               <div className="flex flex-col items-center">

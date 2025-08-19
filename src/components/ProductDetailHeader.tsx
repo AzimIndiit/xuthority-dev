@@ -22,6 +22,7 @@ interface Product {
   entryPrice: string;
   brandColors?: string;
   website?: string;
+  contactEmail?:string;
 }
 
 interface ProductDetailHeaderProps {
@@ -139,7 +140,7 @@ export default function ProductDetailHeader({
                       {isFollowing ? "Unfollow" : "Follow"}
                     </Button>}
                     <a
-  href={`mailto:${productOwner?.email}`}
+  href={`mailto:${product?.contactEmail}`}
   className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600 flex items-center px-2 py-2 rounded border"
 >
   <User className="w-4 h-4 mr-1" />
@@ -223,7 +224,7 @@ export default function ProductDetailHeader({
            
 
             <a
-  href={`mailto:${productOwner?.email}`}
+  href={`mailto:${product?.contactEmail}`}
   className="border-red-500 text-red-500 hover:bg-red-50 hover:text-red-600 flex items-center px-3 py-1 rounded border"
 >
   <User className="w-4 h-4 mr-1" />

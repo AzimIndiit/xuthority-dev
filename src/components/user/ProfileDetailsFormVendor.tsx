@@ -147,8 +147,8 @@ export const profileVendorSchema = z.object({
     return /^[0-9a-fA-F]{24}$/.test(val);
   }, "Please select a valid industry"),
   companyName: z.string().min(2, "Company name must be at least 2 characters").trim().max(100, "Company name must be less than 100 characters").nonempty("Company name is required"),
-  companyEmail: z.string().optional().or(z.literal("")).refine((val) => !val || z.string().email().safeParse(val).success, "Invalid company email address").refine((val) => !val || val.length <= 254, "Company email must be less than 254 characters"),
-  companySize: z.string().min(1, "Please select company size"),
+  companyEmail: z.string().email("Invalid company email address").max(254, "Company email must be less than 254 characters").nonempty("Company email is required"),
+  companySize: z.string().min(1, "Please select company size").nonempty("Company size is required"),
   yearFounded: z.string().optional().or(z.literal("")),
   hqLocation: z.string().optional().or(z.literal("")).refine((val) => !val || val.length <= 200, "HQ location must be less than 200 characters"),
   companyDescription: z.string().optional().or(z.literal("")).refine((val) => !val || val.length <= 2000, "Company description must be less than 2000 characters"),
@@ -273,7 +273,7 @@ const ProfileDetailsFormVendor: React.FC<ProfileDetailsFormProps> = ({
             twitter: cleanValue(data.twitterUrl),
           },
           avatar: cleanValue(data.avatar),
-          companyEmail: cleanValue(data.companyEmail),
+          companyEmail: data.companyEmail, // Required field - send directly
           yearFounded: cleanValue(data.yearFounded),
           hqLocation: cleanValue(data.hqLocation),
           companyDescription: cleanValue(data.companyDescription),
@@ -420,9 +420,10 @@ const ProfileDetailsFormVendor: React.FC<ProfileDetailsFormProps> = ({
 
           {/* Company Details */}
           <div>
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
               Company Details
             </h3>
+            <p className="text-sm text-gray-500 mb-4 sm:mb-6">Fields marked with * are required</p>
 
             <div className="flex items-center mb-4 sm:mb-6">
               <div className="relative">

@@ -217,7 +217,8 @@ export default function ProductDetailPage() {
     entryPrice: minPrice !== null ? formatCurrency(minPrice) : 'N/A',
     brandColors: product.brandColors || '#ffffff',
     website: product.websiteUrl || '',
-    isFree:product.isFree 
+    isFree:product.isFree ,
+    contactEmail:product.contactEmail
   };
 console.log('product33333', product)
   const handleSearch = (query: string) => {

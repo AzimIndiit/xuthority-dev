@@ -224,6 +224,17 @@ const router = createBrowserRouter([
           </Suspense>
         ),
       },
+      {
+        path: "/contact-us",
+        Component: (props: any) => {
+          const ContactUs = lazy(() => import("@/pages/ContactUs"));
+          return (
+            <Suspense fallback={<Loader />}>
+              <ContactUs {...props} />
+            </Suspense>
+          );
+        },
+      },
     
       {
         path: "/:category",

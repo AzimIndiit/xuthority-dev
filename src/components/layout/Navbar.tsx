@@ -19,8 +19,8 @@ import { useReviewStore } from "@/store/useReviewStore";
 import { formatNumber } from "@/utils/formatNumber";
 import { queryClient } from "@/lib/queryClient";
 import ConfirmationModal from "../ui/ConfirmationModal";
-import { useFollowStatus } from "@/hooks/useFollow";
-import ProfileVerificationModal from '@/components/ui/ProfileVerificationModal';
+
+import VendorOnboardingModal from '@/components/vendor/VendorOnboardingModal';
 
 const navLinks = [
   { label: "Software", href: "/software" },
@@ -51,7 +51,6 @@ export default function Navbar() {
     isLoading: userStatsLoading 
   } = useUserProfileStats(user?._id || '');
 
-  
   const openAuthModal = useUIStore((state) => state.openAuthModal);
   const navigate = useNavigate();
   const location = useLocation();
@@ -70,9 +69,9 @@ export default function Navbar() {
   };
   
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const showProfileVerificationModal = useUserStore(state => state.showProfileVerificationModal);
-  const setShowProfileVerificationModal = useUserStore(state => state.setShowProfileVerificationModal);
   
+  const showVendorOnboarding = useUserStore(state => state.showVendorOnboarding);
+  const setShowVendorOnboarding = useUserStore(state => state.setShowVendorOnboarding);
   // Auto-close drawer on desktop (lg and up)
   useEffect(() => {
     const handleResize = () => {
@@ -126,7 +125,7 @@ export default function Navbar() {
       navigate("/write-review");
   
   }
-
+console.log('showVendorOnboarding', showVendorOnboarding)
   return (
     <>
       <header className="w-full bg-white border-b border-gray-100 ">
@@ -462,10 +461,10 @@ export default function Navbar() {
         confirmText="Yes I'm Sure"
         isLoading={logoutMutation.isPending}
       />
-      <ProfileVerificationModal
-        isOpen={showProfileVerificationModal}
-        onOpenChange={setShowProfileVerificationModal}
-        onConfirm={() => setShowProfileVerificationModal(false)}
+    
+      <VendorOnboardingModal
+        isOpen={showVendorOnboarding}
+        onOpenChange={setShowVendorOnboarding}
       />
     </>
   );

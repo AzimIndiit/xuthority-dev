@@ -150,6 +150,7 @@ const PricingFeaturesFieldArray: React.FC<PricingFeaturesFieldArrayProps> = ({ n
               placeholder={`Enter plan feature ${fIdx + 1}`}
               maxLength={200}
               disabled={loading}
+              customError={fieldError}
             />
             {fieldError && <p className="text-red-500 text-sm mt-1">{fieldError}</p>}
           </div>
@@ -211,6 +212,7 @@ const FeaturesDescriptionFieldArray: React.FC<FeaturesDescriptionFieldArrayProps
               placeholder={`Enter feature description ${fIdx + 1}`}
               maxLength={200}
               disabled={loading}
+              customError={fieldError}
             />
             {fieldError && <p className="text-red-500 text-sm mt-1">{fieldError}</p>}
           </div>
@@ -604,7 +606,7 @@ console.log('mediaUrls', mediaFiles)
                     </button>
                   {/* )} */}
                 </div>
-                <FormInput name={`features.${idx}.title`} label="Feature Title" maxLength={100} placeholder='Enter feature title' disabled={addProductMutation.isPending} />
+                <FormInput name={`features.${idx}.title`} label="Feature Title" maxLength={100} placeholder='Enter feature title' disabled={addProductMutation.isPending} customError={getNestedErrorMessage(errors, `features.${idx}.title`)} />
                 {getNestedErrorMessage(errors, `features.${idx}.title`) && (
                   <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `features.${idx}.title`)}</p>
                 )}
@@ -647,7 +649,7 @@ console.log('mediaUrls', mediaFiles)
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         
                   <div>
-                    <FormInput name={`pricing.${idx}.name`} label="Plan Name" maxLength={100} placeholder="Enter plan name" disabled={addProductMutation.isPending} />
+                    <FormInput name={`pricing.${idx}.name`} label="Plan Name" maxLength={100} placeholder="Enter plan name" disabled={addProductMutation.isPending} customError={getNestedErrorMessage(errors, `pricing.${idx}.name`)} />
                     {getNestedErrorMessage(errors, `pricing.${idx}.name`) && (
                       <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.name`)}</p>
                     )}
@@ -697,6 +699,7 @@ console.log('mediaUrls', mediaFiles)
                         }
                       }}
                       placeholder="Enter price" 
+                      customError={getNestedErrorMessage(errors, `pricing.${idx}.price`)}
                     />
                     {getNestedErrorMessage(errors, `pricing.${idx}.price`) && (
                       <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.price`)}</p>
@@ -711,6 +714,7 @@ console.log('mediaUrls', mediaFiles)
                       max={10000}
                       placeholder="Enter no of seats" 
                       disabled={addProductMutation.isPending} 
+                      customError={getNestedErrorMessage(errors, `pricing.${idx}.seats`)}
                     />
                     {getNestedErrorMessage(errors, `pricing.${idx}.seats`) && (
                       <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.seats`)}</p>
@@ -718,7 +722,7 @@ console.log('mediaUrls', mediaFiles)
                   </div>
                 </div>
                 <div>
-                  <FormTextarea name={`pricing.${idx}.description`} className="mb-6" label="Plan Description" rows={3} maxLength={500} placeholder="Enter plan description" disabled={addProductMutation.isPending} />
+                  <FormTextarea name={`pricing.${idx}.description`} className="mb-6" label="Plan Description" rows={3} maxLength={500} placeholder="Enter plan description" disabled={addProductMutation.isPending} customError={getNestedErrorMessage(errors, `pricing.${idx}.description`)} />
                   {getNestedErrorMessage(errors, `pricing.${idx}.description`) && (
                     <p className="text-red-500 text-sm mt-1">{getNestedErrorMessage(errors, `pricing.${idx}.description`)}</p>
                   )}

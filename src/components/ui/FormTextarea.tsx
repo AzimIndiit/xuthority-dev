@@ -6,15 +6,16 @@ import { Textarea } from './textarea';
 interface FormTextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   name: string;
   label: string;
+  customError?: any;
 }
 
-export const FormTextarea: React.FC<FormTextareaProps> = ({ name, label, ...props }) => {
+export const FormTextarea: React.FC<FormTextareaProps> = ({ name, label, customError, ...props }) => {
   const {
     register,
     formState: { errors },
   } = useFormContext();
 
-  const error = errors[name];
+const error = errors[name] || customError;
 
   return (
     <div className="w-full">
@@ -25,7 +26,7 @@ export const FormTextarea: React.FC<FormTextareaProps> = ({ name, label, ...prop
         id={name}
         {...register(name)}
         {...props}
-        className={`mt-2 resize-none rounded-xl min-h-40 ${error ? '' : 'border-gray-300'}`}
+        className={`mt-2 resize-none rounded-xl min-h-40 ${error ? 'border-red-500' : 'border-gray-300'}`}
       />
       {error && (
         <p className="text-red-500 text-sm mt-2">{error.message?.toString()}</p>

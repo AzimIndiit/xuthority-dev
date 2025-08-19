@@ -178,6 +178,7 @@ export default function TestimonialsCarousel() {
                 align: "center",
                 loop: true,
                 slidesToScroll: 1,
+                watchDrag: false,
               }}
               className="w-full"
             >

@@ -214,7 +214,7 @@ export function VendorSignupForm() {
                 id="firstName"
                 placeholder="Enter First Name"
                 {...register("firstName")}
-                className="rounded-full h-14 px-4"
+                className={`rounded-full h-14 px-4 ${errors.firstName ? "border-red-500" : ""}`}
                 disabled={registerMutation.isPending}
                 maxLength={50}
               />
@@ -232,7 +232,7 @@ export function VendorSignupForm() {
                 id="lastName"
                 placeholder="Enter Last Name"
                 {...register("lastName")}
-                className="rounded-full h-14 px-4"
+                className={`rounded-full h-14 px-4 ${errors.lastName ? "border-red-500" : ""}`}
                 disabled={registerMutation.isPending}
                 maxLength={50}
               />
@@ -251,7 +251,7 @@ export function VendorSignupForm() {
               id="email"
               placeholder="Enter Email"
               {...register("email")}
-              className="rounded-full h-14 px-4"
+              className={`rounded-full h-14 px-4 ${errors.email ? "border-red-500" : ""}`}
               disabled={registerMutation.isPending}
             />
             <div className="min-h-[20px]">
@@ -266,7 +266,7 @@ export function VendorSignupForm() {
               id="companyName"
               placeholder="Enter Company Name"
               {...register("companyName")}
-              className="rounded-full h-14 px-4"
+              className={`rounded-full h-14 px-4 ${errors.companyName ? "border-red-500" : ""}`}
               disabled={registerMutation.isPending}
               maxLength={100}
             />
@@ -284,7 +284,7 @@ export function VendorSignupForm() {
               id="companyEmail"
               placeholder="Enter Company Email"
               {...register("companyEmail")}
-              className="rounded-full h-14 px-4"
+              className={`rounded-full h-14 px-4 ${errors.companyEmail ? "border-red-500" : ""}`}
               disabled={registerMutation.isPending}
               maxLength={254}
             />
@@ -305,6 +305,7 @@ export function VendorSignupForm() {
                 placeholder="Select industry"
                 options={industryOptions}
                 disabled={registerMutation.isPending}
+                customError={errors.industry}
               />
             </div>
             <div className="grid gap-2">
@@ -318,7 +319,7 @@ export function VendorSignupForm() {
                     defaultValue={field.value}
                     disabled={registerMutation.isPending}
                   >
-                    <SelectTrigger className="rounded-full h-14 px-4 w-full">
+                    <SelectTrigger className={`rounded-full h-14 px-4 w-full ${errors.companySize ? "border-red-500" : ""}  `}>
                       <SelectValue placeholder="Select Company Size" />
                     </SelectTrigger>
                     <SelectContent>
@@ -361,7 +362,7 @@ export function VendorSignupForm() {
                 type={passwordVisible ? "text" : "password"}
                 placeholder="Enter Password"
                 {...register("password")}
-                className="rounded-full h-14 px-4"
+                className={`rounded-full h-14 px-4 ${errors.password ? "border-red-500" : ""}`}
                 disabled={registerMutation.isPending}
               />
               <button

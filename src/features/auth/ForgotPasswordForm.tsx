@@ -47,7 +47,7 @@ export function ForgotPasswordForm() {
             id="email"
             placeholder="Enter Email Address"
             {...register("email")}
-            className="rounded-full h-14 flex-1 px-5 py-3"
+            className={`rounded-full h-14 flex-1 px-5 py-3 ${errors.email ? "border-red-500" : ""}`}
             disabled={forgotPasswordMutation.isPending}
           />
           {errors.email && (

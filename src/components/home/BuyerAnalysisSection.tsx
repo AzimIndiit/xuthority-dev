@@ -9,7 +9,7 @@ export default function BuyerAnalysisSection() {
   const heading = insightsData?.heading || 'Our Analysis of Buyer Behavior!';
   const subtext = insightsData?.subtext || 'AI drives increased software spending, but buyers demand quick ROI, according to a 2024 Buyer Behavior Report based on a survey of over 1,900 B2B buyers worldwide';
   const buttonText = insightsData?.buttonText || 'Download Report';
-
+const buttonLink = insightsData?.buttonLink || 'https://www.xuthority.com/buyer-behavior-report';
   if (isLoading) {
     return (
       <section className="w-full bg-[#f1f8ff] py-24 px-4 sm:px-6 lg:px-8 animate-pulse">
@@ -43,7 +43,9 @@ export default function BuyerAnalysisSection() {
             {subtext}
           </p>
           <Button
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-3 shadow transition-all"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full px-6 py-3 shadow transition-all" onClick={() => {
+              window.open(buttonLink, '_blank');
+            }}
           >
             {buttonText} <span aria-hidden className="ml-2">→</span>
           </Button>

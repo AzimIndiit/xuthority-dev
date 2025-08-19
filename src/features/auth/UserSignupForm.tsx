@@ -155,7 +155,7 @@ export function UserSignupForm() {
             id="firstName"
             placeholder="Enter First Name"
             {...register("firstName")}
-            className="rounded-full h-14 px-4"
+            className={`rounded-full h-14 px-4 ${errors.firstName ? "border-red-500" : ""}`}
             disabled={registerMutation.isPending}
             maxLength={50}
           />
@@ -173,7 +173,7 @@ export function UserSignupForm() {
             id="lastName"
             placeholder="Enter Last Name"
             {...register("lastName")}
-            className="rounded-full h-14 px-4"
+            className={`rounded-full h-14 px-4 ${errors.lastName ? "border-red-500" : ""}`}
             disabled={registerMutation.isPending}
             maxLength={50}
           />
@@ -192,7 +192,7 @@ export function UserSignupForm() {
           id="email"
           placeholder="Enter Email Address"
           {...register("email")}
-          className="rounded-full h-14 px-4"
+          className={`rounded-full h-14 px-4 ${errors.email ? "border-red-500" : ""}`}
           disabled={registerMutation.isPending}
         />
         <div className="min-h-[20px]">
@@ -209,7 +209,7 @@ export function UserSignupForm() {
             type={passwordVisible ? "text" : "password"}
             placeholder="Enter Password"
             {...register("password")}
-            className="rounded-full h-14 px-4"
+            className={`rounded-full h-14 px-4 ${errors.password ? "border-red-500" : ""}`}
             disabled={registerMutation.isPending}
           />
           <button

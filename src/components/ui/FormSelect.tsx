@@ -29,6 +29,7 @@ interface FormSelectProps {
   multiple?: boolean;
   maxSelections?: number;
   showSelectAll?: boolean;
+  customError?: any;
 }
 
 export const FormSelect: React.FC<FormSelectProps> = ({
@@ -43,6 +44,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
   multiple = false,
   maxSelections,
   showSelectAll = false,
+  customError
   
 }) => {
   const {
@@ -54,7 +56,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
   const [visibleCount, setVisibleCount] = useState(optionsPerPage);
   const [isOpen, setIsOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const error = errors[name];
+  const error = errors[name] || customError;
 
   // Reset visible count when search term changes
   useEffect(() => {
@@ -247,7 +249,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
                   ref={field.ref}
                   id={name}
                   className={`mt-2 rounded-full w-full min-h-14 px-3 py-2 border cursor-pointer flex items-center ${
-                    error ? '' : 'border-gray-300'
+                    error ? 'border-red-500' : 'border-gray-300'
                   } ${disabled ? 'bg-gray-100 cursor-not-allowed' : 'bg-white hover:border-gray-400'}`}
                   onClick={() => !disabled && setIsOpen(!isOpen)}
                 >
@@ -348,7 +350,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
               <SelectTrigger
                 id={name}
                 ref={field.ref}
-                className={`mt-2 rounded-full w-full ${error ? '' : 'border-gray-300'}`}
+                className={`mt-2 rounded-full w-full ${error ? 'border-red-500' : 'border-gray-300'}`}
                 disabled={disabled}
               >
                 <SelectValue placeholder={placeholder} />

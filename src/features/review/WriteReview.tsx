@@ -612,7 +612,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
             <Input
               {...register("title")}
               placeholder="Write review title..."
-              className="w-full"
+              className={`w-full ${errors.title ? "border-red-500" : ""}`}
             />
             {errors.title && (
               <p className="text-red-500 text-sm mt-2">{errors.title.message}</p>
@@ -627,7 +627,7 @@ const WriteReview: React.FC<WriteReviewProps> = ({ setShowStepper }) => {
             <Textarea
               {...register("description")}
               placeholder="Write about your experience..."
-              className="w-full min-h-32 max-h-[300px] rounded-lg resize-none break-all"
+              className={`w-full min-h-32 max-h-[300px] rounded-lg resize-none break-all ${errors.description ? "border-red-500" : ""}`}
               rows={6}
               maxLength={2000}
             />

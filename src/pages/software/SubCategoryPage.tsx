@@ -371,6 +371,7 @@ console.log('products', products)
                     showCompare={true}
                     hasUserReviewed={product.hasUserReviewed}
                     isFree={product.isFree}
+                    status={product.status}
                   />
                 </div>
               ))}

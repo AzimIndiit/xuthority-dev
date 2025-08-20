@@ -169,6 +169,7 @@ const UserProducts = ({publicProfile}) => {
                                     websiteUrl={product.websiteUrl}
                                     hasUserReviewed={product.hasUserReviewed}
                                     isFree={product.isFree}
+                                    status={product.status}
                                 />
                             ))}
                         </div>

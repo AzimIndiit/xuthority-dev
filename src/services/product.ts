@@ -29,6 +29,7 @@ export interface Product {
   integrations?: string[];
   languages?: string[];
   brandColors?: string;
+  status?:string;
   userId?:any;
   pricing?: {
     price: number;

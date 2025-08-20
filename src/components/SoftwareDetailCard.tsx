@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Users, Building2, Network, Heart, Star, Edit, Delete, DeleteIcon, Trash } from "lucide-react";
+import { Badge } from "./ui/badge";
 import StarRating from "./ui/StarRating";
 import useUserStore from "@/store/useUserStore";
 import { formatCurrency } from "@/utils/formatCurrency";
@@ -13,6 +14,7 @@ import useCompareStore from "@/store/useCompareStore";
 import { useToast } from "@/hooks/useToast";
 import { useFavoriteStatus } from "@/hooks/useFavorites";
 import useUIStore from "@/store/useUIStore";
+import { cn } from "@/lib/utils";
 
 interface FeatureDescription {
   value: string;
@@ -50,6 +52,7 @@ interface SoftwareDetailCardProps {
   showCompare?: boolean;
   hasUserReviewed?: boolean;
   isFree?: boolean;
+  status?:string;
   }
 
 function renderStars(rating: number) {
@@ -98,7 +101,8 @@ export default function SoftwareDetailCard({
   marketSegmentAll,
   showCompare = false,
   hasUserReviewed = false,
-  isFree = false
+  isFree = false,
+  status
 }: SoftwareDetailCardProps) {
   const {user, isLoggedIn} = useUserStore();
   const {openAuthModal} = useUIStore();
@@ -186,6 +190,36 @@ const deleteMutation = useDeleteProduct();
     setShowDeleteModal(true);
 
   };
+
+
+  const productStatus = status as
+    | 'pending'
+    | 'published'
+    | 'rejected'
+    | 'archived'
+     | 'update_pending'
+     | 'update_rejected'
+    | undefined;
+    const getStatusBadgeProps = (
+      status?: string
+    ): { variant?: 'default' | 'secondary' | 'destructive' | 'outline'; className?: string } => {
+      switch ((status || '').toLowerCase()) {
+        case 'published':
+          return { variant: 'secondary', className: 'bg-green-100 text-green-800 border-green-200' };
+        case 'pending':
+          return { variant: 'secondary', className: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+        case 'archived':
+          return { variant: 'secondary', className: 'bg-amber-100 text-amber-800 border-amber-200' };
+        case 'rejected':
+          return { variant: 'destructive' };
+        case 'update_pending':
+          return { variant: 'secondary', className: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
+        case 'update_rejected':
+          return { variant: 'destructive' };
+        default:
+          return { variant: 'outline', className: 'bg-gray-100 text-gray-800 border-gray-200' };
+      }
+    };
   return (
     <div className="relative w-full mx-auto h-full">
       {/* Floating Logo */}
@@ -234,6 +268,14 @@ const deleteMutation = useDeleteProduct();
               className="font-bold cursor-pointer text-base sm:text-xl text-gray-900 leading-tight capitalize line-clamp-2"
             >
               {name}
+              {location.pathname.includes('/profile/products') && (
+                <Badge
+                  variant={getStatusBadgeProps(productStatus).variant}
+                  className={cn('ml-2 capitalize', getStatusBadgeProps(productStatus).className)}
+                >
+                  {productStatus.replace('_', ' ')}
+                </Badge>
+              )}
             </div>
             <div className=" flex items-center gap-2 mt-1">
               <StarRating rating={rating} />

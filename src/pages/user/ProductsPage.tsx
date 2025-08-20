@@ -205,6 +205,7 @@ const ProductsPage: React.FC = () => {
               slug={item.slug}
               features={item.features}
               isFree={item.isFree}
+              status={item.status}
             />
           ))}
         </div>

@@ -156,7 +156,7 @@ const UploadImagesModal: React.FC<UploadImagesModalProps> = ({
       }
       
       // Show success message
-      toast.success('Images uploaded successfully!');
+      // toast.success('Images uploaded successfully!');
       
       // Reset and close
       setAttachments([]);

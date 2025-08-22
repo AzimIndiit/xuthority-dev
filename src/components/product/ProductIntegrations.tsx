@@ -24,27 +24,40 @@ const integrations = [
   { name: 'Zapier', logoUrl: 'https://www.vectorlogo.zone/logos/zapier/zapier-icon.svg' },
 ];
 
-const IntegrationCard = ({ name, image }: { name: string, image: string }) => (
-  <TooltipProvider>
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div className="flex flex-col items-center text-center gap-2 cursor-pointer">
-          <div className="w-16 h-16  bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-3 transition-all duration-300 hover:shadow-md hover:border-gray-300">
-            <img
-              src={image}
-              alt={`${name} logo`}
-              className="w-full h-full object-contain"
-            />
+const IntegrationCard = ({ name, image }: { name: string; image: string }) => {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <div className="flex flex-col items-center text-center gap-2 cursor-pointer">
+            <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-200 flex items-center justify-center p-3 transition-all duration-300 hover:shadow-md hover:border-gray-300">
+              {!imgError ? (
+                <img
+                  src={image}
+                  alt={`${name} logo`}
+                  className="w-full h-full object-contain"
+                  onError={() => setImgError(true)}
+                />
+              ) : (
+                <span className="text-lg font-bold text-gray-600">
+                  {name.charAt(0)}
+                </span>
+              )}
+            </div>
+            <p className="text-base font-semibold text-gray-800 line-clamp-1">
+              {name}
+            </p>
           </div>
-          <p className="text-base font-semibold text-gray-800 line-clamp-1">{name}</p>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent>
-        <p>{name}</p>
-      </TooltipContent>
-    </Tooltip>
-  </TooltipProvider>
-);
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{name}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+};
 
 const ProductIntegrations = ({integrations}: {integrations: any}) => {
   const [showAll, setShowAll] = useState(false);

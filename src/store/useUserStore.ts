@@ -74,6 +74,12 @@ const useUserStore = create<UserState>()(
           set({ token, isLoggedIn: true, isLoading: true });
           try {
             await get().getProfileWithAPI();
+            
+            // Check if user is a pending vendor and automatically show onboarding modal
+            const currentUser = get().user;
+            if (currentUser?.role === 'vendor' && currentUser?.status === 'pending') {
+              get().setShowVendorOnboarding(true);
+            }
           } catch (error) {
             // Token is invalid, clear auth state
             set({ 
@@ -421,6 +427,11 @@ const useUserStore = create<UserState>()(
               isLoading: false,
               error: null,
             });
+            
+            // Check if user is a pending vendor and automatically show onboarding modal
+            if (userInfo.role === 'vendor' && userInfo.status === 'pending') {
+              get().setShowVendorOnboarding(true);
+            }
           } else {
             set({
               isLoading: false,
@@ -450,7 +461,12 @@ const useUserStore = create<UserState>()(
     }),
     {
       name: "user-store",
-      partialize: (state) => ({ token: state.token, user: state.user, isLoggedIn: state.isLoggedIn }),
+      partialize: (state) => ({ 
+        token: state.token, 
+        user: state.user, 
+        isLoggedIn: state.isLoggedIn,
+        showVendorOnboarding: state.showVendorOnboarding 
+      }),
     }
   )
 );

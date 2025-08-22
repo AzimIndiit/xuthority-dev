@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -55,11 +55,27 @@ const VendorOnboardingModal: React.FC<VendorOnboardingModalProps> = ({
   onOpenChange,
 }) => {
   const navigate = useNavigate();
-  const { user } = useUserStore();
+  const { user, showVendorOnboarding, setShowVendorOnboarding } = useUserStore();
   const toast = useToast();
   const updateProfileMutation = useUpdateProfileWithImage();
   const { options: industryOptions } = useIndustryOptions();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check if user is a vendor with pending status
+  const isVendorPending = user?.role === 'vendor' && user?.status === 'pending';
+  
+  // Determine if modal should be open
+  // Modal should be open if:
+  // 1. External isOpen prop is true, OR
+  // 2. User is a pending vendor (for automatic display on page refresh)
+  const shouldShowModal = isOpen || (isVendorPending && showVendorOnboarding);
+
+  // Auto-show modal if user is a pending vendor and modal is not already shown
+  useEffect(() => {
+    if (isVendorPending && !showVendorOnboarding) {
+      setShowVendorOnboarding(true);
+    }
+  }, [isVendorPending, showVendorOnboarding, setShowVendorOnboarding]);
 
   const formMethods = useForm<VendorOnboardingFormData>({
     mode: 'onChange',
@@ -71,6 +87,43 @@ const VendorOnboardingModal: React.FC<VendorOnboardingModalProps> = ({
       companySize: user?.companySize || '',
     },
   });
+
+  // Reset form when modal opens to ensure fresh data
+  useEffect(() => {
+    if (shouldShowModal && user) {
+      formMethods.reset({
+        companyName: user.companyName || '',
+        companyEmail: user.companyEmail || '',
+        industry: user.industry || '',
+        companySize: user.companySize || '',
+      });
+    }
+  }, [shouldShowModal, user, formMethods]);
+
+  // Cleanup effect to ensure modal state is properly managed
+  useEffect(() => {
+    return () => {
+      // If component unmounts and user is no longer pending, close the modal
+      if (!isVendorPending) {
+        setShowVendorOnboarding(false);
+      }
+    };
+  }, [isVendorPending, setShowVendorOnboarding]);
+
+  // Don't render modal if not open
+  if (!shouldShowModal) {
+    return null;
+  }
+  
+  // Additional check to ensure we only show for pending vendors
+  if (!isVendorPending) {
+    // If modal is open but user is not a pending vendor, close it
+    if (onOpenChange) {
+      onOpenChange(false);
+    }
+    setShowVendorOnboarding(false);
+    return null;
+  }
 
   const handleSubmit = async (data: VendorOnboardingFormData) => {
     try {
@@ -118,6 +171,9 @@ const VendorOnboardingModal: React.FC<VendorOnboardingModalProps> = ({
         onOpenChange(false);
       }
       
+      // Also close the internal state
+      setShowVendorOnboarding(false);
+      
       // Navigate after a small delay
       setTimeout(() => {
         navigate('/profile/products/add-product');
@@ -131,35 +187,37 @@ const VendorOnboardingModal: React.FC<VendorOnboardingModalProps> = ({
     }
   };
 
-  // Check if user is a vendor with pending status
-  const isVendorPending = user?.role === 'vendor' && user?.status === 'pending';
-
-  // Don't render modal if not open
-  // When user is not a pending vendor, the modal won't show even if isOpen is true
-  if (!isOpen) {
-    return null;
-  }
-  
-  // Additional check to ensure we only show for pending vendors
-  if (!isVendorPending) {
-    // If modal is open but user is not a pending vendor, close it
-    if (onOpenChange) {
-      onOpenChange(false);
-    }
-    return null;
-  }
   return (
     <Dialog 
-      open={isOpen} 
-      onOpenChange={() => {
+      open={shouldShowModal} 
+      onOpenChange={(open) => {
         // Prevent closing the modal by clicking outside or pressing escape
         // Modal can only be closed by completing the form
+        if (!open) {
+          // If trying to close, only allow it if user is no longer a pending vendor
+          if (!isVendorPending) {
+            if (onOpenChange) {
+              onOpenChange(false);
+            }
+            setShowVendorOnboarding(false);
+          }
+        }
       }}
     >
       <DialogContent 
         className="sm:max-w-lg p-0 rounded-2xl"
-        onPointerDownOutside={(e) => e.preventDefault()}
-        onEscapeKeyDown={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => {
+          // Only prevent closing if user is still pending
+          if (isVendorPending) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          // Only prevent closing if user is still pending
+          if (isVendorPending) {
+            e.preventDefault();
+          }
+        }}
       >
         <div className="p-6 sm:p-8">
           <DialogHeader className="mb-6">

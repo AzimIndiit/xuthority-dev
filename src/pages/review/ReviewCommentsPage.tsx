@@ -587,10 +587,12 @@ console.log(review,'allReplies');
                       <Avatar 
                         className="w-14 h-14 cursor-pointer" 
                         onClick={() => {  
-                          if(reply.author.id !== user?.id){ 
-                            navigate(`/public-profile/${reply.author.slug}`)
+                          // Navigate to profile if the current user is the author, otherwise to public profile
+                          const authorId = reply?.author?._id || reply?.author?.id;
+                          if (authorId && user?.id && authorId === user.id) {
+                            navigate(`/profile`);
                           } else {
-                            navigate(`/profile`)
+                            navigate(`/public-profile/${reply.author.slug}`);
                           }
                         }}
                       >
